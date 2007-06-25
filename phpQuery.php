@@ -10,6 +10,8 @@
  * 
  * @todo rewrite selector explode (support attr values with spaces, dots and xpath queries)
  * @todo comma separated queries
+ * @todo each() should pass DOM node to callback, actually it's stack-history dangerous
+ * @todo _() should accept DOM nodes
  * @todo missing jquery functions (css, wrap, val)
  * @todo docs (copied from jquery)
  * @todo more test cases
@@ -17,8 +19,8 @@
  * @todo charset
  */
 
-class phpQuery implements Iterator {
-	public static $debug = false;
+class phpQueryClass implements Iterator {
+	public static $debug = true;
 	private static $documents = array();
 	private static $lastDocument = null;
 	private $DOM = null;
@@ -26,7 +28,7 @@ class phpQuery implements Iterator {
 	private $stack = array();
 	private $history = array();
 	private $root = array();
-	private $_stack = array();
+	private $interator_stack = array();
 	/**
 	 * Interator helpers
 	 */
@@ -46,7 +48,6 @@ class phpQuery implements Iterator {
 		}
 		$DOM['document']->preserveWhiteSpace = true;
 		$DOM['document']->formatOutput = true;
-		$DOM['nodes'] = array();
 		$DOM['xpath'] = new DOMXPath(
 			$DOM['document']
 		);
@@ -66,7 +67,6 @@ class phpQuery implements Iterator {
 			$path = self::$lastDocument;
 		$this->DOM = self::$documents[ $path ]['document'];
 		$this->XPath = self::$documents[ $path ]['xpath'];
-		$this->nodes = self::$documents[ $path ]['nodes'];
 		$this->root = $this->DOM->documentElement;
 		$this->stackToRoot();
 	}
@@ -153,29 +153,30 @@ class phpQuery implements Iterator {
 		return $selector;
 	}
 	private function matchClasses( $class, $node ) {
-		$class = strpos($class, '.', 1)
-			// multi-class
-			? explode('.', substr($class, 1))
-			// single-class
-			: substr($class, 1);
-		$classCount = is_array( $class )
-			? count( $class )
-			: null;
-		if ( is_array( $class )) {
+		// multi-class
+		if ( strpos($class, '.', 1) ) {
+			$classes = explode('.', substr($class, 1));
+			$classesCount = count( $classes );
 			$nodeClasses = explode(' ', $node->getAttribute('class') );
 			$nodeClassesCount = count( $nodeClasses );
-			if ( $classCount > $nodeClassesCount )
+			if ( $classesCount > $nodeClassesCount )
 				return false;
 			$diff = count(
 				array_diff(
-					$class,
+					$classes,
 					$nodeClasses
 				)
 			);
-			if ( $diff == count($nodeClasses) - count($class) )
+			if (! $diff )
 				return true;
-		} else if ( in_array($class, explode(' ', $node->getAttribute('class') )) )
-			return true;
+		// single-class
+		} else {
+			// strip leading dot
+			$class = substr($class, 1);
+			$nodeClasses = explode(' ', $node->getAttribute('class') );
+			if ( in_array($class, $nodeClasses) )
+				return true;
+		}
 	}
 	public function find( $selectors, $stack = null ) {
 		// backup last stack /for end()/
@@ -287,28 +288,21 @@ class phpQuery implements Iterator {
 			$this->debug("XPATH: {$query}\n");
 			// run query, get elements
 			$nodes = $this->XPath->query($query);
-//			// TEST: keep document nodes in one place
-//			foreach( $nodes as $k => $node ) {
-//				foreach( $this->nodes as $fetchedNode ) {
-//					if ( $node->isSameNode( $fetchedNode ) )
-//						$nodes[$k] = $fetchedNode;
-//					else {
-//						$this->nodes[] = $node;
-//					}
-//				}
-//			}
 			foreach( $nodes as $node ) {
 				$matched = false;
 				if ( $compare ) {
-					self::$debug ? $this->debug("Found: ".$this->whois( $node )) : null;
-					$this->debug("Comparing with {$compare}()");
+					self::$debug ?
+						$this->debug("Found: ".$this->whois( $node ).", comparing with {$compare}()")
+						: null;
 					if ( call_user_method($compare, $this, $selector, $node) )
 						$matched = true;
 				} else {
 					$matched = true;
 				}
 				if ( $matched ) {
-					self::$debug ? $this->debug("Matched: ".$this->whois( $node )) : null;
+					self::$debug
+						? $this->debug("Matched: ".$this->whois( $node ))
+						: null;
 					$stack[] = $node;
 				}
 			}
@@ -525,12 +519,12 @@ class phpQuery implements Iterator {
 
 	public function each($callabck) {
 		$this->history[] = $this->stack;
-		foreach( $this->history[ count( $this->history-1 ) ] as $node ) {
+		foreach( $this->history[ count( $this->history )-1 ] as $node ) {
 			$this->stack = array($node);
-			if ( is_array( $func ) ) {
+			if ( is_array( $callabck ) ) {
 				${$callabck[0]}->{$callabck[1]}( $this );
 			} else {
-				$callabck[1]( $this );
+				$callabck( $this );
 			}
 		}
 		return $this->end();
@@ -892,10 +886,11 @@ class phpQuery implements Iterator {
 	public function attr( $attr, $value = null ) { 
 		foreach( $this->stack as $node ) {
 			if ( $value )
-				return $node->setAttribute($attr, $value);
+				$node->setAttribute($attr, $value);
 			else
 				return $node->getAttribute($attr);
 		}
+		return $this;
 	}
 	
 	public function val( $selector = null ) {
@@ -951,7 +946,7 @@ class phpQuery implements Iterator {
 	 * Result:
 	 * [ <p></p> ]
 	 * 
-	 * @return phpQuery
+	 * @return 
 	 */
 	public function _empty() {
 		foreach( $this->stack as $node ) {
@@ -964,10 +959,12 @@ class phpQuery implements Iterator {
 
 	// INTERATOR INTERFACE
 	public function rewind(){
-		$this->_stack = $this->stack;
+		$this->history[] = $this->stack;
+		$this->interator_stack = $this->stack;
 		$this->valid = isset( $this->stack[0] )
 			? 1
 			: 0;
+		$this->stack = array($this->interator_stack[0]);
 		$this->current = 0;
 	}
 
@@ -981,12 +978,12 @@ class phpQuery implements Iterator {
 
 	public function next(){
 		$this->current++;
-		$this->valid = isset( $this->_stack[ $this->current ] )
+		$this->valid = isset( $this->interator_stack[ $this->current ] )
 			? true
 			: false;
 		if ( $this->valid )
 			$this->stack = array(
-				$this->_stack[ $this->current++ ]
+				$this->interator_stack[ $this->current++ ]
 			);
 	}
 	public function valid(){
@@ -1069,21 +1066,21 @@ class phpQuery implements Iterator {
 	}
 }
 
-function _() {
+function phpQuery() {
 	if (! func_num_args() )
-		return new phpQuery();
+		return new phpQueryClass();
 	$input = func_get_args();
 	// load template file
-	if ( phpQuery::isHTMLfile( $input[0] ) ) {
-		$loaded = phpQuery::load( $input[0] );
-		return new phpQuery();
+	if ( phpQueryClass::isHTMLfile( $input[0] ) ) {
+		$loaded = phpQueryClass::load( $input[0] );
+		return new phpQueryClass();
 	} else if ( is_object($input[0]) && get_class($input[0]) == 'DOMElement' ) {
 		// TODO suppot dom nodes
 	} else {
 		$last = count($input)-1;
-		$PQ = new phpQuery(
+		$PQ = new phpQueryClass(
 			// document path
-			isset( $input[$last] ) && phpQuery::isHTMLfile( $input[$last] )
+			isset( $input[$last] ) && phpQueryClass::isHTMLfile( $input[$last] )
 				? $input[$last]
 				: null
 		);
@@ -1095,10 +1092,17 @@ function _() {
 				$input[0],
 				isset( $input[1] )
 					&& is_object( $input[1] )
-					&& get_class( $input[1] ) == 'phpQuery'
+					&& get_class( $input[1] ) == 'phpQueryClass'
 					? $input[1]
 					: null
 			);
+	}
+}
+
+if (! function_exists('_')) {
+	function _() {
+		$args = func_get_args();
+		return call_user_func_array('phpQuery', $args);
 	}
 }
 ?>

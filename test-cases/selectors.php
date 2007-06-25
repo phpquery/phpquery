@@ -62,6 +62,13 @@ $tests = array(
 			'meta'
 		)
 	),
+	array(
+		"li#testID, div.articles",
+		array(
+			'div.articles',
+			'li#testID'
+		)
+	),
 );
 
 _('test.html');

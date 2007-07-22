@@ -4,155 +4,367 @@
  * phpQuery is chainable DOM selector & manipulator.
  * 
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
- * @link http://wiadomosc.info/plainTemplate
+ * @link http://meta20.net/phpQuery
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.6 beta
+ * @version 0.7 beta
  * 
- * @todo rewrite selector explode (support attr values with spaces, dots and xpath queries)
- * @todo comma separated queries
- * @todo each() should pass DOM node to callback, actually it's stack-history dangerous
- * @todo _() should accept DOM nodes
+ * @todo missing selectors (div + div, div ~ div)
+ * @todo missing pseudo classes (:even, :odd +all form specific)
  * @todo missing jquery functions (css, wrap, val)
  * @todo docs (copied from jquery)
  * @todo more test cases
  * @todo cache (mainly class and regex attrs)
- * @todo charset
+ * @todo check if there is any problem with charset
  */
 
 class phpQueryClass implements Iterator {
-	public static $debug = true;
-	private static $documents = array();
-	private static $lastDocument = null;
-	private $DOM = null;
-	private $XPath = null;
-	private $stack = array();
-	private $history = array();
-	private $root = array();
-	private $interator_stack = array();
+	public static $debug = false;
+	protected static $documents = array();
+	public static $lastDocID = null;
+	public $docID = null;
+	protected $DOM = null;
+	protected $XPath = null;
+	protected $stack = array();
+	protected $history = array();
+	protected $root = array();
+	protected $interator_stack = array();
 	/**
-	 * Interator helpers
+	 * Iterator helpers
 	 */
-	private $valid = false;
-	private $current = null;
+	protected $valid = false;
+	protected $current = null;
 	/**
 	 * Other helpers
 	 */
-	private $regexpChars = array('^','*','$');
+	protected $regexpChars = array('^','*','$');
+	protected $tmpNodes = array();
 
-	public static function load( $path ) {
-		self::$documents[ $path ]['document'] = new DOMDocument();
-		$DOM =& self::$documents[ $path ];
-		if (! $DOM['document']->loadHTMLFile( $path ) ) { 
-			unset( self::$documents[ $path ] );
-			return false;
+	/**
+	 * Multi-purpose function.
+	 * Use phpQuery() or _() as shortcut.
+	 * 
+	 * 1. Create new DOM:
+	 * _('file.htm')
+	 * _('<div/>', true)
+	 * 2. Import HTML:
+	 * _('<div/>')
+	 * 3. Run query:
+	 * _('div.myClass')
+	 * _('div.myClass', 'myFile.htm')
+	 * _('div.myClass', _('div.anotherClass') )
+	 * 
+	 * @return	phpQueryClass|false			phpQueryClass object or false in case of error.
+	 */
+	public static function phpQuery() {
+		$input = func_get_args();
+		/**
+		 * Create new DOM:
+		 * _('file.htm')
+		 * _('<div/>', true)
+		 */
+		if ( ($isHTMLfile = self::isHTMLfile($input[0])) || ( isset($input[1]) && self::isHTML($input[0]) && $input[1] )) {
+			// set document ID
+			$ID = $isHTMLfile
+				? $input[0]
+				: md5(microtime());
+			// check if already loaded
+			if ( $isHTMLfile && isset( self::$documents[ $ID ] ) )
+				return new phpQueryClass($ID);
+			// create document
+			self::$documents[ $ID ]['document'] = new DOMDocument();
+			$DOM =& self::$documents[ $ID ];
+			// load
+			$isLoaded = $isHTMLfile
+				? $DOM['document']->loadHTMLFile($ID)
+				: $DOM['document']->loadHTML($input[0]);
+			if (! $isLoaded ) {
+				throw new Exception("Can't load '{$ID}'");
+				return false;
+			}
+			$DOM['document']->preserveWhiteSpace = true;
+			$DOM['document']->formatOutput = true;
+			$DOM['xpath'] = new DOMXPath(
+				$DOM['document']
+			);
+			// remember last document
+			self::$lastDocID = $ID;
+			// we ready to create object
+			return new phpQueryClass($ID);
+		} else if ( is_object($input[0]) && get_class($input[0]) == 'DOMElement' ) {
+			throw new Exception('DOM nodes not supported');
+		/**
+		 * Import HTML:
+		 * _('<div/>')
+		 */
+		} else if ( self::isHTML($input[0]) ) {
+			$phpQuery = new phpQueryClass(self::$lastDocID);
+			return $phpQuery->importHTML( $input[0] );
+		/**
+		 * Run query:
+		 * _('div.myClass')
+		 * _('div.myClass', 'myFile.htm')
+		 * _('div.myClass', _('div.anotherClass') )
+		 */
+		} else {
+			$last = count($input)-1;
+			$ID = isset( $input[$last] ) && self::isHTMLfile( $input[$last] )
+				? $input[$last]
+				: self::$lastDocID;
+			$phpQuery = new phpQueryClass($ID);
+			return $phpQuery->find(
+				$input[0],
+				isset( $input[1] )
+				&& is_object( $input[1] )
+				&& is_a( $input[1], 'phpQueryClass')
+					? $input[1]
+					: null
+			);
 		}
-		$DOM['document']->preserveWhiteSpace = true;
-		$DOM['document']->formatOutput = true;
-		$DOM['xpath'] = new DOMXPath(
-			$DOM['document']
-		);
-		self::$lastDocument = $path;
-		return true;
 	}
-	public static function unload( $path = null ) {
+	public function getDocID() {
+		return $this->docID;
+	}
+	public function unload() {
+		unset( self::$documents[ $this->docID ] );
+	}
+	public static function unloadDocuments( $path = null ) {
 		if ( $path )
 			unset( self::$documents[ $path ] );
 		else
 			unset( self::$documents );
 	}
-	public function __construct( $path = null ) {
-		if ( $path )
-			self::load($path);
-		else
-			$path = self::$lastDocument;
-		$this->DOM = self::$documents[ $path ]['document'];
-		$this->XPath = self::$documents[ $path ]['xpath'];
+	public function __construct($docPath) {
+		if (! isset(self::$documents[ $docPath ] ) ) {
+			throw new Exception("Doc path '{$docPath}' isn't loaded.");
+			return;
+		}
+		$this->docID = $docPath;
+		$this->DOM = self::$documents[ $docPath ]['document'];
+		$this->XPath = self::$documents[ $docPath ]['xpath'];
 		$this->root = $this->DOM->documentElement;
-		$this->stackToRoot();
+		$this->findRoot();
 	}
-	private function debug($in) {
+	protected function debug($in) {
 		if (! self::$debug )
 			return;
 		print('<pre>');
 		print_r($in);
-	//	if ( is_array($in))
-	//		print_r(array_slice(debug_backtrace(), 3));
-		print('</pre>');
+		// file debug
+//		file_put_contents(dirname(__FILE__).'/phpQuery.log', print_r($in, true)."\n", FILE_APPEND);
+		// quite handy debug trace
+//		if ( is_array($in))
+//			print_r(array_slice(debug_backtrace(), 3));
+		print("</pre>\n");
 	}
-	private function stackToRoot() {
+	public function findRoot() {
 		$this->stack = array( $this->DOM->documentElement );
+		return $this;
 	}
-	private function isRegexp($pattern) {
+	protected function isRegexp($pattern) {
 		return in_array(
 			$pattern[ strlen($pattern)-1 ],
 			$this->regexpChars
 		);
 	}
-	public static function isHTMLfile( $filename ) {
+	protected static function isHTMLfile( $filename ) {
 		return is_string($filename) && (
 			substr( $filename, -5 ) == '.html'
 				||
 			substr( $filename, -4 ) == '.htm'
 		);
 	}
-	private function parseSelectors( $selectors ) {
-		$return = array();
-		foreach( split(',', $selectors) as $parse ) {
-			// clean spaces
-			$parse = trim(
-				preg_replace('@\s+@', ' ',
-					str_replace('>', ' > ', $parse)
-				)
-			);
-			$elements = array();
-			// TODO: realy parsing of selector
-			foreach( split(' ', $parse) as $s ) {
-				if ( $elements && $elements[ count($elements)-1 ] != '>' && $s != '>' )
-					$elements[] = ' ';
-				$elements = array_merge(
-					$elements,
-					$this->parseSimpleSelector( $s )
-				);
-			}
-			if ( isset($elements[0]) && $elements[0] != '>' )
-				array_unshift($elements, ' ');
-			$return[] = $elements;
-			$this->debug(array('SELECTOR',$parse,$elements));
-		}
-		return $return;
+	/**
+	 * Determines if $char is really a char.
+	 *
+	 * @param string $char
+	 * @return bool
+	 * @todo rewrite me to charcode ! ;)
+	 */
+	protected function isChar($char) {
+		return preg_match('/\w/', $char);
 	}
+//	protected function parseSelector( $selectors ) {
+//		$return = array();
+//		foreach( split(',', $selectors) as $parse ) {
+//			// clean spaces
+//			$parse = trim(
+//				preg_replace('@\s+@', ' ',
+//					str_replace('>', ' > ', $parse)
+//				)
+//			);
+//			$elements = array();
+//			// TODO: realy parsing of selector
+//			foreach( split(' ', $parse) as $s ) {
+//				if ( $elements && $elements[ count($elements)-1 ] != '>' && $s != '>' )
+//					$elements[] = ' ';
+//				$elements = array_merge(
+//					$elements,
+//					$this->parseSimpleSelector( $s )
+//				);
+//			}
+//			if ( isset($elements[0]) && $elements[0] != '>' )
+//				array_unshift($elements, ' ');
+//			$return[] = $elements;
+//			$this->debug(array('SELECTOR',$parse,$elements));
+//		}
+//		return $return;
+//	}
 	// tag.class1.class2[@attr]:checkbox
-	private function parseSimpleSelector( $s ) {
-		$selector = array();
-		$match = preg_split(
-			'@(\\.|#|\\[|:)@',
-			$s, null,
-			PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY
+//	protected function parseSimpleSelector( $s ) {-
+//		$selector = array();
+//		$match = preg_split(
+//			'@(\\.|#|\\[|:)@',
+//			$s, null,
+//			PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY
+//		);
+//		// tag present
+//		if ( count( $match ) % 2 == 1 )
+//			array_unshift($match, '');
+//		for( $i = 0; $i < count( $match )-1; $i = $i+2 ) {
+//			// join classes, args and pseudo-selectors
+//			$append = (
+//				$selector
+//				&& (
+//					$match[ $i ][0] == '.'
+//					||
+//					$match[ $i ][0] == '['
+//					||
+//					$match[ $i ][0] == ':'
+//				) &&
+//				$selector[ count($selector)-1 ][0] == $match[ $i ][0]
+//			);
+//			if ( $append )
+//				$selector[ count($selector)-1 ] .= $match[ $i ].$match[ $i+1 ];
+//			else
+//				$selector[] = $match[ $i ].$match[ $i+1 ];
+//		}
+//		return $selector;
+//	}
+	protected function parseSelector( $query ) {
+		// clean spaces
+		// TODO include this inside parsing
+		$query = trim(
+			preg_replace('@\s+@', ' ',
+				preg_replace('@\s*(>|\\+|~)\s*@', '\\1', $query)
+			)
 		);
-		// tag present
-		if ( count( $match ) % 2 == 1 )
-			array_unshift($match, '');
-		for( $i = 0; $i < count( $match )-1; $i = $i+2 ) {
-			// join classes, args and pseudo-selectors
-			$append = (
-				$selector
-				&& (
-					$match[ $i ][0] == '.'
-					||
-					$match[ $i ][0] == '['
-					||
-					$match[ $i ][0] == ':'
-				) &&
-				$selector[ count($selector)-1 ][0] == $match[ $i ][0]
-			);
-			if ( $append )
-				$selector[ count($selector)-1 ] .= $match[ $i ].$match[ $i+1 ];
-			else
-				$selector[] = $match[ $i ].$match[ $i+1 ];
+		$queries = array(array());
+		$return =& $queries[0];
+		$specialChars = array('>','+','~',' ');
+		$specialCharsMapping = array('/' => '>');
+		$strlen = strlen($query);
+		$classChars = array('.', '-');
+		$pseudoChars = array('-');
+		// it works, but i dont like it...
+		$i = 0;
+		while( $i < $strlen) {
+			$c = $query[$i];
+			$tmp = '';
+			// TAG
+			if ( $this->isChar($c) || $c == '*' ) {
+				while( isset($query[$i]) && ($this->isChar($query[$i]) || $query[$i] == '*')) {
+					$tmp .= $query[$i];
+					$i++;
+				}
+				$return[] = $tmp;
+			// IDs
+			} else if ( $c == '#' ) {
+				$i++;
+				while( isset($query[$i]) && $this->isChar($query[$i])) {
+					$tmp .= $query[$i];
+					$i++;
+				}
+				$return[] = '#'.$tmp;
+			// SPECIAL CHARS
+			// todo znaki specjalne sie wykluczaja miedzy tagami (trimowac)
+			// np 'tag + tag2' da w wyniku [tag, ,+, ,tag2] a to zle ;]
+			} else if (in_array($c, $specialChars)) {
+				$return[] = $c;
+				$i++;
+			// MAPPED SPECIAL MULTICHARS
+			} else if ( $c.$query[$i+1] == '//' ) {
+				$return[] = ' ';
+				$i = $i+2;
+			// MAPPED SPECIAL CHARS
+			} else if ( isset($specialCharsMapping[$c]) ) {
+				$return[] = $specialCharsMapping[$c];
+				$i++;
+			// COMMA
+			} else if ( $c == ',' ) {
+				$queries[] = array();
+				$return =& $queries[ count($queries)-1 ];
+				$i++;
+				while( isset($query[$i]) && $query[$i] == ' ')
+					$i++;
+			// CLASSES
+			} else if ($c == '.') {
+				while( isset($query[$i]) && ($this->isChar($query[$i]) || in_array($query[$i], $classChars))) {
+					$tmp .= $query[$i];
+					$i++;
+				}
+				$return[] = $tmp;
+			// ATTRS & NESTED XPATH
+			} else if ($c == '[') {
+				$stack = 1;
+				$tmp .= $c;
+				while( isset($query[++$i]) ) {
+					$tmp .= $query[$i];
+					if ( $query[$i] == '[' ) {
+						$stack++;
+					} else if ( $query[$i] == ']' ) {
+						$stack--;
+						if (! $stack )
+							break;
+					}
+				}
+				$return[] = $tmp;
+				$i++;
+			// PSEUDO CLASSES
+			} else if ($c == ':') {
+				$stack = 1;
+				$tmp .= $query[$i++];
+				while( isset($query[$i]) && ($this->isChar($query[$i]) || in_array($query[$i], $pseudoChars))) {
+					$tmp .= $query[$i];
+					$i++;
+				}
+				// with arguments ?
+				if ( isset($query[$i]) && $query[$i] == '(' ) {
+					$tmp .= $query[$i];
+					$stack = 1;
+					while( isset($query[++$i]) ) {
+						$tmp .= $query[$i];
+						if ( $query[$i] == '(' ) {
+							$stack++;
+						} else if ( $query[$i] == ')' ) {
+							$stack--;
+							if (! $stack )
+								break;
+						}
+					}
+					$return[] = $tmp;
+					$i++;
+				} else {
+					$return[] = $tmp;
+				}
+			} else {
+				$i++;
+			}
 		}
-		return $selector;
+		foreach($queries as $k =>$q ) {
+			if ( isset($q[0]) && $q[0] != '>' )
+				array_unshift($queries[$k], ' ');
+		}
+		return $queries;
 	}
-	private function matchClasses( $class, $node ) {
+	protected function newInstance() {
+		$new = new phpQueryClass($this->docID);
+		$new->history = $this->history;
+		$new->stack = $this->stack;
+		$this->stack = array_pop($this->history);
+		return $new;
+	}
+	
+	protected function matchClasses( $class, $node ) {
 		// multi-class
 		if ( strpos($class, '.', 1) ) {
 			$classes = explode('.', substr($class, 1));
@@ -178,100 +390,7 @@ class phpQueryClass implements Iterator {
 				return true;
 		}
 	}
-	public function find( $selectors, $stack = null ) {
-		// backup last stack /for end()/
-		$this->history[] = $this->stack;
-		if ( $stack && get_class($stack) == get_class($this) )
-			$this->stack = $stack;
-		$spaceBefore = false;
-		$XQuery = '';
-		foreach( $this->parseSelectors( $selectors ) as $selector ) {
-			foreach( $selector as $s ) {
-				if ( preg_match('@^\w+$@', $s) || $s == '*' ) {
-					// tag
-					$XQuery .= $s;
-				} else if ( $s[0] == '#' ) {
-					// id
-					if ( $spaceBefore )
-						$XQuery .= '*';
-					$XQuery .= "[@id='".substr($s, 1)."']";
-				} else if ( $s[0] == '[' ) {
-					// attributes and nests
-					if ( $spaceBefore )
-						$XQuery .= '*';
-					// strip side brackets
-					$attrs = explode('][', trim($s, '[]'));
-					$execute = false;
-					foreach( $attrs as $attr ) {
-						if ( $attr[0] == '@' ) {
-							// attr with specifed value
-							if ( strpos( $attr, '=' ) ) {
-								list( $attr, $value ) = explode('=', $attr);
-								$value = trim($value, "'\"'");
-								if ( $this->isRegexp($attr) ) {
-									// cut regexp character
-									$attr = substr($attr, 0, -1);
-									$execute = true;
-									$XQuery .= "[{$attr}]";
-								} else {
-									$XQuery .= "[{$attr}='{$value}']";
-								}
-							// attr without specified value
-							} else {
-								$XQuery .= "[{$attr}]";
-							}
-						// TODO nested xpath
-						} else {
-						}
-					}
-					if ( $execute ) {
-						$this->runQuery($XQuery, $s, 'is');
-						$XQuery = '';
-						if (! $this->length() )
-							return $this;
-					}
-				} else if ( $s[0] == '.' ) {
-					// class(es)
-					if ( $spaceBefore )
-						$XQuery .= '*';
-					$XQuery .= '[@class]';
-					$this->runQuery($XQuery, $s, 'matchClasses');
-					$XQuery = '';
-					if (! $this->length() )
-						return $this;
-				} else if ( $s[0] == ':' ) {
-					// pseudo classes
-					// TODO optimization for :first :last
-					$this->runQuery($XQuery);
-					$XQuery = '';
-					if (! $this->length() )
-						return $this;
-					$this->filterPseudoClasses( $s );
-					if (! $this->length() )
-						return $this;
-				} else if ( $s == '>' ) {
-					// direct descendant
-					$XQuery .= '/';
-				} else {
-					$XQuery .= '//';
-				}
-				if ( $s == ' ' )
-					$spaceBefore = true;
-				else
-					$spaceBefore = false;
-			}
-			// run query if any
-			if ( $XQuery ) {
-				$this->runQuery($XQuery);
-				$XQuery = '';
-				if (! $this->length() )
-					return $this;
-			}
-		}
-		// preserve chain
-		return $this;
-	}
-	private function runQuery( $XQuery, $selector = null, $compare = null ) {
+	protected function runQuery( $XQuery, $selector = null, $compare = null ) {
 		if ( $compare && ! method_exists($this, $compare) )
 			return false;
 		$stack = array();
@@ -279,15 +398,20 @@ class phpQueryClass implements Iterator {
 			$this->debug('Stack empty, skipping...');
 		foreach( $this->stack as $k => $stackNode ) {
 			$remove = false;
+			// to work on detached nodes we need temporary place them somewhere
+			// thats because context xpath queries sucks ;]
 			if (! $stackNode->parentNode && ! $this->isRoot($stackNode) ) {
 				$this->root->appendChild($stackNode);
 				$remove = true;
 			}
 			$xpath = $this->getNodeXpath($stackNode);
 			$query = $xpath.$XQuery;
-			$this->debug("XPATH: {$query}\n");
+			$this->debug("XPATH: {$query}");
 			// run query, get elements
 			$nodes = $this->XPath->query($query);
+			$this->debug("QUERY FETCHED");
+			if (! $nodes->length )
+				$this->debug('Nothing found');
 			foreach( $nodes as $node ) {
 				$matched = false;
 				if ( $compare ) {
@@ -311,58 +435,183 @@ class phpQueryClass implements Iterator {
 		}
 		$this->stack = $stack;
 	}
+	public function find( $selectors, $context = null ) {
+		// backup last stack /for end()/
+		$this->history[] = $this->stack;
+		// allow to define context
+		if ( $context && is_a($context, get_class($this)) )
+			$this->stack = $context->stack;
+		$spaceBefore = false;
+		$queries = $this->parseSelector( $selectors );
+		$this->debug(array('FIND',$selectors,$queries));
+		$XQuery = '';
+		// remember stack state because of multi-queries
+		$oldStack = $this->stack;
+		// here will be kept found elements
+		$stack = array();
+		foreach( $queries as $selector ) {
+			$this->stack = $oldStack;
+			foreach( $selector as $s ) {
+				// TAG
+				if ( preg_match('@^\w+$@', $s) || $s == '*' ) {
+					$XQuery .= $s;
+				} else if ( $s[0] == '#' ) {
+					// id
+					if ( $spaceBefore )
+						$XQuery .= '*';
+					$XQuery .= "[@id='".substr($s, 1)."']";
+				// ATTRIBUTES
+				} else if ( isset($s[1]) && $s[0].$s[1] == '[@' ) {
+					if ( $spaceBefore )
+						$XQuery .= '*';
+					// strip side brackets
+					$attr = trim($s, '][');
+					$execute = false;
+					// attr with specifed value
+					if ( strpos( $s, '=' ) ) {
+						list( $attr, $value ) = explode('=', $attr);
+						$value = trim($value, "'\"'");
+						if ( $this->isRegexp($attr) ) {
+							// cut regexp character
+							$attr = substr($attr, 0, -1);
+							$execute = true;
+							$XQuery .= "[{$attr}]";
+						} else {
+							$XQuery .= "[{$attr}='{$value}']";
+						}
+					// attr without specified value
+					} else {
+						$XQuery .= "[{$attr}]";
+					}
+					if ( $execute ) {
+						$this->runQuery($XQuery, $s, 'is');
+						$XQuery = '';
+						if (! $this->length() )
+							break;
+					}
+				// NESTED XPATH
+				} else if ( $s[0] == '[' ) {
+					if ( $XQuery && $XQuery != '//' ) {
+						$this->runQuery($XQuery);
+						$XQuery = '';
+						if (! $this->length() )
+							break;
+					}
+					// strip side brackets
+					$x = substr($s, 1, -1);
+					$this->stack = $this->find($x)->stack;
+				// CLASSES
+				} else if ( $s[0] == '.' ) {
+					if ( $spaceBefore )
+						$XQuery .= '*';
+					$XQuery .= '[@class]';
+					$this->runQuery($XQuery, $s, 'matchClasses');
+					$XQuery = '';
+					if (! $this->length() )
+						break;
+				// PSEUDO CLASSES
+				} else if ( $s[0] == ':' ) {
+					// TODO optimization for :first :last
+					if ( $XQuery ) {
+						$this->runQuery($XQuery);
+						$XQuery = '';
+					}
+					if (! $this->length() )
+						break;
+					$this->filterPseudoClasses( $s );
+					if (! $this->length() )
+						break;
+				} else if ( $s == '>' ) {
+					// direct descendant
+					$XQuery .= '/';
+				} else {
+					$XQuery .= '//';
+				}
+				if ( $s == ' ' )
+					$spaceBefore = true;
+				else
+					$spaceBefore = false;
+			}
+			// run query if any
+			if ( $XQuery && $XQuery != '//' ) {
+				$this->runQuery($XQuery);
+				$XQuery = '';
+				if (! $this->length() )
+					break;
+			}
+			foreach( $this->stack as $node )
+				if (! $this->stackContains($node, $stack) )
+					$stack[] = $node;
+		}
+		$this->stack = $stack;
+		return $this->newInstance();
+	}
 	
-	public function filterPseudoClasses( $classes ) {
-		foreach( explode(':', substr($classes, 1)) as $class ) {
-			// TODO clean args parsing
-			$haveArgs = strpos($class, '(');
-			if ( $haveArgs !== false ) {
-				$args = substr($class, $haveArgs+1, -1);
-				$class = substr($class, 0, $haveArgs);
-			}
-			switch( $class ) {
-				case 'even':
-				case 'odd':
-					$stack = array();
-					foreach( $this->stack as $i => $node ) {
-						if ( $class == 'even' && $i % 2 == 0 )
-							$stack[] = $node;
-						else if ( $class == 'odd' && $i % 2 )
-							$stack[] = $node;
-					}
-					$this->stack = $stack;
-					break;
-				case 'eq':
-					$this->stack = isset( $this->stack[ intval($args) ] )
-						? array( $this->stack[ $args ] )
-						: array();
-					break;
-				case 'gt':
-					$this->stack = array_slice($this->stack, $args+1);
-					break;
-				case 'lt':
-					$this->stack = array_slice($this->stack, 0, $args+1);
-					break;
-				case 'first':
-					if ( isset( $this->stack[0] ) )
-						$this->stack = array( $this->stack[0] );
-					break;
-				case 'last':
-					if ( $this->stack )
-						$this->stack = array( $this->stack[ count($this->stack)-1 ] );
-					break;
-				case 'parent':
-					$stack = array();
-					foreach( $this->stack as $node ) {
-						if ( $node->childNodes->length )
-							$stack = $node;
-					}
-					$this->stack = $stack;
-					break;
-				case 'contains':
-					$this->contains( trim($args, "\"'"), false );
-					break;
-			}
+	/**
+	 * @todo create API for classes with pseudoselectors
+	 */
+	protected function filterPseudoClasses( $class ) {
+		// TODO clean args parsing ?
+		$class = trim($class, ':');
+		$haveArgs = strpos($class, '(');
+		if ( $haveArgs !== false ) {
+			$args = substr($class, $haveArgs+1, -1);
+			$class = substr($class, 0, $haveArgs);
+		}
+		switch( $class ) {
+			case 'even':
+			case 'odd':
+				$stack = array();
+				foreach( $this->stack as $i => $node ) {
+					if ( $class == 'even' && $i % 2 == 0 )
+						$stack[] = $node;
+					else if ( $class == 'odd' && $i % 2 )
+						$stack[] = $node;
+				}
+				$this->stack = $stack;
+				break;
+			case 'eq':
+				$k = intval($args);
+				$this->stack = isset( $this->stack[$k] )
+					? array( $this->stack[$k] )
+					: array();
+				break;
+			case 'gt':
+				$this->stack = array_slice($this->stack, $args+1);
+				break;
+			case 'lt':
+				$this->stack = array_slice($this->stack, 0, $args+1);
+				break;
+			case 'first':
+				if ( isset( $this->stack[0] ) )
+					$this->stack = array( $this->stack[0] );
+				break;
+			case 'last':
+				if ( $this->stack )
+					$this->stack = array( $this->stack[ count($this->stack)-1 ] );
+				break;
+			case 'parent':
+				$stack = array();
+				foreach( $this->stack as $node ) {
+					if ( $node->childNodes->length )
+						$stack = $node;
+				}
+				$this->stack = $stack;
+				break;
+			case 'contains':
+				$this->contains( trim($args, "\"'"), false );
+				break;
+			case 'not':
+				$query = trim($args, "\"'");
+				$stack = $this->stack;
+				$newStack = array();
+				foreach( $stack as $node ) {
+					$this->stack = array($node);
+					if (! $this->is($query) )
+						$newStack[] = $node;
+				}
+				$this->stack = $newStack;
+				break;
 		}
 	}
 	public function is( $selector, $_node = null ) {
@@ -375,86 +624,102 @@ class phpQueryClass implements Iterator {
 		return $match;
 	}
 	
-	public function filter( $selector, $_skipHistory = false ) {
+	public function filter( $selectors, $_skipHistory = false ) {
 		if (! $_skipHistory )
 			$this->history[] = $this->stack;
-		$selector = $this->parseSimpleSelector( $selector );
+		$selectors = $this->parseSelector( $selectors );
 		$stack = array();
-		foreach( $this->stack as $k => $node ) { 
-			foreach( $selector as $s ) {
-				switch( $s[0] ) {
-					case '#':
-						if ( $node->getAttribute('id') != $val )
-							$stack[] = $node;
-						break;
-					case '.':
-						if ( $this->matchClasses( $s, $node ) )
-							$stack[] = $node;
-						break;
-					case '[':
-						foreach( explode( '][', trim($s, '[]') ) as $attr ) {
-							// attrs
-							if ( $attr[0] == '@' ) {
-								// cut-da-monkey ;)
-								$attr = substr($attr, 1);
-								if ( strpos($attr, '=') ) {
-									list( $attr, $val ) = explode('=', $attr);
-									if ( $this->isRegexp($attr)) {
-										// switch last character
-										switch( substr($attr, -1) ) {
-											case '^':
-												$pattern = '^'.preg_quote($val, '@');
-												break;
-											case '*':
-												$pattern = '.*'.preg_quote($val, '@').'.*';
-												break;
-											case '$':
-												$pattern = preg_quote($val, '@').'$';
-												break;
-										}
-										// cut last character
-										$attr = substr($attr, 0, -1);
-										if ( preg_match("@{$pattern}@", $node->getAttribute($attr)))
-											$stack[] = $node;
-									} else if ( $node->getAttribute($attr) == $val )
-										$stack[] = $node;
-								} else if ( $node->hasAttribute($attr) )
-									$stack[] = $node;
-							// nested xpath
-							} else {
-								// TODO
-							}
+		foreach ( $selectors as $selector ) {
+			// PER NODE selector chunks
+			foreach( $this->stack as $node ) {
+				$break = false;
+				foreach( $selector as $s ) {
+					// ID
+					if ( $s[0] == '#' ) {
+						if ( $node->getAttribute('id') != substr($s, 1) )
+							$break = true;
+					// CLASSES
+					} else if ( $s[0] == '.' ) {
+						if (! $this->matchClasses( $s, $node ) )
+							$break = true;
+					// ATTRS
+					} else if ( isset($s[1]) && $s[0].$s[1] == '[@' ) {
+						// strip side brackets and @
+						$attr = substr($s, 2, -1);
+						if ( strpos($attr, '=') ) {
+							list( $attr, $val ) = explode('=', $attr);
+							if ( $this->isRegexp($attr)) {
+								// switch last character
+								switch( substr($attr, -1) ) {
+									case '^':
+										$pattern = '^'.preg_quote($val, '@');
+										break;
+									case '*':
+										$pattern = '.*'.preg_quote($val, '@').'.*';
+										break;
+									case '$':
+										$pattern = preg_quote($val, '@').'$';
+										break;
+								}
+								// cut last character
+								$attr = substr($attr, 0, -1);
+								if (! preg_match("@{$pattern}@", $node->getAttribute($attr)))
+									$break = true;
+							} else if ( $node->getAttribute($attr) != $val )
+								$break = true;
+						} else if (! $node->hasAttribute($attr) )
+							$break = true;
+					// PSEUDO CLASSES
+					} else if ( $s[0] == ':' ) {
+						// skip
+					// NESTED XPATH
+					} else if ( $s[0] == '[' ) {
+						// strip side brackets
+						$x = substr($s, 1, -1);
+						$oldStack = $this->stack;
+						$this->stack = array($node);
+						$pass = $this->find( $x )->size();
+						$this->stack = $oldStack;
+						if (! $pass )
+							$break = true;
+					// TAG
+					} else if ( trim($s) ) {
+						if ( $s != '*' ) {
+							if ( isset($node->tagName) ) {
+								if ( $node->tagName != $s )
+									$break = true;
+							} else if ( $s == 'html' && ! $this->isRoot($node) )
+								$break = true;
 						}
+					}
+					if ( $break )
 						break;
-					case ':':
-						// at the end of function
-						break;
-					default:
-						// tag
-						if ( isset($node->tagName) ) {
-							if ( $node->tagName == $s )
-								$stack[] = $node;
-						} else if ( $s == 'html' && $this->isRoot($node) )
-							$stack[] = $node;
 				}
+				// if element passed all chunks of selector - add it to new stack
+				if (! $break )
+					$stack[] = $node;
 			}
+			$this->stack = $stack;
+			// PER ALL NODES selector chunks
+			foreach($selector as $s)
+				// PSEUDO CLASSES
+				if ( $s[0] == ':' )
+					$this->filterPseudoClasses($s);
 		}
-		$this->stack = $stack;
-		// pseudoclasses
-		if ( $selector[ count($selector)-1 ][0] == ':' )
-			$this->filterPseudoClasses( $selector[ count($selector)-1 ] );
-		return $this;
+		return $_skipHistory
+			? $this
+			: $this->newInstance();
 	}
 	
-	private function isRoot( $node ) {
-		return get_class($node) == 'DOMDocument';
+	protected function isRoot( $node ) {
+		return is_a($node, 'DOMDocument') || $node->tagName == 'html';
 	}
 
 	public function css() {
 		// TODO
 	}
 	
-	private function importHTML($html) {
+	protected function importHTML($html) {
 		$this->history[] = $this->stack;
 		$this->stack = array();
 		$DOM = new DOMDocument();
@@ -486,13 +751,13 @@ class phpQueryClass implements Iterator {
 	public function gt($num) {
 		$this->history[] = $this->stack;
 		$this->stack = array_slice( $this->stack, $num+1 );
-		return $this;
+		return $this->newInstance();
 	}
 
 	public function lt($num) {
 		$this->history[] = $this->stack;
 		$this->stack = array_slice( $this->stack, 0, $num+1 );
-		return $this;
+		return $this->newInstance();
 	}
 
 	public function eq($num) {
@@ -501,7 +766,7 @@ class phpQueryClass implements Iterator {
 		$this->stack = array();
 		if ( isset($oldStack[$num]) )
 			$this->stack[] = $oldStack[$num];
-		return $this;
+		return $this->newInstance();
 	}
 
 	public function size() {
@@ -522,12 +787,15 @@ class phpQueryClass implements Iterator {
 		foreach( $this->history[ count( $this->history )-1 ] as $node ) {
 			$this->stack = array($node);
 			if ( is_array( $callabck ) ) {
-				${$callabck[0]}->{$callabck[1]}( $this );
+				if ( is_object( $callabck[0] ) )
+					$callabck[0]->{$callabck[1]}( $this->newInstance() );
+				else
+					eval("{$callabck[0]}::{$callabck[1]}( \$this->newInstance() );");
 			} else {
-				$callabck( $this );
+				$callabck( $this->newInstance() );
 			}
 		}
-		return $this->end();
+		return $this;
 	}
 
 	public function _clone() {
@@ -550,27 +818,27 @@ class phpQueryClass implements Iterator {
 		return $this;
 	}
 
-	private function isHTML( $html ) {
+	protected function isHTML( $html ) {
 		return substr(trim($html), 0, 1) == '<';
 	}
 
 	public function html($html = null) {
-		if ( $html ) {
+		if (! is_null($html) ) {
+			$this->debug("Inserting data with 'html'");
 			if ( $this->isHTML( $html ) ) {
 				$toInserts = array();
 				$DOM = new DOMDocument();
 				@$DOM->loadHTML( $html );
 				foreach($DOM->documentElement->firstChild->childNodes as $node)
 					$toInserts[] = $this->DOM->importNode( $node, true );
-			//	$toInserts = array_reverse( $toInserts );
 			} else {
 				$toInserts = array($this->DOM->createTextNode( $html ));
 			}
 			$this->_empty();
 			// i dont like brackets ! python rules ! ;)
 			foreach( $toInserts as $toInsert )
-				foreach( $this->stack as $k => $node )
-					$node->appendChild( $k
+				foreach( $this->stack as $alreadyAdded => $node )
+					$node->appendChild( $alreadyAdded
 						? $toInsert->cloneNode()
 						: $toInsert
 					);
@@ -580,13 +848,27 @@ class phpQueryClass implements Iterator {
 				return $this->DOM->saveHTML();
 			$DOM = new DOMDocument();
 			foreach( $this->stack as $node ) {
-				$DOM->appendChild(
-					$DOM->importNode( $node, true )
-				);
+				foreach( $node->childNodes as $child ) {
+					$DOM->appendChild(
+						$DOM->importNode( $child, true )
+					);
+				}
 			}
 			$DOM->formatOutput = true;
 			return $DOM->saveHTML();
 		}
+	}
+	public function htmlWithTag() {
+		if ( $this->length() == 1 && $this->isRoot( $this->stack[0] ) )
+			return $this->DOM->saveHTML();
+		$DOM = new DOMDocument();
+		foreach( $this->stack as $node ) {
+			$DOM->appendChild(
+				$DOM->importNode( $node, true )
+			);
+		}
+		$DOM->formatOutput = true;
+		return $DOM->saveHTML();
 	}
 	public function __toString() {
 		return $this->html();
@@ -604,11 +886,11 @@ class phpQueryClass implements Iterator {
 	 * @param string	Valid PHP Code
 	 */
 	public function phpMeta($selector, $code) {
-		return $this->find($selector)
-			->php($code)
-			->end();
+		$this->find($selector)
+			->php($code);
+		return $this;
 	}
-	private function dumpHistory($when) {
+	protected function dumpHistory($when) {
 		foreach( $this->history as $nodes ) {
 			$history[] = array();
 			foreach( $nodes as $node ) {
@@ -627,10 +909,10 @@ class phpQueryClass implements Iterator {
 			}
 		}
 		$this->history[] = $this->stack;
-		$this->stack = $tack;
-		return $this;
+		$this->stack = $stack;
+		return $this->newInstance();
 	}
-	public function ancestors( $selector ) {
+	public function ancestors( $selector = null ) {
 		return $this->children( $selector );
 	}
 	
@@ -673,7 +955,8 @@ class phpQueryClass implements Iterator {
 	public function insertAfter( $seletor ) {
 		return $this->insert($seletor, __FUNCTION__);
 	}
-	private function insert( $target, $type ) {
+	protected function insert( $target, $type ) {
+		$this->debug("Inserting data with '{$type}'");
 		$to = false;
 		switch( $type ) {
 			case 'appendTo':
@@ -685,26 +968,39 @@ class phpQueryClass implements Iterator {
 		switch(gettype( $target )) {
 			case 'string':
 				if ( $to ) {
-					//$this->dumpHistory('appendTo');
-					$oldStack = $this->stack;
-					$historyCount = count( $this->history );
-					$this->stack = array( $this->root );
-					$this->find($target);
-					$insertTo = $this->stack;
-					$this->stack = $oldStack;
 					$insertFrom = $this->stack;
-					if ( count( $this->history ) > $historyCount )
-						$this->history = array_slice( $this->history, 0, $historyCount );
-					//$this->dumpHistory('appendTo-END');
-				} else {
-					$insertTo = $this->stack;
+					// insert into created element
 					if ( $this->isHTML( $target ) ) {
 						$DOM = new DOMDocument();
 						@$DOM->loadHTML($target);
+						$i = count($this->tmpNodes);
+						$this->tmpNodes[] = array();
 						foreach($DOM->documentElement->firstChild->childNodes as $node) {
-							$insertFrom[] = $this->DOM->importNode( $node, true );
+							$this->tmpNodes[$i][] = $this->DOM->importNode( $node, true );
 						}
-						$insertFrom = array_reverse($insertFrom);
+						// XXX needed ?!
+					//	$this->tmpNodes[$i] = array_reverse($this->tmpNodes[$i]);
+						$insertTo =& $this->tmpNodes[$i];
+					// insert into selected element
+					} else {
+						$thisStack = $this->stack;
+						$this->findRoot();
+						$insertTo = $this->find($target)->stack;
+						$this->stack = $thisStack;
+					}
+				} else {
+					$insertTo = $this->stack;
+					// insert created element
+					if ( $this->isHTML( $target ) ) {
+						$DOM = new DOMDocument();
+						@$DOM->loadHTML($target);
+						$insertFrom = array();
+						foreach($DOM->documentElement->firstChild->childNodes as $node) {
+							$insertFrom[] = $this->DOM->importNode($node, true);
+						}
+						// XXX needed ?!
+					//	$insertFrom = array_reverse($insertFrom);
+					// insert selected element
 					} else {
 						$insertFrom = array(
 							$this->DOM->createTextNode( $target )
@@ -713,34 +1009,56 @@ class phpQueryClass implements Iterator {
 				}
 				break;
 			case 'object':
-				if ( get_class( $target ) == get_class( $this )) {
+				$insertFrom = $insertTo = array();
+				if ( is_a($target, get_class($this)) ){
 					if ( $to ) {
 						$insertTo = $target->stack;
-						foreach( $this->stack as $node )
-							$insertFrom[] = $target->DOM->importNode($node);
+						if ( $this->size() == 1 && $this->isRoot($this->stack[0]) )
+							$loop = $this->find('body>*')->stack;
+						else
+							$loop = $this->stack;
+						foreach( $loop as $node )
+							$insertFrom[] = $target->DOM->importNode($node, true);
 					} else {
 						$insertTo = $this->stack;
-						foreach( $target->stack as $node )
-							$insertFrom[] = $this->DOM->importNode($node);
+						if ( $target->size() == 1 && $this->isRoot($target->stack[0]) )
+							$loop = $target->find('body>*')->stack;
+						else
+							$loop = $target->stack;
+						foreach( $loop as $node ) {
+							$insertFrom[] = $this->DOM->importNode($node, true);
+						}
 					}
 				}
 				break;
 		}
-		foreach( $insertFrom as $fromNode ) {
-			foreach( $insertTo as $toNode ) {
+		foreach( $insertTo as $toNode ) {
+			// we need static relative elements in some cases
+			switch( $type ) {
+				case 'prependTo':
+				case 'prepend':
+					$firstChild = $toNode->firstChild;
+					break;
+				case 'insertAfter':
+				case 'after':
+					$nextSibling = $toNode->nextSibling;
+					break;
+			}
+			foreach( $insertFrom as $fromNode ) {
 				switch( $type ) {
 					case 'appendTo':
 					case 'append':
-						$toNode->insertBefore(
-							$fromNode,
-							$toNode->lastChild->nextSibling
-						);
+//						$toNode->insertBefore(
+//							$fromNode,
+//							$toNode->lastChild->nextSibling
+//						);
+						$toNode->appendChild($fromNode);
 						break;
 					case 'prependTo':
 					case 'prepend':
 						$toNode->insertBefore(
 							$fromNode,
-							$toNode->firstChild
+							$firstChild
 						);
 						break;
 					case 'insertBefore':
@@ -751,16 +1069,30 @@ class phpQueryClass implements Iterator {
 						);
 						break;
 					case 'insertAfter':
-					case 'after':
+					case 'after':					
 						$toNode->parentNode->insertBefore(
 							$fromNode,
-							$toNode->nextSibling
+							$nextSibling
 						);
 						break;
 				}
 			}
 		}
 		return $this;
+	}
+	
+	public function replace($html = null) {
+		// TODO
+	}
+	
+	
+	public function slice() {
+		// TODO python slices
+	}	
+	
+	public function reverse() {
+		$this->history[] = $this->stack;
+		$this->stack = array_reverse($this->stack);
 	}
 
 	public function text() {
@@ -773,15 +1105,38 @@ class phpQueryClass implements Iterator {
 	
 	public function _next( $selector = null ) {
 		$this->sibling( $selector, 'previousSibling' );
-		return $this;
+		return $this->newInstance();
 	}
 	
 	public function _prev( $selector = null ) {
 		$this->sibling( $selector, 'previousSibling' );
-		return $this;
+		return $this->newInstance();
 	}
 	
-	private function sibling( $selector, $direction ) {
+	/**
+	 * @return phpQueryClass
+	 * @todo
+	 */
+	public function prevSiblings( $selector = null ) {
+	}
+	
+	/**
+	 * @return phpQueryClass
+	 * @todo
+	 */
+	public function nextSiblings( $selector = null ) {
+	}
+	
+	/**
+	 * Number of prev siblings
+	 * @return int
+	 * @todo
+	 */
+	public function index() {
+		return $this->prevSiblings()->size();
+	}
+	
+	protected function sibling( $selector, $direction ) {
 		$stack = array();
 		foreach( $this->stack as $node ) {
 			$test = $node;
@@ -806,73 +1161,79 @@ class phpQueryClass implements Iterator {
 		$stack = array();
 		foreach( $this->stack as $node ) {
 			if ( $selector ) {
-				if ( $this->is( $selector, $test ) )
+				if ( $this->is( $selector ) && ! $this->stackContains($node, $stack) )
 					$stack[] = $node;
-			} else
+			} else if (! $this->stackContains($node, $stack) )
 				$stack[] = $node;
 		}
 		$this->history[] = $this->stack;
 		$this->stack = $stack;
-		return $this;
+		return $this->newInstance();
 	}
 	
 	public function not( $selector = null ) {
 		$stack = array();
 		foreach( $this->stack as $node ) {
-			if (! $this->is( $selector, node ) )
+			if (! $this->is( $selector, $node ) )
 				$stack[] = $node;
 		}
 		$this->history[] = $this->stack;
 		$this->stack = $stack;
-		return $this;
+		return $this->newInstance();
 	}
 	
 	public function add( $selector = null ) {
 		$stack = array();
 		$this->history[] = $this->stack;
-		$this->find($selector);
-		$this->merge(
-			$this->history[ count($this->history)-2 ]
-		);
-		return $this;
-		
+		$found = $this->find($selector);
+		$this->merge($found->stack);
+		return $this->newInstance();
 	}
 	
-	private function merge() {
-		foreach( get_func_args() as $nodes ) {
-			foreach( $nodes as $newNode ) { 
-				foreach( $this->stack as $node ) {
-					if (! $node->isSameNode( $newNode ))
-						$this->stack[] = $newNode;
-				}
-			}
+	protected function merge() {
+		foreach( get_func_args() as $nodes )
+			foreach( $nodes as $newNode )
+				if (! $this->stackContains($newNode) )
+					$this->stack[] = $newNode;
+	}
+	
+	protected function stackContains($nodeToCheck, $stackToCheck = null) {
+		$loop = ! is_null($stackToCheck)
+			? $stackToCheck
+			: $this->stack;
+		foreach( $loop as $node ) {
+			if ( $node->isSameNode( $nodeToCheck ) )
+				return true;
 		}
+		return false;
 	}
 	
 	public function parent( $selector = null ) {
 		$stack = array();
-		foreach( $this->stack as $node ) {
-			if ( $this->is( $selector, $node->parentNode ) )
+		foreach( $this->stack as $node )
+			if ( $node->parentNode && ! $this->stackContains($node->parentNode, $stack) )
 				$stack[] = $node->parentNode;
-		}
 		$this->history[] = $this->stack;
 		$this->stack = $stack;
-		return $this;
+		$this->filter($selector, true);
+		return $this->newInstance();
 		
 	}
 	
 	public function parents( $selector = null ) {
 		$stack = array();
+		if (! $this->stack )
+			$this->debug('parents() - stack empty');
 		foreach( $this->stack as $node ) {
 			$test = $node;
 			while( $test->parentNode ) {
 				$test = $test->parentNode;
 				if ( $selector ) {
-					if ( $this->is( $selector, $test ) ) {
+					if ( $this->is( $selector, $test ) && ! $this->stackContains($test, $stack) ) {
 						$stack[] = $test;
 						continue;
 					}
-				} else {
+				} else if (! $this->stackContains($test, $stack) ) {
 					$stack[] = $test;
 					continue;
 				}
@@ -880,7 +1241,7 @@ class phpQueryClass implements Iterator {
 		}
 		$this->history[] = $this->stack;
 		$this->stack = $stack;
-		return $this;
+		return $this->newInstance();
 	}
 	
 	public function attr( $attr, $value = null ) { 
@@ -893,8 +1254,12 @@ class phpQueryClass implements Iterator {
 		return $this;
 	}
 	
-	public function val( $selector = null ) {
-		
+	/**
+	 * Enter description here...
+	 * 
+	 * @todo val()
+	 */
+	public function val() {
 	}
 	
 	public function removeAttr( $attr ) {
@@ -903,6 +1268,25 @@ class phpQueryClass implements Iterator {
 	}
 	
 	public function addClass( $className ) {
+		foreach( $this->stack as $node ) {
+			if (! $this->is( $node, '.'.$className))
+				$node->setAttribute(
+					'class',
+					$node->getAttribute('class').' '.$className
+				);
+		}
+	}
+	
+	/**
+	 * Returns if className (optionally match with regex in // delimiters) is set for element.
+	 *
+	 * @param	string	$className
+	 * Optional. Can be regexp in // delimiters.
+	 * @return	string
+	 * Matched class.
+	 * @todo	hasClass
+	 */
+	public function hasClass( $className ) {
 		foreach( $this->stack as $node ) {
 			if (! $this->is( $node, '.'.$className))
 				$node->setAttribute(
@@ -957,14 +1341,17 @@ class phpQueryClass implements Iterator {
 	}
 	
 
-	// INTERATOR INTERFACE
+	// ITERATOR INTERFACE
 	public function rewind(){
+		$this->debug('interating foreach');
 		$this->history[] = $this->stack;
 		$this->interator_stack = $this->stack;
 		$this->valid = isset( $this->stack[0] )
 			? 1
 			: 0;
-		$this->stack = array($this->interator_stack[0]);
+		$this->stack = $this->valid
+			? array($this->stack[0])
+			: array();
 		$this->current = 0;
 	}
 
@@ -983,27 +1370,25 @@ class phpQueryClass implements Iterator {
 			: false;
 		if ( $this->valid )
 			$this->stack = array(
-				$this->interator_stack[ $this->current++ ]
+				$this->interator_stack[ $this->current ]
 			);
 	}
 	public function valid(){
 		return $this->valid;
 	}
 
-	// ADDONS
-
-	private function getNodeXpath( $oneNode = null ) {
+	protected function getNodeXpath( $oneNode = null ) {
 		$return = array();
 		$loop = $oneNode
 			? array($oneNode)
 			: $this->stack;
 		foreach( $loop as $node ) {
-			if ( $this->isRoot($node) ) {
+			if ( is_a($node, 'DOMDocument') ) {
 				$return[] = '';
 				continue;
 			}				
 			$xpath = array();
-			while( get_class($node) != 'DOMDocument' ) {
+			while(! is_a($node, 'DOMDocument') ) {
 				$i = 1;
 				$sibling = $node;
 				while( $sibling->previousSibling ) {
@@ -1044,9 +1429,11 @@ class phpQueryClass implements Iterator {
 	
 	// HELPERS
 
-	public function dumpStack() {
+	public function dumpStack() { 
+		$i = 1;
 		foreach( $this->stack as $node ) {
-			$this->debug($node->tagName);
+			$this->debug("Node {$i} ".$this->whois($node));
+			$i++;
 		}
 	}
 	
@@ -1066,7 +1453,19 @@ class phpQueryClass implements Iterator {
 	}
 }
 
+/**
+ * Shortcut to <code>new phpQuery($arg1, $arg2, ...)</code>
+ *
+ * @return phpQuery
+ * @todo move logic to contructor
+ */
 function phpQuery() {
+	$args = func_get_args();
+	return call_user_func_array(
+		array('phpQueryClass', 'phpQuery'),
+		$args
+	);
+	// old code
 	if (! func_num_args() )
 		return new phpQueryClass();
 	$input = func_get_args();
@@ -1075,7 +1474,6 @@ function phpQuery() {
 		$loaded = phpQueryClass::load( $input[0] );
 		return new phpQueryClass();
 	} else if ( is_object($input[0]) && get_class($input[0]) == 'DOMElement' ) {
-		// TODO suppot dom nodes
 	} else {
 		$last = count($input)-1;
 		$PQ = new phpQueryClass(
@@ -1099,6 +1497,7 @@ function phpQuery() {
 	}
 }
 
+// handy phpQuery shortcut
 if (! function_exists('_')) {
 	function _() {
 		$args = func_get_args();

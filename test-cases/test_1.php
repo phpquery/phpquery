@@ -1,6 +1,7 @@
 <?php
 require_once('../phpQuery.php');
-$testName = '1';
+phpQueryClass::$debug = true;
+$testName = 'Simple data insert';
 $testResult = <<<EOF
 <div class="articles">
 			div.articles text node
@@ -41,24 +42,22 @@ $rows = array(
 	),
 );
 _('test.html');
-$articles = _('.articles ul');
-$row = clone $articles->find('li');
-$row->remove()->eq(0);
+$articles = phpQuery('.articles ul');
+$rowSrc = $articles
+	->find('li')
+	->remove()
+	->eq(0);
 foreach( $rows as $r ) {
-	$row->_copy();
+	$row = $rowSrc->_clone();
 	foreach( $r as $field => $value ) {
 		$row->find(".{$field}")
 				->html( $value )
 			->end();
 	}
-	$row->appendTo('.articles ul')
-	// DOESNT WORK
-//	$row->appendTo($articles)
+	$row->appendTo($articles)
 		->end();
 }
-$result = _('.articles')->html();
-// DOESNT WORK
-// print $articles->html();
+$result = phpQuery('.articles')->htmlWithTag();
 $similarity = 0.0;
 similar_text($testResult, $result, $similarity);
 if ( $similarity > 95 )

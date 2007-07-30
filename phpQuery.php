@@ -6,9 +6,10 @@
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
  * @link http://meta20.net/phpQuery
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.7 beta
+ * @version 0.7.1 beta
  * 
  * @todo missing selectors (div + div, div ~ div)
+ * @todo fix phpQueryClass::isHTML() stuff (dom nodes, text nodes...)
  * @todo missing pseudo classes (:even, :odd +all form specific)
  * @todo missing jquery functions (css, wrap, val)
  * @todo docs (copied from jquery)
@@ -21,6 +22,7 @@ class phpQueryClass implements Iterator {
 	public static $debug = false;
 	protected static $documents = array();
 	public static $lastDocID = null;
+	public static $defaultDoctype = 'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"';
 	public $docID = null;
 	protected $DOM = null;
 	protected $XPath = null;
@@ -45,9 +47,10 @@ class phpQueryClass implements Iterator {
 	 * 
 	 * 1. Create new DOM:
 	 * _('file.htm')
-	 * _('<div/>', true)
+	 * _('<div/>', true)		// accepts text nodes at beginning
 	 * 2. Import HTML:
-	 * _('<div/>')
+	 * _('<div/>')				// DOESNT accept text nodes at beginning !
+	 * _('<div/>', docID)
 	 * 3. Run query:
 	 * _('div.myClass')
 	 * _('div.myClass', 'myFile.htm')
@@ -62,7 +65,7 @@ class phpQueryClass implements Iterator {
 		 * _('file.htm')
 		 * _('<div/>', true)
 		 */
-		if ( ($isHTMLfile = self::isHTMLfile($input[0])) || ( isset($input[1]) && self::isHTML($input[0]) && $input[1] )) {
+		if ( ($isHTMLfile = self::isHTMLfile($input[0])) || ( isset($input[1]) && $input[1] === true/* && self::isHTML($input[0])*/ )) {
 			// set document ID
 			$ID = $isHTMLfile
 				? $input[0]
@@ -75,14 +78,12 @@ class phpQueryClass implements Iterator {
 			$DOM =& self::$documents[ $ID ];
 			// load
 			$isLoaded = $isHTMLfile
-				? $DOM['document']->loadHTMLFile($ID)
-				: $DOM['document']->loadHTML($input[0]);
+				? @$DOM['document']->loadHTMLFile($ID)
+				: @$DOM['document']->loadHTML($input[0]);
 			if (! $isLoaded ) {
 				throw new Exception("Can't load '{$ID}'");
 				return false;
 			}
-			$DOM['document']->preserveWhiteSpace = true;
-			$DOM['document']->formatOutput = true;
 			$DOM['xpath'] = new DOMXPath(
 				$DOM['document']
 			);
@@ -97,8 +98,12 @@ class phpQueryClass implements Iterator {
 		 * _('<div/>')
 		 */
 		} else if ( self::isHTML($input[0]) ) {
-			$phpQuery = new phpQueryClass(self::$lastDocID);
-			return $phpQuery->importHTML( $input[0] );
+			$docID = isset($input[1]) && $input[1]
+				? $input[1]
+				: self::$lastDocID;
+			$phpQuery = new phpQueryClass($docID);
+			$phpQuery->importHTML($input[0]);
+			return $phpQuery;
 		/**
 		 * Run query:
 		 * _('div.myClass')
@@ -178,68 +183,11 @@ class phpQueryClass implements Iterator {
 	 *
 	 * @param string $char
 	 * @return bool
-	 * @todo rewrite me to charcode ! ;)
+	 * @todo rewrite me to charcode range ! ;)
 	 */
 	protected function isChar($char) {
 		return preg_match('/\w/', $char);
 	}
-//	protected function parseSelector( $selectors ) {
-//		$return = array();
-//		foreach( split(',', $selectors) as $parse ) {
-//			// clean spaces
-//			$parse = trim(
-//				preg_replace('@\s+@', ' ',
-//					str_replace('>', ' > ', $parse)
-//				)
-//			);
-//			$elements = array();
-//			// TODO: realy parsing of selector
-//			foreach( split(' ', $parse) as $s ) {
-//				if ( $elements && $elements[ count($elements)-1 ] != '>' && $s != '>' )
-//					$elements[] = ' ';
-//				$elements = array_merge(
-//					$elements,
-//					$this->parseSimpleSelector( $s )
-//				);
-//			}
-//			if ( isset($elements[0]) && $elements[0] != '>' )
-//				array_unshift($elements, ' ');
-//			$return[] = $elements;
-//			$this->debug(array('SELECTOR',$parse,$elements));
-//		}
-//		return $return;
-//	}
-	// tag.class1.class2[@attr]:checkbox
-//	protected function parseSimpleSelector( $s ) {-
-//		$selector = array();
-//		$match = preg_split(
-//			'@(\\.|#|\\[|:)@',
-//			$s, null,
-//			PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY
-//		);
-//		// tag present
-//		if ( count( $match ) % 2 == 1 )
-//			array_unshift($match, '');
-//		for( $i = 0; $i < count( $match )-1; $i = $i+2 ) {
-//			// join classes, args and pseudo-selectors
-//			$append = (
-//				$selector
-//				&& (
-//					$match[ $i ][0] == '.'
-//					||
-//					$match[ $i ][0] == '['
-//					||
-//					$match[ $i ][0] == ':'
-//				) &&
-//				$selector[ count($selector)-1 ][0] == $match[ $i ][0]
-//			);
-//			if ( $append )
-//				$selector[ count($selector)-1 ] .= $match[ $i ].$match[ $i+1 ];
-//			else
-//				$selector[] = $match[ $i ].$match[ $i+1 ];
-//		}
-//		return $selector;
-//	}
 	protected function parseSelector( $query ) {
 		// clean spaces
 		// TODO include this inside parsing
@@ -447,7 +395,7 @@ class phpQueryClass implements Iterator {
 		$XQuery = '';
 		// remember stack state because of multi-queries
 		$oldStack = $this->stack;
-		// here will be kept found elements
+		// here we will be keeping found elements
 		$stack = array();
 		foreach( $queries as $selector ) {
 			$this->stack = $oldStack;
@@ -536,8 +484,8 @@ class phpQueryClass implements Iterator {
 			if ( $XQuery && $XQuery != '//' ) {
 				$this->runQuery($XQuery);
 				$XQuery = '';
-				if (! $this->length() )
-					break;
+//				if (! $this->length() )
+//					break;
 			}
 			foreach( $this->stack as $node )
 				if (! $this->stackContains($node, $stack) )
@@ -594,7 +542,7 @@ class phpQueryClass implements Iterator {
 				$stack = array();
 				foreach( $this->stack as $node ) {
 					if ( $node->childNodes->length )
-						$stack = $node;
+						$stack[] = $node;
 				}
 				$this->stack = $stack;
 				break;
@@ -615,6 +563,9 @@ class phpQueryClass implements Iterator {
 		}
 	}
 	public function is( $selector, $_node = null ) {
+		$this->debug(array("Is:", $selector));
+		if (! $selector)
+			return false;
 		$oldStack = $this->stack;
 		if ( $_node )
 			$this->stack = array($_node);
@@ -627,9 +578,17 @@ class phpQueryClass implements Iterator {
 	public function filter( $selectors, $_skipHistory = false ) {
 		if (! $_skipHistory )
 			$this->history[] = $this->stack;
+		$notSimpleSelector = array(' ', '>', '~', '+', '/');
 		$selectors = $this->parseSelector( $selectors );
+		if (! $_skipHistory )
+			$this->debug(array("Filtering:", $selectors));
 		$stack = array();
 		foreach ( $selectors as $selector ) {
+			if (! $selector )
+				break;
+			// avoid first space or /
+			if (in_array( $selector[0], $notSimpleSelector ) )
+				$selector = array_slice($selector, 1);
 			// PER NODE selector chunks
 			foreach( $this->stack as $node ) {
 				$break = false;
@@ -691,6 +650,10 @@ class phpQueryClass implements Iterator {
 							} else if ( $s == 'html' && ! $this->isRoot($node) )
 								$break = true;
 						}
+					// AVOID NON-SIMPLE SELECTORS
+					} else if ( in_array($s, $notSimpleSelector)) {
+						$break = true;
+						$this->debug(array('Skipping non simple selector', $selector));
 					}
 					if ( $break )
 						break;
@@ -728,12 +691,24 @@ class phpQueryClass implements Iterator {
 			$this->stack[] = $this->DOM->importNode( $node, true );
 	}
 
-	public function wrap($before, $after) {
-		foreach( $this->stack as $node ) {
-			_($before.$after)
-				->insertAfter($node);
-			
+	/**
+	 * Wraps elements with $before and $after.
+	 * In case ! $after, $before should be a tag name.
+	 */
+	public function wrap($before, $after = null) {
+		if (! $after ) {
+			$after = "</{$before}>";
+			$before = "<{$before}>";
 		}
+		// safer...
+		$each = clone $this;
+		foreach( $each as $node ) {
+			$wrap = self::phpQuery($before."<div id='__wrap'/>".$after)
+				->insertAfter($node);
+			$wrap->find('#__wrap')
+					->replace($node);
+		}
+		return $this;
 	}
 	
 	public function contains( $text, $history = true ) {
@@ -781,7 +756,19 @@ class phpQueryClass implements Iterator {
 		$this->stack = array_pop( $this->history );
 		return $this;
 	}
-
+	
+	/**
+	 * Test
+	 *
+	 * @param unknown_type $selector
+	 * @return unknown
+	 */
+	public function select($selector) {
+		return $this->is($selector)
+			? $this->filter($selector)
+			: $this->find($selector);
+	}
+	
 	public function each($callabck) {
 		$this->history[] = $this->stack;
 		foreach( $this->history[ count( $this->history )-1 ] as $node ) {
@@ -810,16 +797,45 @@ class phpQueryClass implements Iterator {
 		return $this;
 	}
 
+	/**
+	 * Replaces current element with $content and changes stack to new element(s) (except text nodes).
+	 * Can be reverted with end().
+	 *
+	 * @param string|phpQueryClass $with
+	 * @return phpQueryClass
+	 */
+	public function replace($content) {
+		$stack = array();
+		// safer...
+		$each = clone $this;
+		foreach( $each as $node ) {
+			$prev = $node->before($content)->_prev();
+			if ( $this->isHTML($content) )
+				$stack[] = $prev->stack;
+		}
+		$stack = $this->before($content);
+		$this->remove();
+		$this->history[] = $this->stack;
+		$this->stack = $stack;
+		return $this->newInstance();
+	}
+	public function replacePHP($code) {
+		return $thuis->replace("<php>{$code}</php>");
+	}
+
 	public function remove() {
 		foreach( $this->stack as $node ) {
+			if (! $node->parentNode )
+				continue;
 			$this->debug("Removing '{$node->tagName}'");
 			$node->parentNode->removeChild( $node );
 		}
 		return $this;
 	}
 
-	protected function isHTML( $html ) {
+	protected function isHTML($html) {
 		return substr(trim($html), 0, 1) == '<';
+//			|| is_object($html) && is_a($html, 'DOMElement');
 	}
 
 	public function html($html = null) {
@@ -845,7 +861,7 @@ class phpQueryClass implements Iterator {
 			return $this;
 		} else {
 			if ( $this->length() == 1 && $this->isRoot( $this->stack[0] ) )
-				return $this->DOM->saveHTML();
+				return $this->save();
 			$DOM = new DOMDocument();
 			foreach( $this->stack as $node ) {
 				foreach( $node->childNodes as $child ) {
@@ -854,24 +870,40 @@ class phpQueryClass implements Iterator {
 					);
 				}
 			}
-			$DOM->formatOutput = true;
-			return $DOM->saveHTML();
+			return $this->save($DOM);
 		}
 	}
 	public function htmlWithTag() {
 		if ( $this->length() == 1 && $this->isRoot( $this->stack[0] ) )
-			return $this->DOM->saveHTML();
+			return $this->save();
 		$DOM = new DOMDocument();
 		foreach( $this->stack as $node ) {
 			$DOM->appendChild(
 				$DOM->importNode( $node, true )
 			);
 		}
-		$DOM->formatOutput = true;
-		return $DOM->saveHTML();
+		return $this->save($DOM);
+	}
+	protected function save($DOM = null){
+		if (! $DOM)
+			$DOM = $this->DOM;
+		$DOM->formatOutput = false;
+		$DOM->preserveWhiteSpace = true;
+		$doctype = isset($DOM->doctype) && is_object($DOM->doctype)
+			? $DOM->doctype->publicId
+			: self::$defaultDoctype;
+		return stripos($doctype, 'xhtml') !== false
+			? str_replace(array('&#13;','&#xD;'), '',
+				preg_replace('!<textarea([^>]*)/>!', '<textarea\1></textarea>',
+					implode("\n",
+						array_slice(
+							explode("\n", $DOM->saveXML()),
+							1
+			))))
+			: $DOM->saveHTML();
 	}
 	public function __toString() {
-		return $this->html();
+		return $this->htmlWithTag();
 	}
 	public function php($code) {
 		return $this->html("<php>".trim($code)."</php>");
@@ -912,6 +944,22 @@ class phpQueryClass implements Iterator {
 		$this->stack = $stack;
 		return $this->newInstance();
 	}
+	public function unwrapContent() {
+		foreach( $this->stack as $node ) {
+			if (! $node->parentNode )
+				continue;
+			$childNodes = array();
+			// any modification in DOM tree breaks childNodes iteration, so cache them first
+			foreach( $node->childNodes as $chNode )
+				$childNodes[] = $chNode;
+			foreach( $childNodes as $chNode )
+//				$node->parentNode->appendChild($chNode);
+				$node->parentNode->insertBefore($chNode, $node);
+			$node->parentNode->removeChild($node);
+		}
+		return $this->newInstance();
+	}
+	
 	public function ancestors( $selector = null ) {
 		return $this->children( $selector );
 	}
@@ -1080,11 +1128,7 @@ class phpQueryClass implements Iterator {
 		}
 		return $this;
 	}
-	
-	public function replace($html = null) {
-		// TODO
-	}
-	
+
 	
 	public function slice() {
 		// TODO python slices
@@ -1140,7 +1184,7 @@ class phpQueryClass implements Iterator {
 		$stack = array();
 		foreach( $this->stack as $node ) {
 			$test = $node;
-			while( $test->{$direction} ) {
+			while( isset($test->{$direction}) && $test->{$direction} ) {
 				$test = $test->nextSibling;
 				if ( $selector ) {
 					if ( $this->is( $selector, $test ) ) {
@@ -1215,9 +1259,9 @@ class phpQueryClass implements Iterator {
 				$stack[] = $node->parentNode;
 		$this->history[] = $this->stack;
 		$this->stack = $stack;
-		$this->filter($selector, true);
+		if ( $selector )
+			$this->filter($selector, true);
 		return $this->newInstance();
-		
 	}
 	
 	public function parents( $selector = null ) {
@@ -1228,6 +1272,8 @@ class phpQueryClass implements Iterator {
 			$test = $node;
 			while( $test->parentNode ) {
 				$test = $test->parentNode;
+				if ( is_a($test, 'DOMDocument') )
+					break;
 				if ( $selector ) {
 					if ( $this->is( $selector, $test ) && ! $this->stackContains($test, $stack) ) {
 						$stack[] = $test;
@@ -1244,14 +1290,61 @@ class phpQueryClass implements Iterator {
 		return $this->newInstance();
 	}
 	
-	public function attr( $attr, $value = null ) { 
+	/**
+	 * Attribute method.
+	 * Accepts * for all attributes (for setting and getting)
+	 *
+	 * @param unknown_type $attr
+	 * @param unknown_type $value
+	 * @return string|array
+	 */
+	public function attr( $attr = null, $value = null ) { 
 		foreach( $this->stack as $node ) {
-			if ( $value )
-				$node->setAttribute($attr, $value);
-			else
+			if (! is_null( $value )) {
+				$loop = $attr == '*'
+					? $this->getNodeAttrs($node)
+					: array($attr);
+				foreach( $loop as $a ) {
+					if ( $value )
+						$node->setAttribute($a, $value);
+					else
+						$node->removeAttribute($a);
+				}
+			} else if ( $attr == '*' ) {
+				$return = array();
+				foreach( $node->attributes as $n => $v)
+					$return[$n] = $v->value;
+				return $return;
+			} else
 				return $node->getAttribute($attr);
 		}
 		return $this;
+	}
+	
+	protected function getNodeAttrs($node) {
+		$return = array();
+		foreach( $node->attributes as $n => $o)
+			$return[] = $n;
+		return $return;
+	}
+	
+	
+	public function attrPHP( $attr, $value ) { 
+		foreach( $this->stack as $node ) {
+			$node->setAttribute($attr, "<?php {$value} ?>");
+		}
+		return $this;
+	}
+	
+	public function removeAttr( $attr ) {
+		foreach( $this->stack as $node ) {
+			$loop = $attr == '*'
+				? $this->getNodeAttrs($node)
+				: array($attr);
+			foreach( $loop as $a )
+				$node->removeAttribute($a);
+		}
+			
 	}
 	
 	/**
@@ -1260,11 +1353,6 @@ class phpQueryClass implements Iterator {
 	 * @todo val()
 	 */
 	public function val() {
-	}
-	
-	public function removeAttr( $attr ) {
-		foreach( $this->stack as $node )
-			$node->removeAttribute($attr);
 	}
 	
 	public function addClass( $className ) {
@@ -1414,13 +1502,13 @@ class phpQueryClass implements Iterator {
 			? array( $oneNode )
 			: $this->stack;
 		foreach( $loop as $node ) {
-			$return[] = (
-				$node->tagName
-				.($node->getAttribute('id')
-					? '#'.$node->getAttribute('id'):'')
-				.($node->getAttribute('class')
-					? '.'.join('.', split(' ', $node->getAttribute('class'))):'')
-			);
+			$return[] = isset($node->tagName)
+				? $node->tagName
+					.($node->getAttribute('id')
+						? '#'.$node->getAttribute('id'):'')
+					.($node->getAttribute('class')
+						? '.'.join('.', split(' ', $node->getAttribute('class'))):'')
+				: get_class($node);
 		}
 		return $oneNode
 		? $return[0]

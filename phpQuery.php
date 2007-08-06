@@ -893,14 +893,25 @@ class phpQueryClass implements Iterator {
 			? $DOM->doctype->publicId
 			: self::$defaultDoctype;
 		return stripos($doctype, 'xhtml') !== false
-			? str_replace(array('&#13;','&#xD;'), '',
-				preg_replace('!<textarea([^>]*)/>!', '<textarea\1></textarea>',
-					implode("\n",
-						array_slice(
-							explode("\n", $DOM->saveXML()),
-							1
-			))))
+			? $this->saveXHTML( $DOM->saveXML() )
 			: $DOM->saveHTML();
+	}
+	protected function saveXHTML($content){
+		return
+			// TODO find out what and why it is. maybe it has some relations with extra new lines ?
+			str_replace(array('&#13;','&#xD;'), '',
+			// strip non-commented cdata
+			str_replace(']]]]><![CDATA[>', ']]>',
+			preg_replace('@(<script[^>]*>\s*)<!\[CDATA\[@', '\1',
+			preg_replace('@\]\]>(\s*</script>)@', '\1',
+			// textarea can't be short tagged
+			preg_replace('!<textarea([^>]*)/>!', '<textarea\1></textarea>',
+				// cut first line xml declaration
+				implode("\n",
+					array_slice(
+						explode("\n", $content),
+						1
+		)))))));
 	}
 	public function __toString() {
 		return $this->htmlWithTag();

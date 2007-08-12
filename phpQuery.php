@@ -9,6 +9,10 @@
  * @version 0.7.1 beta
  * 
  * @todo missing selectors (div + div, div ~ div)
+ * @todo plugin interface thru magic __call()
+ * @todo metadata plugin
+ * @todo phpQueryPie JS layer
+ * @todo HTTP sources 
  * @todo fix phpQueryClass::isHTML() stuff (dom nodes, text nodes...)
  * @todo missing pseudo classes (:even, :odd +all form specific)
  * @todo missing jquery functions (css, wrap, val)
@@ -1140,6 +1144,27 @@ class phpQueryClass implements Iterator {
 		return $this;
 	}
 
+	/**
+	 * Returns JSON representation of stacked HTML elements and it's children.
+	 * Compatible with @link http://programming.arantius.com/dollar-e 
+	 *
+	 * @return string
+	 */
+	public function toJSON() {
+		$json = '';
+		foreach( $this->stack as $node ) {
+			
+		}
+		return $json;
+	}
+	protected function _toJSON($node) {
+		$json = '';
+		switch( $node->type ) {
+			case 3:
+				break;
+		}
+		return $json;
+	}
 	
 	public function slice() {
 		// TODO python slices

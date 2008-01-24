@@ -7,6 +7,7 @@
             plainTemplate test
         </title>
 		<script src="jquery-latest.js" type="text/javascript" charset="utf-8"></script>
+		<script src="<?php print $js_src; ?>" type="text/javascript" charset="utf-8"></script>
     </head>
     <body>
         <div class='articles'>
@@ -40,5 +41,14 @@
             </ul>
 			<p class='after'>paragraph after UL</p>
         </div>
+		<ul>
+			<li id='i_have_nested_list'>
+				<ul>
+					<li class='nested'></li>
+				</ul>
+			</li>
+			<li class='second'>
+			</li>
+		</ul>
     </body>
 </html>

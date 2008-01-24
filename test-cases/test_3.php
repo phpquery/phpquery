@@ -1,6 +1,6 @@
 <?php
 require_once('../phpQuery.php');
-phpQuery::$debug = true;
+phpQueryClass::$debug = true;
 $testName = 'Selectors';
 $tests = array(
 	array(
@@ -36,8 +36,9 @@ $tests = array(
 		)
 	),
 	array(
-		'*[@rel=test]',
+		'*[@rel="test"]',
 		array(
+			'p',
 			'p'
 		)
 	),
@@ -52,8 +53,9 @@ $tests = array(
 		array(
 			'p',
 			'p',
-			'p.after',
+			'p',
 			'p.noTitle',
+			'p.after',
 		)
 	),
 	array(
@@ -65,15 +67,31 @@ $tests = array(
 	array(
 		"li#testID, div.articles",
 		array(
-			'div.articles',
-			'li#testID'
+			'li#testID',
+			'div.articles'
+		)
+	),
+	array(
+		"script[@src]:not([@src^=<?php])",
+		array(
+			'script'
+		)
+	),
+	array(
+		'li:not([ul/li])',
+		array(
+			'li',
+			'li#testID',
+			'li',
+			'li.nested',
+			'li.second',
 		)
 	),
 );
 
-_('test.html');
+phpQuery('test.html');
 foreach( $tests as $k => $test ) {
-	$tests[ $k ][2] = _( $test[0] )->whois();
+	$tests[ $k ][2] = phpQuery( $test[0] )->whois();
 }
 foreach( $tests as $test ) {
 	if ( $test[1] == $test[2] )

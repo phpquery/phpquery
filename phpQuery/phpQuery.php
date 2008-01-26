@@ -948,8 +948,8 @@ class phpQueryClass implements Iterator {
 	}
 	/**
 	 * Enter description here...
-	 *
-	 * @todo change to htmlWithElement
+	 * 
+	 * @return String
 	 */
 	public function htmlOuter() {
 		if ( $this->length() == 1 && $this->isRoot( $this->elements[0] ) )
@@ -1388,8 +1388,9 @@ class phpQueryClass implements Iterator {
 	 * @return phpQueryClass
 	 */
 	public function _next( $selector = null ) {
-		$this->sibling( $selector, 'previousSibling' );
-		return $this->newInstance();
+		return $this->newInstance(
+			$this->getElementSiblings('nextSibling', $selector, true)
+		);
 	}
 	
 	/**
@@ -1398,22 +1399,29 @@ class phpQueryClass implements Iterator {
 	 * @return phpQueryClass
 	 */
 	public function _prev( $selector = null ) {
-		$this->sibling( $selector, 'previousSibling' );
-		return $this->newInstance();
+		return $this->newInstance(
+			$this->getElementSiblings('previousSibling', $selector, true)
+		);
 	}
 	
 	/**
 	 * @return phpQueryClass
 	 * @todo
 	 */
-	public function prevSiblings( $selector = null ) {
+	public function prevAll( $selector = null ) {
+		return $this->newInstance(
+			$this->getElementSiblings('previousSibling', $selector)
+		);
 	}
 	
 	/**
 	 * @return phpQueryClass
 	 * @todo
 	 */
-	public function nextSiblings( $selector = null ) {
+	public function nextAll( $selector = null ) {
+		return $this->newInstance(
+			$this->getElementSiblings('nextSibling', $selector)
+		);
 	}
 	
 	/**
@@ -1425,25 +1433,23 @@ class phpQueryClass implements Iterator {
 		return $this->prevSiblings()->size();
 	}
 	
-	protected function sibling( $selector, $direction ) {
+	protected function getElementSiblings($direction, $selector, $limitToOne = false) {
 		$stack = array();
+		$count = 0;
 		foreach( $this->elements as $node ) {
 			$test = $node;
 			while( isset($test->{$direction}) && $test->{$direction} ) {
-				$test = $test->nextSibling;
-				if ( $selector ) {
-					if ( $this->is( $selector, $test ) ) {
+				$test = $test->{$direction};
+				if ( $selector )
+					if ( $this->is( $selector, $test ) )
 						$stack[] = $test;
-						continue;
-					}
-				} else {
+				else
 					$stack[] = $test;
-					continue;
-				}
+				if ($limitToOne && $stack)
+					return $stack;
 			}
 		}
-		$this->elementsBackup = $this->elements;
-		$this->elements = $stack;
+		return $stack;
 	}
 	
 	/**

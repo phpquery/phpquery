@@ -2,13 +2,14 @@
 /**
  * jQuery port to PHP.
  * phpQuery is chainable DOM selector & manipulator.
- * Compatible with jQuery 1.1.
+ * Compatible with jQuery 1.2 (work in progress).
  * 
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
  * @link http://meta20.net/phpQuery
  * @link http://code.google.com/p/phpquery/
+ * @link http://jquery.com
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.7.2 beta
+ * @version 0.8
  */
 
 class phpQueryClass implements Iterator {
@@ -19,6 +20,7 @@ class phpQueryClass implements Iterator {
 	public $docID = null;
 	protected $DOM = null;
 	protected $XPath = null;
+	protected $elementsBackup = array();
 	protected $elements = array();
 	protected $previous = null;
 	protected $root = array();
@@ -58,21 +60,22 @@ class phpQueryClass implements Iterator {
 		 * _('file.htm')
 		 * _('<div/>', true)
 		 */
-		if ( ($isHTMLfile = self::isHTMLfile($input[0])) || ( isset($input[1]) && gettype($input[1]) === 'boolean'/* && self::isHTML($input[0])*/ )) {
+		if ( ($isHtmlFile = self::isHtmlFile($input[0])) || ( isset($input[1]) && gettype($input[1]) === 'boolean'/* && self::isHTML($input[0])*/ )) {
+			$rawInput = isset($input[1]) && $input[1] === true;
 			// set document ID
-			$ID = $input[1] !== true
-				? $input[0]
-				: md5(microtime());
+			$ID = $rawInput
+				? md5(microtime())
+				: $input[0];
 			// check if already loaded
-			if ( $isHTMLfile && isset( self::$documents[ $ID ] ) )
+			if ( $isHtmlFile && isset( self::$documents[ $ID ] ) )
 				return new phpQueryClass($ID);
 			// create document
 			self::$documents[ $ID ]['document'] = new DOMDocument();
 			$DOM =& self::$documents[ $ID ];
 			// load
-			$isLoaded = $input[1] !== true
-				? @$DOM['document']->loadHTMLFile($ID)
-				: @$DOM['document']->loadHTML($input[0]);
+			$isLoaded = $rawInput
+				? @$DOM['document']->loadHTML($input[0])
+				: @$DOM['document']->loadHTMLFile($ID);
 			if (! $isLoaded ) {
 				throw new Exception("Can't load '{$ID}'");
 				return false;
@@ -90,12 +93,12 @@ class phpQueryClass implements Iterator {
 		 * Import HTML:
 		 * _('<div/>')
 		 */
-		} else if ( self::isHTML($input[0]) ) {
+		} else if ( self::isHtml($input[0]) ) {
 			$docID = isset($input[1]) && $input[1]
 				? $input[1]
 				: self::$lastDocID;
 			$phpQuery = new phpQueryClass($docID);
-			$phpQuery->importHTML($input[0]);
+			$phpQuery->importHtml($input[0]);
 			return $phpQuery;
 		/**
 		 * Run query:
@@ -105,7 +108,7 @@ class phpQueryClass implements Iterator {
 		 */
 		} else {
 			$last = count($input)-1;
-			$ID = isset( $input[$last] ) && self::isHTMLfile( $input[$last] )
+			$ID = isset( $input[$last] ) && self::isHtmlFile( $input[$last] )
 				? $input[$last]
 				: self::$lastDocID;
 			$phpQuery = new phpQueryClass($ID);
@@ -147,7 +150,7 @@ class phpQueryClass implements Iterator {
 	 * @return phpQueryClass
 	 */
 	public function __construct($docPath) {
-		if (! isset(self::$documents[ $docPath ] ) ) {
+		if (! isset(self::$documents[$docPath] ) ) {
 			throw new Exception("Doc path '{$docPath}' isn't loaded.");
 			return;
 		}
@@ -184,7 +187,7 @@ class phpQueryClass implements Iterator {
 			$this->regexpChars
 		);
 	}
-	protected static function isHTMLfile( $filename ) {
+	protected static function isHtmlFile( $filename ) {
 		return is_string($filename) && (
 			substr( $filename, -5 ) == '.html'
 				||
@@ -334,6 +337,15 @@ class phpQueryClass implements Iterator {
 		return $new;
 	}
 	
+	/**
+	 * Enter description here...
+	 *
+	 * In the future, when PHP will support XLS 2.0, then we would do that this way:
+	 * contains(tokenize(@class, '\s'), "something")
+	 * @param unknown_type $class
+	 * @param unknown_type $node
+	 * @return boolean
+	 */
 	protected function matchClasses( $class, $node ) {
 		// multi-class
 		if ( strpos($class, '.', 1) ) {
@@ -353,11 +365,12 @@ class phpQueryClass implements Iterator {
 				return true;
 		// single-class
 		} else {
-			// strip leading dot
-			$class = substr($class, 1);
-			$nodeClasses = explode(' ', $node->getAttribute('class') );
-			if ( in_array($class, $nodeClasses) )
-				return true;
+			return in_array(
+				// strip leading dot from class name
+				substr($class, 1),
+				// get classes for element as array
+				explode(' ', $node->getAttribute('class') )
+			);
 		}
 	}
 	protected function runQuery( $XQuery, $selector = null, $compare = null ) {
@@ -412,7 +425,7 @@ class phpQueryClass implements Iterator {
 	 */
 	public function find( $selectors, $context = null ) {
 		// backup last stack /for end()/
-		$this->history[] = $this->elements;
+		$this->elementsBackup = $this->elements;
 		// allow to define context
 		if ( $context && is_a($context, get_class($this)) )
 			$this->elements = $context->elements;
@@ -504,7 +517,7 @@ class phpQueryClass implements Iterator {
 //					break;
 			}
 			foreach( $this->elements as $node )
-				if (! $this->elementsContains($node, $stack) )
+				if (! $this->elementsContainsNode($node, $stack) )
 					$stack[] = $node;
 		}
 		$this->elements = $stack;
@@ -517,8 +530,8 @@ class phpQueryClass implements Iterator {
 	protected function filterPseudoClasses( $class ) {
 		// TODO clean args parsing ?
 		$class = trim($class, ':');
-		$haveArgs = strpos($class, '(');
-		if ( $haveArgs !== false ) {
+		$haveArgs = strpos($class, '(') !== false;
+		if ( $haveArgs ) {
 			$args = substr($class, $haveArgs+1, -1);
 			$class = substr($class, 0, $haveArgs);
 		}
@@ -563,7 +576,14 @@ class phpQueryClass implements Iterator {
 				$this->elements = $stack;
 				break;
 			case 'contains':
-				$this->contains( trim($args, "\"'"), false );
+				$text = trim($args, "\"'");
+				$stack = array();
+				foreach( $this->elements as $node ) {
+					if ( strpos( $node->textContent, $text ) === false )
+						continue;
+					$stack[] = $node;
+				}
+				$this->elements = $stack;
 				break;
 			case 'not':
 				$query = trim($args, "\"'");
@@ -703,11 +723,11 @@ class phpQueryClass implements Iterator {
 		// TODO
 	}
 	
-	protected function importHTML($html) {
+	protected function importHtml($html) {
 		$this->elementsBackup = $this->elements;
 		$this->elements = array();
 		$DOM = new DOMDocument();
-		@$DOM->loadHTML( $html );
+		@$DOM->loadHtml( $html );
 		foreach($DOM->documentElement->firstChild->childNodes as $node)
 			$this->elements[] = $this->DOM->importNode( $node, true );
 	}
@@ -732,25 +752,6 @@ class phpQueryClass implements Iterator {
 		}
 		return $this;
 	}
-	
-	/**
-	 * Enter description here...
-	 *
-	 * @return phpQueryClass
-	 * @todo move to pseudoclasses
-	 */
-	public function contains( $text, $history = true ) {
-		$this->elementsBackup = $this->elements;
-		$stack = array();
-		foreach( $this->elements as $node ) {
-			if ( strpos( $node->textContent, $text ) === false )
-				continue;
-			$stack[] = $node;
-		}
-		$this->elements = $stack;
-		return $this;
-	}
-
 
 	/**
 	 * Enter description here...
@@ -792,6 +793,8 @@ class phpQueryClass implements Iterator {
 	public function end() {
 //		$this->elements = array_pop( $this->history );
 //		return $this;
+		$this->previous->DOM = $this->DOM;
+		$this->previous->XPath = $this->XPath;
 		return $this->previous
 			? $this->previous
 			: $this;
@@ -814,7 +817,7 @@ class phpQueryClass implements Iterator {
 	 */
 	public function each($callabck) {
 		$this->elementsBackup = $this->elements;
-		foreach( $this->history[ count( $this->history )-1 ] as $node ) {
+		foreach( $this->elementsBackup as $node ) {
 			$this->elements = array($node);
 			if ( is_array( $callabck ) ) {
 				if ( is_object( $callabck[0] ) )
@@ -858,7 +861,7 @@ class phpQueryClass implements Iterator {
 		$each = clone $this;
 		foreach( $each as $node ) {
 			$prev = $node->before($content)->_prev();
-			if ( $this->isHTML($content) )
+			if ( $this->isHtml($content) )
 				$stack[] = $prev->elements;
 		}
 		$stack = $this->before($content);
@@ -891,18 +894,25 @@ class phpQueryClass implements Iterator {
 		return $this;
 	}
 
-	protected function isHTML($html) {
-		return substr(trim($html), 0, 1) == '<';
+	/**
+	 * Checks if $input is HTML string, which has to start with '<'.
+	 * @todo this has to be done better, so check & rethink & refactor. Thought 1 - phpQuery::parseHtml()
+	 *
+	 * @param unknown_type $input
+	 * @return unknown
+	 */
+	protected function isHtml($input) {
+		return substr(trim($input), 0, 1) == '<';
 //			|| is_object($html) && is_a($html, 'DOMElement');
 	}
 
 	public function html($html = null) {
 		if (! is_null($html) ) {
 			$this->debug("Inserting data with 'html'");
-			if ( $this->isHTML( $html ) ) {
+			if ( $this->isHtml( $html ) ) {
 				$toInserts = array();
 				$DOM = new DOMDocument();
-				@$DOM->loadHTML( $html );
+				@$DOM->loadHtml( $html );
 				foreach($DOM->documentElement->firstChild->childNodes as $node)
 					$toInserts[] = $this->DOM->importNode( $node, true );
 			} else {
@@ -910,12 +920,16 @@ class phpQueryClass implements Iterator {
 			}
 			$this->_empty();
 			// i dont like brackets ! python rules ! ;)
-			foreach( $toInserts as $toInsert )
-				foreach( $this->elements as $alreadyAdded => $node )
+			foreach( $toInserts as $toInsert ) {
+				foreach( $this->elements as $alreadyAdded => $node ) {
 					$node->appendChild( $alreadyAdded
 						? $toInsert->cloneNode()
 						: $toInsert
 					);
+				}
+			}
+			$this->dumpStack();
+			print($this->elements[0]->textContent);
 			return $this;
 		} else {
 			if ( $this->length() == 1 && $this->isRoot( $this->elements[0] ) )
@@ -936,10 +950,11 @@ class phpQueryClass implements Iterator {
 	 *
 	 * @todo change to htmlWithElement
 	 */
-	public function htmlWithElement() {
+	public function htmlOuter() {
 		if ( $this->length() == 1 && $this->isRoot( $this->elements[0] ) )
 			return $this->save();
 		$DOM = new DOMDocument();
+		$this->dumpStack();
 		foreach( $this->elements as $node ) {
 			$DOM->appendChild(
 				$DOM->importNode( $node, true )
@@ -977,7 +992,7 @@ class phpQueryClass implements Iterator {
 		)))))));
 	}
 	public function __toString() {
-		return $this->htmlWithElement();
+		return $this->htmlOuter();
 	}
 	/**
 	 * Enter description here...
@@ -1192,9 +1207,9 @@ class phpQueryClass implements Iterator {
 				if ( $to ) {
 					$insertFrom = $this->elements;
 					// insert into created element
-					if ( $this->isHTML( $target ) ) {
+					if ( $this->isHtml( $target ) ) {
 						$DOM = new DOMDocument();
-						@$DOM->loadHTML($target);
+						@$DOM->loadHtml($target);
 						$i = count($this->tmpNodes);
 						$this->tmpNodes[] = array();
 						foreach($DOM->documentElement->firstChild->childNodes as $node) {
@@ -1213,9 +1228,9 @@ class phpQueryClass implements Iterator {
 				} else {
 					$insertTo = $this->elements;
 					// insert created element
-					if ( $this->isHTML( $target ) ) {
+					if ( $this->isHtml( $target ) ) {
 						$DOM = new DOMDocument();
-						@$DOM->loadHTML($target);
+						@$DOM->loadHtml($target);
 						$insertFrom = array();
 						foreach($DOM->documentElement->firstChild->childNodes as $node) {
 							$insertFrom[] = $this->DOM->importNode($node, true);
@@ -1439,9 +1454,9 @@ class phpQueryClass implements Iterator {
 		$stack = array();
 		foreach( $this->elements as $node ) {
 			if ( $selector ) {
-				if ( $this->is( $selector ) && ! $this->elementsContains($node, $stack) )
+				if ( $this->is( $selector ) && ! $this->elementsContainsNode($node, $stack) )
 					$stack[] = $node;
-			} else if (! $this->elementsContains($node, $stack) )
+			} else if (! $this->elementsContainsNode($node, $stack) )
 				$stack[] = $node;
 		}
 		$this->elementsBackup = $this->elements;
@@ -1481,13 +1496,13 @@ class phpQueryClass implements Iterator {
 	protected function merge() {
 		foreach( get_func_args() as $nodes )
 			foreach( $nodes as $newNode )
-				if (! $this->elementsContains($newNode) )
+				if (! $this->elementsContainsNode($newNode) )
 					$this->elements[] = $newNode;
 	}
 	
-	protected function stackContains($nodeToCheck, $stackToCheck = null) {
-		$loop = ! is_null($stackToCheck)
-			? $stackToCheck
+	protected function elementsContainsNode($nodeToCheck, $elementsStack = null) {
+		$loop = ! is_null($elementsStack)
+			? $elementsStack
 			: $this->elements;
 		foreach( $loop as $node ) {
 			if ( $node->isSameNode( $nodeToCheck ) )
@@ -1504,7 +1519,7 @@ class phpQueryClass implements Iterator {
 	public function parent( $selector = null ) {
 		$stack = array();
 		foreach( $this->elements as $node )
-			if ( $node->parentNode && ! $this->elementsContains($node->parentNode, $stack) )
+			if ( $node->parentNode && ! $this->elementsContainsNode($node->parentNode, $stack) )
 				$stack[] = $node->parentNode;
 		$this->elementsBackup = $this->elements;
 		$this->elements = $stack;
@@ -1529,11 +1544,11 @@ class phpQueryClass implements Iterator {
 				if ( is_a($test, 'DOMDocument') )
 					break;
 				if ( $selector ) {
-					if ( $this->is( $selector, $test ) && ! $this->elementsContains($test, $stack) ) {
+					if ( $this->is( $selector, $test ) && ! $this->elementsContainsNode($test, $stack) ) {
 						$stack[] = $test;
 						continue;
 					}
-				} else if (! $this->elementsContains($test, $stack) ) {
+				} else if (! $this->elementsContainsNode($test, $stack) ) {
 					$stack[] = $test;
 					continue;
 				}
@@ -1786,8 +1801,8 @@ class phpQueryClass implements Iterator {
 				: get_class($node);
 		}
 		return $oneNode
-		? $return[0]
-		: $return;
+			? $return[0]
+			: $return;
 	}
 	
 	// HELPERS

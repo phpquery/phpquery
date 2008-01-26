@@ -1,5 +1,5 @@
 <?php
-require_once('../phpQuery.php');
+require_once('../phpQuery/phpQuery.php');
 phpQueryClass::$debug = true;
 $testName = 'Selectors';
 $tests = array(
@@ -36,7 +36,7 @@ $tests = array(
 		)
 	),
 	array(
-		'*[@rel="test"]',
+		'*[rel="test"]',
 		array(
 			'p',
 			'p'
@@ -59,7 +59,7 @@ $tests = array(
 		)
 	),
 	array(
-		"[@content*=html]",
+		"[content*=html]",
 		array(
 			'meta'
 		)
@@ -72,19 +72,25 @@ $tests = array(
 		)
 	),
 	array(
-		"script[@src]:not([@src^=<?php])",
+		"script[src]:not([src^=<?php])",
 		array(
 			'script'
 		)
 	),
+//	array(
+//		'li:not([ul/li])',
+//		array(
+//			'li',
+//			'li#testID',
+//			'li',
+//			'li.nested',
+//			'li.second',
+//		)
+//	),
 	array(
-		'li:not([ul/li])',
+		'li:has(ul)',
 		array(
-			'li',
-			'li#testID',
-			'li',
-			'li.nested',
-			'li.second',
+			'li#i_have_nested_list',
 		)
 	),
 );

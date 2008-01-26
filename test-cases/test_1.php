@@ -1,7 +1,7 @@
 <?php
-require_once('../phpQuery.php');
+require_once('../phpQuery/phpQuery.php');
 phpQueryClass::$debug = true;
-$testName = 'Simple data insert';
+$testName = 'Simple data insertion';
 $testResult = <<<EOF
 <div class="articles">
 			div.articles text node
@@ -41,23 +41,22 @@ $rows = array(
 		'body'	=> 'News 3 body',
 	),
 );
-_('test.html');
+phpQuery('test.html');
 $articles = phpQuery('.articles ul');
-$rowSrc = $articles
-	->find('li')
+$rowSrc = $articles->find('li')
 	->remove()
 	->eq(0);
 foreach( $rows as $r ) {
 	$row = $rowSrc->_clone();
 	foreach( $r as $field => $value ) {
 		$row->find(".{$field}")
-				->html( $value )
-			->end();
+			->html($value);
+//		die($row->htmlOuter());
 	}
-	$row->appendTo($articles)
-		->end();
+	$row->appendTo($articles);
 }
-$result = phpQuery('.articles')->htmlWithTag();
+$result = phpQuery('.articles')->htmlOuter();
+//print htmlspecialchars("<pre>{$result}</pre>").'<br />';
 $similarity = 0.0;
 similar_text($testResult, $result, $similarity);
 if ( $similarity > 95 )

@@ -5,8 +5,8 @@
  * Compatible with jQuery 1.2 (work in progress).
  * 
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
- * @link http://meta20.net/phpQuery
  * @link http://code.google.com/p/phpquery/
+ * @link http://meta20.net/phpQuery
  * @link http://jquery.com
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  * @version 0.8
@@ -116,7 +116,7 @@ class phpQueryClass implements Iterator {
 				$input[0],
 				isset( $input[1] )
 				&& is_object( $input[1] )
-				&& is_a( $input[1], 'phpQueryClass')
+				&& ($input[1] instanceof self)
 					? $input[1]
 					: null
 			);
@@ -711,7 +711,8 @@ class phpQueryClass implements Iterator {
 	}
 	
 	protected function isRoot( $node ) {
-		return is_a($node, 'DOMDocument') || $node->tagName == 'html';
+		$DOMDocument = "DOMDocument";
+		return $node instanceof $DOMDocument || $node->tagName == 'html';
 	}
 
 	/**
@@ -1756,17 +1757,18 @@ class phpQueryClass implements Iterator {
 	}
 
 	protected function getNodeXpath( $oneNode = null ) {
+		$DOMDocument = "DOMDocument";
 		$return = array();
 		$loop = $oneNode
 			? array($oneNode)
 			: $this->elements;
 		foreach( $loop as $node ) {
-			if ( is_a($node, 'DOMDocument') ) {
+			if ($node instanceof $DOMDocument) {
 				$return[] = '';
 				continue;
 			}				
 			$xpath = array();
-			while(! is_a($node, 'DOMDocument') ) {
+			while(! ($node instanceof $DOMDocument) ) {
 				$i = 1;
 				$sibling = $node;
 				while( $sibling->previousSibling ) {

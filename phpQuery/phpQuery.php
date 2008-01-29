@@ -529,9 +529,9 @@ class phpQueryClass implements Iterator {
 	 */
 	protected function filterPseudoClasses( $class ) {
 		// TODO clean args parsing ?
-		$class = trim($class, ':');
-		$haveArgs = strpos($class, '(') !== false;
-		if ( $haveArgs ) {
+		$class = ltrim($class, ':');
+		$haveArgs = strpos($class, '(');
+		if ( $haveArgs !== false ) {
 			$args = substr($class, $haveArgs+1, -1);
 			$class = substr($class, 0, $haveArgs);
 		}
@@ -596,6 +596,8 @@ class phpQueryClass implements Iterator {
 				}
 				$this->elements = $newStack;
 				break;
+			default:
+				$this->debug("Unknown pseudoclass '{$class}', skipping...");
 		}
 	}
 	/**
@@ -1763,7 +1765,7 @@ class phpQueryClass implements Iterator {
 	}
 
 	protected function getNodeXpath( $oneNode = null ) {
-		$DOMDocument = "DOMDocument";
+		$DOMDocument = "DOMDocument"; $DOMElement = 'DOMElement';
 		$return = array();
 		$loop = $oneNode
 			? array($oneNode)
@@ -1779,7 +1781,7 @@ class phpQueryClass implements Iterator {
 				$sibling = $node;
 				while( $sibling->previousSibling ) {
 					$sibling = $sibling->previousSibling;
-					$isElement = get_class($sibling) == 'DOMElement';
+					$isElement = $sibling instanceof $DOMElement;
 					if ( $isElement && $sibling->tagName == $node->tagName )
 						$i++;
 				}

@@ -1661,6 +1661,11 @@ class phpQueryClass implements Iterator {
 	public function val() {
 	}
 	
+	public function andSelf() {
+		if ( $this->previous )
+			$this->elements = array_merge($this->elements, $this->previous->elements);
+	}	
+	
 	/**
 	 * Enter description here...
 	 *

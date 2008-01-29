@@ -463,13 +463,13 @@ class phpQueryClass implements Iterator {
 							// cut regexp character
 							$attr = substr($attr, 0, -1);
 							$execute = true;
-							$XQuery .= "[{$attr}]";
+							$XQuery .= "[@{$attr}]";
 						} else {
-							$XQuery .= "[{$attr}='{$value}']";
+							$XQuery .= "[@{$attr}='{$value}']";
 						}
 					// attr without specified value
 					} else {
-						$XQuery .= "[{$attr}]";
+						$XQuery .= "[@{$attr}]";
 					}
 					if ( $execute ) {
 						$this->runQuery($XQuery, $s, 'is');
@@ -650,9 +650,9 @@ class phpQueryClass implements Iterator {
 						if (! $this->matchClasses( $s, $node ) )
 							$break = true;
 					// ATTRS
-					} else if ( isset($s[1]) && $s[0].$s[1] == '[@' ) {
-						// strip side brackets and @
-						$attr = substr($s, 2, -1);
+					} else if ( $s[0] == '[' ) {
+						// strip side brackets
+						$attr = trim($s, '[]');
 						if ( strpos($attr, '=') ) {
 							list( $attr, $val ) = explode('=', $attr);
 							if ( $this->isRegexp($attr)) {

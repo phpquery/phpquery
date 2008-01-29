@@ -427,8 +427,19 @@ class phpQueryClass implements Iterator {
 		// backup last stack /for end()/
 		$this->elementsBackup = $this->elements;
 		// allow to define context
-		if ( $context && is_a($context, get_class($this)) )
-			$this->elements = $context->elements;
+		if ( $context ) {
+			$DOMElement = 'DOMElement';
+			if (! is_array($context) && $context instanceof $DOMElement )
+				$this->elements = array($context);
+			else if ( is_array($context) ) {
+				$this->elements = array();
+				foreach ($context as $e)
+					if ( $c instanceof $DOMElement )
+						$this->elements[] = $c;
+				
+			} else if ( $context instanceof self )
+				$this->elements = $context->elements;  
+		}
 		$spaceBefore = false;
 		$queries = $this->parseSelector( $selectors );
 		$this->debug(array('FIND',$selectors,$queries));
@@ -595,6 +606,15 @@ class phpQueryClass implements Iterator {
 						$newStack[] = $node;
 				}
 				$this->elements = $newStack;
+				break;
+			case 'has':
+				$selector = trim($args, "\"'");
+				$stack = array();
+				foreach( $this->elements as $el ) {
+					if ( $this->find($selector, $el)->length() )
+						$stack[] = $el;
+				}
+				$this->elements = $stack;
 				break;
 			default:
 				$this->debug("Unknown pseudoclass '{$class}', skipping...");

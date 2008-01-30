@@ -12,6 +12,12 @@
  * @version 0.8
  */
 
+// class names for instanceof
+define('DOMDOCUMENT', 'DOMDocument');
+define('DOMELEMENT', 'DOMElement');
+define('DOMNODELIST', 'DOMNodeList');
+define('DOMNODE', 'DOMNode');
+
 class phpQueryClass implements Iterator {
 	public static $debug = false;
 	protected static $documents = array();
@@ -34,7 +40,9 @@ class phpQueryClass implements Iterator {
 	 * Other helpers
 	 */
 	protected $regexpChars = array('^','*','$');
-
+	// TODO check this within insert(), it probably not needed
+	protected $tmpNodes = array();
+	
 	/**
 	 * Multi-purpose function.
 	 * Use phpQuery() or _() as shortcut.
@@ -428,13 +436,12 @@ class phpQueryClass implements Iterator {
 		$this->elementsBackup = $this->elements;
 		// allow to define context
 		if ( $context ) {
-			$DOMElement = 'DOMElement';
-			if (! is_array($context) && $context instanceof $DOMElement )
+			if (! is_array($context) && $context instanceof DOMELEMENT )
 				$this->elements = array($context);
 			else if ( is_array($context) ) {
 				$this->elements = array();
 				foreach ($context as $e)
-					if ( $c instanceof $DOMElement )
+					if ( $c instanceof DOMELEMENT )
 						$this->elements[] = $c;
 				
 			} else if ( $context instanceof self )
@@ -733,8 +740,7 @@ class phpQueryClass implements Iterator {
 	}
 	
 	protected function isRoot( $node ) {
-		$DOMDocument = "DOMDocument";
-		return $node instanceof $DOMDocument || $node->tagName == 'html';
+		return $node instanceof DOMDOCUMENT || $node->tagName == 'html';
 	}
 
 	/**
@@ -754,27 +760,65 @@ class phpQueryClass implements Iterator {
 		foreach($DOM->documentElement->firstChild->childNodes as $node)
 			$this->elements[] = $this->DOM->importNode( $node, true );
 	}
+
 	/**
-	 * Wraps elements with $before and $after.
-	 * In case when there's no $after, $before should be a tag name (without <>).
+	 * Enter description here...
 	 *
+	 * @param String|phpQueryClass
 	 * @return phpQueryClass
 	 */
-	public function wrap($before, $after = null) {
-		if (! $after ) {
-			$after = "</{$before}>";
-			$before = "<{$before}>";
-		}
-		// safer...
-		$each = clone $this;
-		foreach( $each as $node ) {
-			$wrap = self::phpQuery($before."<div id='__wrap'/>".$after)
-				->insertAfter($node);
-			$wrap->find('#__wrap')
-					->replace($node);
-		}
+	public function wrapAll($wrapper) {
+		$wrapper = phpQuery($wrapper);
+		if (! $wrapper->length() || ! $this->length() )
+			return $this;
+		$wrapper->insertBefore($this->elements[0]);
+		$deepest = $wrapper->elements[0];
+		while($deepest->firstChild)
+			$deepest = $deepest->firstChild;
+		phpQuery($deepest)->append($this);
 		return $this;
 	}
+	
+	/**
+	 * Enter description here...
+	 *
+	 * @param String|phpQueryClass
+	 * @return phpQueryClass
+	 */
+	public function wrap($wrapper) {
+		foreach($this as $el)
+			$el->wrapAll($wrapper);
+		return $this;
+	}
+	
+	/**
+	 * Enter description here...
+	 *
+	 * @param String|phpQueryClass
+	 * @return phpQueryClass
+	 */
+	public function wrapInner($wrapper) {
+		foreach($this as $el)
+			$el->contents()->wrapAll($wrapper);
+		return $this;
+	}
+	
+	/**
+	 * Enter description here...
+	 *
+	 * @return phpQueryClass
+	 * @testme Support for text nodes
+	 */
+	public function contents() {
+		$stack = array();
+		foreach( $this->elements as $el ) {
+			foreach( $el->childNodes as $node ) {
+				$stack[] = $node;
+			}
+		}
+		return $this->newInstance($stack);
+	}
+	
 
 	/**
 	 * Enter description here...
@@ -874,6 +918,8 @@ class phpQueryClass implements Iterator {
 	/**
 	 * Replaces current element with $content and changes stack to new element(s) (except text nodes).
 	 * Can be reverted with end().
+	 * 
+	 * NON JQUERY-COMPATIBLE METHOD!
 	 *
 	 * @param string|phpQueryClass $with
 	 * @return phpQueryClass
@@ -900,6 +946,29 @@ class phpQueryClass implements Iterator {
 	 */
 	public function replacePHP($code) {
 		return $this->replace("<php>{$code}</php>");
+	}
+	
+	/**
+	 * Enter description here...
+	 * 
+	 * @param String|phpQueryClass $content
+	 * @link http://docs.jquery.com/Manipulation/replaceWith#content
+	 * @return phpQueryClass
+	 */
+	public function replaceWith($content) {
+		return $this->after($content)->remove();
+	}
+	
+	/**
+	 * Enter description here...
+	 *
+	 * @param String $selector
+	 * @return phpQueryClass
+	 */
+	public function replaceAll($selector) {
+		foreach( $this->find($selector) as $el )
+			$el->after($this)->remove();
+		return $this;
 	}
 
 	/**
@@ -1036,6 +1105,8 @@ class phpQueryClass implements Iterator {
 	/**
 	 * Fills elements selected by $selector with $content using html(), and roll back selection.
 	 * 
+	 * NON JQUERY-COMPATIBLE METHOD!
+	 * 
 	 * @param string	Selector
 	 * @param string	Content
 	 * 
@@ -1088,6 +1159,8 @@ class phpQueryClass implements Iterator {
 	}
 	/**
 	 * Enter description here...
+	 * 
+	 * NON JQUERY-COMPATIBLE METHOD! 
 	 *
 	 * @return phpQueryClass
 	 */
@@ -1185,6 +1258,7 @@ class phpQueryClass implements Iterator {
 	/**
 	 * Enter description here...
 	 *
+	 * @param String|phpQueryClass
 	 * @return phpQueryClass
 	 */
 	public function insertBefore( $seletor ) {
@@ -1215,7 +1289,15 @@ class phpQueryClass implements Iterator {
 	public function insertAfter( $seletor ) {
 		return $this->insert($seletor, __FUNCTION__);
 	}
-	protected function insert( $target, $type ) {
+	
+	/**
+	 * Various insert scenarios.
+	 *
+	 * @param unknown_type $target
+	 * @param unknown_type $type
+	 * @return phpQueryClass
+	 */
+	protected function insert($target, $type) {
 		$this->debug("Inserting data with '{$type}'");
 		$to = false;
 		switch( $type ) {
@@ -1238,8 +1320,6 @@ class phpQueryClass implements Iterator {
 						foreach($DOM->documentElement->firstChild->childNodes as $node) {
 							$this->tmpNodes[$i][] = $this->DOM->importNode( $node, true );
 						}
-						// XXX needed ?!
-					//	$this->tmpNodes[$i] = array_reverse($this->tmpNodes[$i]);
 						$insertTo =& $this->tmpNodes[$i];
 					// insert into selected element
 					} else {
@@ -1258,8 +1338,6 @@ class phpQueryClass implements Iterator {
 						foreach($DOM->documentElement->firstChild->childNodes as $node) {
 							$insertFrom[] = $this->DOM->importNode($node, true);
 						}
-						// XXX needed ?!
-					//	$insertFrom = array_reverse($insertFrom);
 					// insert selected element
 					} else {
 						$insertFrom = array(
@@ -1270,7 +1348,8 @@ class phpQueryClass implements Iterator {
 				break;
 			case 'object':
 				$insertFrom = $insertTo = array();
-				if ( is_a($target, get_class($this)) ){
+				// phpQuery
+				if ( $target instanceof self ) {
 					if ( $to ) {
 						$insertTo = $target->elements;
 						if ( $this->size() == 1 && $this->isRoot($this->elements[0]) )
@@ -1285,10 +1364,24 @@ class phpQueryClass implements Iterator {
 							$loop = $target->find('body>*')->elements;
 						else
 							$loop = $target->elements;
-						foreach( $loop as $node ) {
+						foreach( $loop as $node )
 							$insertFrom[] = $this->DOM->importNode($node, true);
-						}
 					}
+				// DOMElement
+				} elseif ( $target instanceof DOMELEMENT ) {
+					// import node if needed
+					if ( $target->ownerDocument != $this->DOM )
+						$target = $this->DOM->importNode($target, true);
+					if ( $to ) {
+						$insertTo = array($target);
+						if ( $this->size() == 1 && $this->isRoot($this->elements[0]) )
+							$insertFrom = $this->find('body>*')->elements;
+						else
+							$insertFrom = $this->elements;
+					} else {
+						$insertTo = $this->elements;
+						$insertFrom[] = array($target);
+					}					
 				}
 				break;
 		}
@@ -1790,23 +1883,22 @@ class phpQueryClass implements Iterator {
 	}
 
 	protected function getNodeXpath( $oneNode = null ) {
-		$DOMDocument = "DOMDocument"; $DOMElement = 'DOMElement';
 		$return = array();
 		$loop = $oneNode
 			? array($oneNode)
 			: $this->elements;
 		foreach( $loop as $node ) {
-			if ($node instanceof $DOMDocument) {
+			if ($node instanceof DOMDOCUMENT) {
 				$return[] = '';
 				continue;
 			}				
 			$xpath = array();
-			while(! ($node instanceof $DOMDocument) ) {
+			while(! ($node instanceof DOMDOCUMENT) ) {
 				$i = 1;
 				$sibling = $node;
 				while( $sibling->previousSibling ) {
 					$sibling = $sibling->previousSibling;
-					$isElement = $sibling instanceof $DOMElement;
+					$isElement = $sibling instanceof DOMELEMENT;
 					if ( $isElement && $sibling->tagName == $node->tagName )
 						$i++;
 				}

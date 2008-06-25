@@ -95,7 +95,7 @@ $tests = array(
 	),
 );
 
-phpQuery('test.html');
+phpQueryCreateDomFromFile('test.html');
 foreach( $tests as $k => $test ) {
 	$tests[ $k ][2] = phpQuery( $test[0] )->whois();
 }

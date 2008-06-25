@@ -7,8 +7,8 @@ $testResult = array(
 	'p.body',
 	'p.body',
 );
-$result = phpQuery('test.html')
-	->find('p')
+$result = phpQueryCreateDomFromFile('test.html');
+$result = $result->find('p')
 	->filter('.body:gt(1)');
 if ( $result->whois() == $testResult )
 	print "Test '{$testName}' passed :)";

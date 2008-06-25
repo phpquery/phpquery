@@ -41,7 +41,7 @@ $rows = array(
 		'body'	=> 'News 3 body',
 	),
 );
-phpQuery('test.html');
+phpQueryCreateDomFromFile('test.html');
 $articles = phpQuery('.articles ul');
 $rowSrc = $articles->find('li')
 	->remove()

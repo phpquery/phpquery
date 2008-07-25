@@ -9,7 +9,7 @@
  * @link http://meta20.net/phpQuery
  * @link http://jquery.com
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.9.1 RC
+ * @version 0.9.1 beta
  */
 
 /**
@@ -131,15 +131,19 @@ class phpQuery implements Iterator {
 		self::$lastDomId = $id;
 	}
 	/**
-	 * Returns document with id $id.
+	 * Returns document with id $id or last selected.
 	 * $id can be retrived via getDocumentId() or getDocumentIdRef().
 	 * Chainable.
 	 *
+	 * @see phpQuery::selectDocument()
 	 * @param unknown_type $id
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public static function getDocument($id) {
-		self::selectDocument($id);
+	public static function getDocument($id = null) {
+		if ($id)
+			self::selectDocument($id);
+		else
+			$id = phpQuery::$lastDomId;
 		return new phpQuery($id);
 	}
 	/**
@@ -2153,7 +2157,7 @@ class phpQuery implements Iterator {
 			if (! $this->is(".$className", $node))
 				$node->setAttribute(
 					'class',
-					$node->getAttribute('class').' '.$className
+					trim($node->getAttribute('class').' '.$className)
 				);
 		}
 		return $this;
@@ -2397,7 +2401,7 @@ if (! function_exists('pq')) {
 	function pq() {
 		$args = func_get_args();
 		return call_user_func_array(
-			array('phpQuery', 'phpQuery'),
+			array('phpQuery', 'pq'),
 			$args
 		);
 	}

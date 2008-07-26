@@ -1,6 +1,6 @@
 <?php
 require_once('../phpQuery/phpQuery.php');
-phpQueryClass::$debug = true;
+phpQuery::$debug = true;
 $testName = 'Simple data insertion';
 $testResult = <<<EOF
 <div class="articles">
@@ -41,8 +41,8 @@ $rows = array(
 		'body'	=> 'News 3 body',
 	),
 );
-phpQueryCreateDomFromFile('test.html');
-$articles = phpQuery('.articles ul');
+phpQuery::newDocumentFile('test.html');
+$articles = pq('.articles ul');
 $rowSrc = $articles->find('li')
 	->remove()
 	->eq(0);
@@ -55,7 +55,7 @@ foreach( $rows as $r ) {
 	}
 	$row->appendTo($articles);
 }
-$result = phpQuery('.articles')->htmlOuter();
+$result = pq('.articles')->htmlOuter();
 //print htmlspecialchars("<pre>{$result}</pre>").'<br />';
 $similarity = 0.0;
 similar_text($testResult, $result, $similarity);

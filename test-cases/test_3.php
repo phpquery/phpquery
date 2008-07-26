@@ -1,6 +1,6 @@
 <?php
 require_once('../phpQuery/phpQuery.php');
-phpQueryClass::$debug = true;
+phpQuery::$debug = true;
 $testName = 'Selectors';
 $tests = array(
 	array(
@@ -95,13 +95,13 @@ $tests = array(
 	),
 );
 
-phpQueryCreateDomFromFile('test.html');
+phpQuery::newDocumentFile('test.html');
 foreach( $tests as $k => $test ) {
-	$tests[ $k ][2] = phpQuery( $test[0] )->whois();
+	$tests[ $k ][2] = pq( $test[0] )->whois();
 }
 foreach( $tests as $test ) {
 	if ( $test[1] == $test[2] )
-		print "Test '{$test[0]}' passed :)";
+		print "Test '{$test[0]}' PASSED :)";
 	else {
 		print "Test '{$test[0]}' <strong>FAILED</strong> !!!";
 		print_r($test[2]);

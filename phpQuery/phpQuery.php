@@ -165,7 +165,7 @@ class phpQuery implements Iterator {
 	 * @return unknown
 	 */
 	public static function newDocumentFile($file) {
-		$domId = self::createDomFromFile($html);
+		$domId = self::createDomFromFile($file);
 		return new phpQuery($domId);
 	}
 	public static function createDomFromFile($file, $domId = null) {
@@ -532,16 +532,17 @@ class phpQuery implements Iterator {
 	 */
 	protected function newInstance($newStack = null) {
 		$class = get_class($this);
-		// support inheritance by passing old object to overloaded contructor
+		// support inheritance by passing old object to overloaded constructor
 		$new = $class != 'phpQuery'
 			? new $class($this, $this->domId)
 			: new phpQuery($this->domId);
 		$new->previous = $this;
-		if (!is_null($newStack)) {
-			$new->elements = $newStack;
-		} else {
+		if (is_null($newStack)) {
 			$new->elements = $this->elements;
-			$this->elements = $this->elementsBackup;
+			if ($this->elementsBackup)
+				$this->elements = $this->elementsBackup;
+		} else {
+			$new->elements = $newStack;
 		}
 		return $new;
 	}
@@ -1097,27 +1098,6 @@ class phpQuery implements Iterator {
 			? $this->filter($selector)
 			: $this->find($selector);
 	}
-	
-	/**
-	 * Enter description here...
-	 *
-	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 */
-	public function each($callabck) {
-		$this->elementsBackup = $this->elements;
-		foreach( $this->elementsBackup as $node ) {
-			$this->elements = array($node);
-			if ( is_array( $callabck ) ) {
-				if ( is_object( $callabck[0] ) )
-					$callabck[0]->{$callabck[1]}( $this->newInstance() );
-				else
-					eval("{$callabck[0]}::{$callabck[1]}( \$this->newInstance() );");
-			} else {
-				$callabck( $this->newInstance() );
-			}
-		}
-		return $this;
-	}
 
 	/**
 	 * Enter description here...
@@ -1335,8 +1315,8 @@ class phpQuery implements Iterator {
 			foreach( $loop as $node ) {
 				if (! $node instanceof DOMELEMENT )
 					continue;
-				$isEncoding = isset($html->tagName) && $html->tagName == 'meta'
-					&& strtolower($html->getAttribute('http-equiv')) == 'content-type';
+				$isEncoding = isset($node->tagName) && $node->tagName == 'meta'
+					&& strtolower($node->getAttribute('http-equiv')) == 'content-type';
 				if ($isEncoding)
 					return true;
 				foreach( $node->getElementsByTagName('meta') as $node )
@@ -1344,7 +1324,7 @@ class phpQuery implements Iterator {
 						return true;
 			}
 		} else
-			return preg_match('@<meta\\s+http-equiv\\s*=\\s*(["|\'])Content-Type\\1@', $html);
+			return preg_match('@<meta\\s+http-equiv\\s*=\\s*(["|\'])Content-Type\\1@i', $html);
 	}
 	public static function isXhtml($dom) {
 		$doctype = isset($dom->doctype) && is_object($dom->doctype)
@@ -2261,6 +2241,17 @@ class phpQuery implements Iterator {
 		return $this;
 	}
 	
+	/**
+	 * Enter description here...
+	 *
+	 * @param unknown_type $callback
+	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 */
+	public function each($callback) {
+		foreach($this->newInstance() as $node)
+			call_user_func($callback, $node);
+		return $this;
+	}
 
 	// ITERATOR INTERFACE
 	public function rewind(){

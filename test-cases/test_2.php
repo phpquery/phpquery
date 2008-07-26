@@ -1,13 +1,11 @@
 <?php
 require_once('../phpQuery/phpQuery.php');
-phpQueryClass::$debug = true;
+phpQuery::$debug = true;
 $testName = 'Filter with pseudoclass';
 $testResult = array(
 	'p.body',
-	'p.body',
-	'p.body',
 );
-$result = phpQueryCreateDomFromFile('test.html');
+$result = phpQuery::newDocumentFile('test.html');
 $result = $result->find('p')
 	->filter('.body:gt(1)');
 if ( $result->whois() == $testResult )

@@ -1,12 +1,12 @@
 <?php
 require_once('../phpQuery/phpQuery.php');
-phpQueryClass::$debug = true;
+phpQuery::$debug = true;
 
 // SLICE1
 $testResult = array(
 	'li#testID',
 );
-$result = phpQueryCreateDomFromFile('test.html')
+$result = phpQuery::newDocumentFile('test.html')
 	->find('li')
 	->slice(1, 2);
 if ( $result->whois() == $testResult )
@@ -26,7 +26,7 @@ $testResult = array(
 	'li#i_have_nested_list',
 	'li.nested',
 );
-$result = phpQueryCreateDomFromFile('test.html')
+$result = phpQuery::newDocumentFile('test.html')
 	->find('li')
 	->slice(1, -1);
 if ( $result->whois() == $testResult )
@@ -42,7 +42,7 @@ print "\n";
 
 
 // Multi-insert
-$result = phpQueryCreateDom('<li><span class="field1"></span><span class="field1"></span></li>')
+$result = phpQuery::newDocument('<li><span class="field1"></span><span class="field1"></span></li>')
 	->find('.field1')
 	->php('longlongtest');
 $validResult = '<li><span class="field1"><php>longlongtest</php></span><span class="field1"><php>longlongtest</php></span></li>';

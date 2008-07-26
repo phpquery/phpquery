@@ -1726,10 +1726,15 @@ class phpQuery implements Iterator {
 	/**
 	 * Enter description here...
 	 *
-	 * @todo
+	 * @return Int
 	 */
-	public function __index() {
-		;
+	public function index($subject) {
+		$index = -1;
+		foreach($this->newInstance() as $k => $node) {
+			if ($node->elements[0]->isSameNode($subject->elements[0]))
+				$index = $k;
+		}
+		return $index;
 	}
 	
 	/**
@@ -1847,15 +1852,6 @@ class phpQuery implements Iterator {
 			$this->getElementSiblings('nextSibling', $selector)
 		);
 	}
-	
-	/**
-	 * Number of prev siblings
-	 * @return int
-	 * @todo
-	 */
-//	public function index() {
-//		return $this->prevSiblings()->size();
-//	}
 	
 	protected function getElementSiblings($direction, $selector, $limitToOne = false) {
 		$stack = array();

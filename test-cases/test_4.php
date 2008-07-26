@@ -8,9 +8,9 @@ $testResult = array(
 );
 $result = phpQuery::newDocumentFile('test.html')
 	->find('li')
-	->slice(1, 2);
+		->slice(1, 2);
 if ( $result->whois() == $testResult )
-	print "Test 'Slice1' passed :)";
+	print "Test 'Slice1' PASSED :)";
 else {
 	print "Test 'Slice1' <strong>FAILED</strong> !!! ";
 	print "<pre>";
@@ -28,9 +28,9 @@ $testResult = array(
 );
 $result = phpQuery::newDocumentFile('test.html')
 	->find('li')
-	->slice(1, -1);
+		->slice(1, -1);
 if ( $result->whois() == $testResult )
-	print "Test 'Slice2' passed :)";
+	print "Test 'Slice2' PASSED :)";
 else {
 	print "Test 'Slice2' <strong>FAILED</strong> !!! ";
 	print "<pre>";
@@ -39,21 +39,31 @@ else {
 }
 print "\n";
 
-
-
 // Multi-insert
 $result = phpQuery::newDocument('<li><span class="field1"></span><span class="field1"></span></li>')
 	->find('.field1')
-	->php('longlongtest');
+		->php('longlongtest');
 $validResult = '<li><span class="field1"><php>longlongtest</php></span><span class="field1"><php>longlongtest</php></span></li>';
 similar_text($result->htmlOuter(), $validResult, $similarity);
 if ( $similarity > 80 )
-	print "Test 'Multi-insert' passed :)";
+	print "Test 'Multi-insert' PASSED :)";
 else {
 	print "Test 'Multi-insert' <strong>FAILED</strong> !!! ";
 	print "<pre>";
 	var_dump($result->htmlOuter());
 	print "</pre>\n";
+}
+print "\n";
+
+// INDEX
+$testResult = 1;
+$result = phpQuery::newDocumentFile('test.html')
+	->find('p')
+		->index(pq('p.title:first'));
+if ( $result == $testResult )
+	print "Test 'Index' PASSED :)";
+else {
+	print "Test 'Index' <strong>FAILED</strong> !!! ";
 }
 print "\n";
 ?>

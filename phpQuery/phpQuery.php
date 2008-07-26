@@ -21,6 +21,7 @@ wrapInner
 metadata plugin
 forward funtions to jquery:
 	events
+	FIXME charset in inserts
  */
 
 // class names for instanceof
@@ -92,7 +93,7 @@ class phpQuery implements Iterator {
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQuery|false
+	 * @return false|phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public static function pq($arg1, $dom = null) {
 		if (! $dom )
@@ -149,7 +150,7 @@ class phpQuery implements Iterator {
 	 * Chainable.
 	 *
 	 * @param unknown_type $html
-	 * @return unknown
+	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public static function newDocument($html) {
 		$domId = self::createDom($html);
@@ -160,7 +161,7 @@ class phpQuery implements Iterator {
 	 * Chainable.
 	 *
 	 * @param string $file URLs allowed. See File wrapper page at php.net for more supported sources.
-	 * @return unknown
+	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public static function newDocumentFile($file) {
 		$domId = self::createDomFromFile($file);
@@ -235,8 +236,9 @@ class phpQuery implements Iterator {
 	protected static function loadHtml(&$DOM, $html) {
 		self::checkDocumentFragment($DOM, $html);
 		if (! self::containsEncoding($html) )
+			$html = self::appendEncoding($html);
 //			$html = mb_convert_encoding($html, 'HTML-ENTITIES', self::$defaultEncoding);
-			$html = '<meta http-equiv="Content-Type" content="text/html;charset='.self::$defaultEncoding.'">'.$html;
+//			$html = '<meta http-equiv="Content-Type" content="text/html;charset='.self::$defaultEncoding.'">'.$html;
 		// TODO if ! self::containsEncoding() && self::containsHead() then attach encoding inside head
 		// check comments on php.net about problems with charset when loading document without encoding as first line
 		return @$DOM['document']->loadHTML($html);
@@ -249,6 +251,29 @@ class phpQuery implements Iterator {
 		return $DOM['documentFragment'];
 //		else
 //			var_dump(stripos($html, '<html'));
+	}
+	protected static function appendEncoding($html, $charset = null) {
+		$charset = is_null($charset)
+			? self::$defaultEncoding
+			: $charset;
+		$meta = '<meta http-equiv="Content-Type" content="text/html;charset='.$charset.'">';
+		if (strpos($html, '<head') === false) {
+			if (strpos($html, '<html') === false) {
+				return $meta.$html;
+			} else {
+				return preg_replace(
+					'@<html(.*?)(?(?<!\?)>)@s',
+					"<html\\1><head>{$meta}</head>",
+					$html
+				);
+			}
+		} else {
+			return preg_replace(
+				'@<head(.*?)(?(?<!\?)>)@s',
+				'<head\\1>'.$meta,
+				$html
+			);
+		}
 	}
 	/**
 	 * Merges two HTML DOMs.

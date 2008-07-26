@@ -14,15 +14,13 @@
 
 /**
  * @todo:
- * - phpQuery::newDocument( DOMDocument );
+ * support DOMDocument in phpQuery::newDocument()
  * implements Countable
- * $n->getNodePath()
+ * use when possible $n->getNodePath()
+wrapInner
 metadata plugin
-index(subject)
 forward funtions to jquery:
 	events
-wrapInner ???
-map !!!
  */
 
 // class names for instanceof

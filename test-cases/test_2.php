@@ -2,6 +2,7 @@
 require_once('../phpQuery/phpQuery.php');
 phpQuery::$debug = true;
 
+
 $testName = 'Filter with pseudoclass';
 $testResult = array(
 	'p.body',

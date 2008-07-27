@@ -93,6 +93,20 @@ $tests = array(
 			'li#i_have_nested_list',
 		)
 	),
+	array(
+		'p[rel] + p',
+		array(
+			'p.title',
+			'p.noTitle',
+		)
+	),
+	array(
+		'ul:first > li:first ~ *',
+		array(
+			'li#testID',
+			'li',
+		)
+	),
 );
 
 phpQuery::newDocumentFile('test.html');

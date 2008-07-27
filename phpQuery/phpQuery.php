@@ -445,7 +445,7 @@ class phpQuery implements Iterator {
 		);
 		$queries = array(array());
 		$return =& $queries[0];
-		$specialChars = array('>','+','~',' ');
+		$specialChars = array('>',' ');
 //		$specialCharsMapping = array('/' => '>');
 		$specialCharsMapping = array();
 		$strlen = strlen($query);
@@ -493,6 +493,38 @@ class phpQuery implements Iterator {
 			// CLASSES
 			} else if ($c == '.') {
 				while( isset($query[$i]) && ($this->isChar($query[$i]) || in_array($query[$i], $classChars))) {
+					$tmp .= $query[$i];
+					$i++;
+				}
+				$return[] = $tmp;
+			// ~ General Sibling Selector
+			} else if ($c == '~') {
+				$spaceAllowed = true;
+				$tmp .= $query[$i++];
+				while( isset($query[$i])
+					&& ($this->isChar($query[$i])
+						|| in_array($query[$i], $classChars)
+						|| $query[$i] == '*'
+						|| ($query[$i] == ' ' && $spaceAllowed)
+					)) {
+					if ($query[$i] != ' ')
+						$spaceAllowed = false;
+					$tmp .= $query[$i];
+					$i++;
+				}
+				$return[] = $tmp;
+			// + Adjacent sibling selectors
+			} else if ($c == '+') {
+				$spaceAllowed = true;
+				$tmp .= $query[$i++];
+				while( isset($query[$i])
+					&& ($this->isChar($query[$i])
+						|| in_array($query[$i], $classChars)
+						|| $query[$i] == '*'
+						|| ($spaceAllowed && $query[$i] == ' ')
+					)) {
+					if ($query[$i] != ' ')
+						$spaceAllowed = false;
 					$tmp .= $query[$i];
 					$i++;
 				}
@@ -701,8 +733,8 @@ class phpQuery implements Iterator {
 				// TAG
 				if ( preg_match('@^\w+$@', $s) || $s == '*' ) {
 					$XQuery .= $s;
+				// ID
 				} else if ( $s[0] == '#' ) {
-					// id
 					if ( $spaceBefore )
 						$XQuery .= '*';
 					$XQuery .= "[@id='".substr($s, 1)."']";
@@ -744,6 +776,33 @@ class phpQuery implements Iterator {
 					$XQuery = '';
 					if (! $this->length() )
 						break;
+				// ~ General Sibling Selector
+				} else if ( $s[0] == '~' ) {
+					$this->runQuery($XQuery);
+					$XQuery = '';
+					$this->elements = $this
+						->siblings(
+							substr($s, 1)
+						)->elements;
+					if (! $this->length() )
+						break;
+				// + Adjacent sibling selectors
+				} else if ( $s[0] == '+' ) {
+					$this->runQuery($XQuery);
+					$XQuery = '';
+					$subSelector = substr($s, 1);
+					$subElements = $this->elements;
+					$this->elements = array();
+					foreach($subElements as $node) {
+						// search first DOMElement sibling
+						$test = $node->nextSibling;
+						while($test && ! ($test instanceof DOMELEMENT))
+							$test = $test->nextSibling;
+						if ($test && $this->is($subSelector, $test))
+							$this->elements[] = $test;
+					}
+					if (! $this->length() )
+						break;
 				// PSEUDO CLASSES
 				} else if ( $s[0] == ':' ) {
 					// TODO optimization for :first :last
@@ -756,8 +815,8 @@ class phpQuery implements Iterator {
 					$this->filterPseudoClasses( $s );
 					if (! $this->length() )
 						break;
+				// DIRECT DESCENDANDS
 				} else if ( $s == '>' ) {
-					// direct descendant
 					$XQuery .= '/';
 				} else {
 					$XQuery .= '//';
@@ -1948,7 +2007,7 @@ class phpQuery implements Iterator {
 		);
 	}
 	
-	protected function getElementSiblings($direction, $selector, $limitToOne = false) {
+	protected function getElementSiblings($direction, $selector = null, $limitToOne = false) {
 		$stack = array();
 		$count = 0;
 		foreach( $this->elements as $node ) {
@@ -1974,18 +2033,17 @@ class phpQuery implements Iterator {
 	 *
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function siblings( $selector = null ) {
+	public function siblings($selector = null) {
 		$stack = array();
-		foreach( $this->elements as $node ) {
-			if ( $selector ) {
-				if ( $this->is( $selector ) && ! $this->elementsContainsNode($node, $stack) )
-					$stack[] = $node;
-			} else if (! $this->elementsContainsNode($node, $stack) )
+		$siblings = array_merge(
+			$this->getElementSiblings('prevSibling', $selector),
+			$this->getElementSiblings('nextSibling', $selector)
+		);
+		foreach($siblings as $node) {
+			if (! $this->elementsContainsNode($node, $stack))
 				$stack[] = $node;
 		}
-		$this->elementsBackup = $this->elements;
-		$this->elements = $stack;
-		return $this->newInstance();
+		return $this->newInstance($stack);
 	}
 	
 	/**
@@ -1999,9 +2057,7 @@ class phpQuery implements Iterator {
 			if (! $this->is( $selector, $node ) )
 				$stack[] = $node;
 		}
-		$this->elementsBackup = $this->elements;
-		$this->elements = $stack;
-		return $this->newInstance();
+		return $this->newInstance($stack);
 	}
 	
 	/**

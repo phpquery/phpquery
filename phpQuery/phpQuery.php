@@ -43,6 +43,7 @@ class phpQuery implements Iterator {
 	 * @var DOMDocument
 	 */
 	public $DOM = null;
+	protected $docId = null;
 	protected $XPath = null;
 	protected $elementsBackup = array();
 	protected $elements = array();
@@ -84,8 +85,8 @@ class phpQuery implements Iterator {
 	 * TODO: pq('div.myClass', DOMDocument )
 	 * TODO: pq('div.myClass', DOMElement )
 	 * 
-	 * @param string $arg1 HTML markup or CSS Selector
-	 * @param string|phpQuery $dom DOM ID or phpQuery object
+	 * @param string|DOMNode|DOMNodeList|array $arg1 HTML markup or CSS Selector
+	 * @param string|phpQuery $dom DOM ID, phpQuery object
 	 * 
 	 * @return	phpQuery|false			phpQuery object or false in case of error.
 	 */
@@ -94,13 +95,14 @@ class phpQuery implements Iterator {
 	 *
 	 * @return false|phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public static function pq($arg1, $dom = null) {
-		if (! $dom )
+	public static function pq($arg1, $context = null) {
+		// TODO support DOMNodes as $context, find out ownerDocument, search loaded DOMs
+		if (! $context)
 			$domId = self::$lastDomId;
-		else if ($dom instanceof self)
+		else if ($context instanceof self)
 			$domId = $dom->domId;
 		else
-			$domId = $dom;
+			$domId = $context;
 		if ($arg1 instanceof self) {
 			/**
 			 * Return $arg1 or import $arg1 stack if document differs:
@@ -109,6 +111,7 @@ class phpQuery implements Iterator {
 			if ($arg1->domId == $domId)
 				return $arg1;
 			$phpQuery = new phpQuery($domId);
+			$phpQuery->elements = array();
 			foreach($arg1->elements as $node)
 				$phpQuery->elements[] = $phpQuery->DOM->importNode($node, true);
 			return $phpQuery;
@@ -120,8 +123,11 @@ class phpQuery implements Iterator {
 			$phpQuery = new phpQuery($domId);
 			if (!($arg1 instanceof DOMNODELIST) && ! is_array($arg1))
 				$arg1 = array($arg1);
+			$phpQuery->elements = array();
 			foreach($arg1 as $node)
-				$phpQuery->elements[] = $phpQuery->DOM->importNode($node, true);
+				$phpQuery->elements[] = ! $node->ownerDocument->isSameNode($phpQuery->DOM)
+					? $phpQuery->DOM->importNode($node, true)
+					: $node;
 			return $phpQuery;
 		} else if (self::isMarkup($arg1)) {
 			/**
@@ -137,6 +143,9 @@ class phpQuery implements Iterator {
 			 * pq('div.myClass')
 			 */
 			$phpQuery = new phpQuery($domId);
+			if ($context && $context instanceof self)
+				$domId = $dom->domId;
+			$phpQuery->elements = $context->elements;
 			return $phpQuery->find($arg1);
 		}
 	}
@@ -188,17 +197,17 @@ class phpQuery implements Iterator {
 		$domId = self::createDomFromFile($file);
 		return new phpQuery($domId);
 	}
-	public static function createDomFromFile($file, $domId = null) {
-		return self::createDom(
-			file_get_contents($file, $domId)
-		);
-	}
 	public static function documentFragment($state = null) {
 		if ( $state ) {
 			self::$documents[$this->docId]['documentFragment'] = $state;
 			return $this;
 		}
 		return $this->documentFragment;
+	}
+	public static function createDomFromFile($file, $domId = null) {
+		return self::createDom(
+			file_get_contents($file, $domId)
+		);
 	}
 	/**
 	 * Enter description here...
@@ -412,12 +421,13 @@ class phpQuery implements Iterator {
 	 * Enter description here...
 	 * NON JQUERY METHOD
 	 *
-	 * TODO SUPPORT FOR end() !!!
+	 * TODO SUPPORT FOR end() !!! Causing problems in queryTemplates...
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function toRoot() {
-//		$this->elements = array( $this->DOM->documentElement );
-		return $this->newInstance(array($this->root));
+		$this->elements = array($this->root);
+		return $this;
+//		return $this->newInstance(array($this->root));
 	}
 	protected function isRegexp($pattern) {
 		return in_array(
@@ -1772,7 +1782,7 @@ class phpQuery implements Iterator {
 						else
 							$loop = $this->elements;
 						// import nodes if needed
-						if ($this->DOM != $target->DOM)
+						if ($this->domId != $target->domId)
 							foreach($loop as $node)
 								$insertFrom[] = $target->DOM->importNode($node, true);
 						else
@@ -1785,7 +1795,7 @@ class phpQuery implements Iterator {
 						else
 							$loop = $target->elements;
 						// import nodes if needed
-						if ($target->DOM != $this->DOM)
+						if ($target->domId != $this->domId)
 							foreach($loop as $node)
 								$insertFrom[] = $this->DOM->importNode($node, true);
 						else
@@ -1794,8 +1804,8 @@ class phpQuery implements Iterator {
 				// DOMNODE
 				} elseif ( $target instanceof DOMNODE) {
 					// import node if needed
-					if ( $target->ownerDocument != $this->DOM )
-						$target = $this->DOM->importNode($target, true);
+//					if ( $target->ownerDocument != $this->DOM )
+//						$target = $this->DOM->importNode($target, true);
 					if ( $to ) {
 						$insertTo = array($target);
 						if ( $this->documentFragment && $this->stackIsRoot() )
@@ -1803,19 +1813,18 @@ class phpQuery implements Iterator {
 							$loop = $this->find('body > *')->elements;
 						else
 							$loop = $this->elements;
-						// import nodes if needed
-						if (isset($insertFrom[0]) && $insertFrom[0]->ownerDocument != $target->ownerDocument)
-							foreach($insertFrom as $fromNode)
-								$insertFrom[] = $target->ownerDocument->importNode($fromNode, true);
-						else
-							$insertFrom = $loop;
+						foreach($loop as $fromNode)
+							// import nodes if needed
+							$insertFrom[] = ! $fromNode->ownerDocument->isSameNode($target->ownerDocument)
+								? $target->ownerDocument->importNode($fromNode, true)
+								: $fromNode;
 					} else {
 						// import node if needed
-						if ( $target->ownerDocument != $this->DOM )
+						if (! $target->ownerDocument->isSameNode($this->DOM))
 							$target = $this->DOM->importNode($target, true);
 						$insertTo = $this->elements;
-						$insertFrom[] = array($target);
-					}					
+						$insertFrom[] = $target;
+					}				
 				}
 				break;
 		}
@@ -2417,7 +2426,7 @@ class phpQuery implements Iterator {
 
 	// ITERATOR INTERFACE
 	public function rewind(){
-		$this->debug('interating foreach');
+		$this->debug('iterating foreach');
 		$this->elementsBackup = $this->elements;
 		$this->elementsInterator = $this->elements;
 		$this->valid = isset( $this->elements[0] )
@@ -2430,7 +2439,7 @@ class phpQuery implements Iterator {
 	}
 
 	public function current(){
-		return $this;
+		return $this->elements[0];
 	}
 
 	public function key(){

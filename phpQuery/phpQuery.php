@@ -1164,7 +1164,7 @@ class phpQuery implements Iterator {
 	 */
 	public function wrap($wrapper) {
 		foreach($this as $node)
-			self::pq($node, $this)->wrapAll($wrapper);
+			self::pq($node, $this->domId)->wrapAll($wrapper);
 		return $this;
 	}
 	
@@ -1176,7 +1176,7 @@ class phpQuery implements Iterator {
 	 */
 	public function wrapInner($wrapper) {
 		foreach($this as $node)
-			self::pq($node, $this)->contents()->wrapAll($wrapper);
+			self::pq($node, $this->domId)->contents()->wrapAll($wrapper);
 		return $this;
 	}
 	
@@ -1299,8 +1299,8 @@ class phpQuery implements Iterator {
 	 * @todo this works ?
 	 */
 	public function replaceAll($selector) {
-		foreach(self::pq($selector, $this) as $node)
-			self::pq($node, $this)
+		foreach(self::pq($selector, $this->domId) as $node)
+			self::pq($node, $this->domId)
 				->after($this->_clone())
 				->remove();
 		return $this;

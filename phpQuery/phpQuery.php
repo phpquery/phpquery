@@ -69,24 +69,27 @@ class phpQuery implements Iterator {
 	 * 
 	 * *************
 	 * 1. Import HTML into existing DOM (without any attaching):
-	 * - Insert into last used DOM:
+	 * - Import into last used DOM:
 	 *   pq('<div/>')				// DOESNT accept text nodes at beginning of input string !
-	 * - Insert into DOM with ID 'domId':
+	 * - Import into DOM with ID 'domId':
 	 *   pq('<div/>', 'domId')
-	 * TODO: pq( DOMElement )
+	 * - Import into same DOM as DOMNode belongs to:
+	 *   pq('<div/>', DOMNode)
+	 * - Import into DOM from phpQuery object:
+	 *   pq('<div/>', phpQuery)
 	 * *************
 	 * 2. Run query:
 	 * - Run query on last used DOM:
 	 *   pq('div.myClass')
 	 * - Run query on DOM with ID 'domId':
 	 *   pq('div.myClass', 'domId')
-	 * - Run query on DOM from $phpQueryObject:
+	 * - Run query on same DOM as DOMNode belongs to and use node(s)as root for query:
+	 *   pq('div.myClass', DOMNode)
+	 * - Run query on DOM from $phpQueryObject and use object's stack as root nodes for query:
 	 *   pq('div.myClass', $phpQueryObject )
-	 * TODO: pq('div.myClass', DOMDocument )
-	 * TODO: pq('div.myClass', DOMElement )
 	 * 
-	 * @param string|DOMNode|DOMNodeList|array $arg1 HTML markup or CSS Selector
-	 * @param string|phpQuery $dom DOM ID, phpQuery object
+	 * @param string|DOMNode|DOMNodeList|array	$arg1	HTML markup, CSS Selector, DOMNode or array of DOMNodes
+	 * @param string|phpQuery|DOMNode	$context	DOM ID from $pq->getDocumentId(), phpQuery object (determines also query root) or DOMNode (determines also query root)
 	 * 
 	 * @return	phpQuery|false			phpQuery object or false in case of error.
 	 */
@@ -101,7 +104,25 @@ class phpQuery implements Iterator {
 			$domId = self::$lastDomId;
 		else if ($context instanceof self)
 			$domId = $context->domId;
-		else
+		else if ($context instanceof DOMDOCUMENT) {
+			foreach(phpQuery::$documents as $id => $document) {
+				if ($context->isSameNode($document['document']))
+					$domId = $id;
+			}
+			if (! $domId) {
+				throw new Exception('Orphaned DOMNode');
+//				$domId = self::newDocument($context);
+			}
+		} else if ($context instanceof DOMNODE) {
+			foreach(phpQuery::$documents as $id => $document) {
+				if ($context->ownerDocument->isSameNode($document['document']))
+					$domId = $id;
+			}
+			if (! $domId){
+				throw new Exception('Orphaned DOMNode');
+//				$domId = self::newDocument($context->ownerDocument);
+			}
+		} else
 			$domId = $context;
 		if ($arg1 instanceof self) {
 			/**
@@ -145,6 +166,12 @@ class phpQuery implements Iterator {
 			$phpQuery = new phpQuery($domId);
 			if ($context && $context instanceof self)
 				$phpQuery->elements = $context->elements;
+			else if ($context && $context instanceof DOMNODELIST) {
+				$phpQuery->elements = array();
+				foreach($context as $node)
+					$phpQuery->elements[] = $node;
+			} else if ($context && $context instanceof DOMNODE)
+				$phpQuery->elements = array(DOMNODE);
 			return $phpQuery->find($arg1);
 		}
 	}

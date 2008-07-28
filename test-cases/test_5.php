@@ -5,14 +5,14 @@ phpQuery::$debug = true;
 // CALLBACKS
 class callbackClass {
 	static function staticMethodCallback($node) {
-		$node->addClass('newClass');
+		pq($node)->addClass('newClass');
 	}
 	function methodCallback($node) {
-		$node->addClass('newClass');
+		pq($node)->addClass('newClass');
 	}
 }
 function functionCallback($node) {
-	$node->addClass('newClass');
+	pq($node)->addClass('newClass');
 }
 $testResult = array(
 	'li.newClass',

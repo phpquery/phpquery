@@ -23,7 +23,7 @@ $testResult = 3;
 phpQuery::newDocumentFile('test.html');
 pq('<div class="replacer">')
 	->replaceAll('li:first p');
-$result = pq('.replacer');
+$result = pq('li:first');
 if ( $result->size() == $testResult )
 	print "Test '{$testName}' PASSED :)";
 else

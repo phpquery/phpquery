@@ -7,4 +7,5 @@ include 'test_4.php';
 include 'test_5.php';
 include 'test_wrap.php';
 include 'test_replace.php';
+include 'test_multidoc.php';
 ?>

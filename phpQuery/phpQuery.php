@@ -100,7 +100,7 @@ class phpQuery implements Iterator {
 		if (! $context)
 			$domId = self::$lastDomId;
 		else if ($context instanceof self)
-			$domId = $dom->domId;
+			$domId = $context->domId;
 		else
 			$domId = $context;
 		if ($arg1 instanceof self) {
@@ -144,8 +144,7 @@ class phpQuery implements Iterator {
 			 */
 			$phpQuery = new phpQuery($domId);
 			if ($context && $context instanceof self)
-				$domId = $dom->domId;
-			$phpQuery->elements = $context->elements;
+				$phpQuery->elements = $context->elements;
 			return $phpQuery->find($arg1);
 		}
 	}
@@ -1164,8 +1163,8 @@ class phpQuery implements Iterator {
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function wrap($wrapper) {
-		foreach($this as $el)
-			$el->wrapAll($wrapper);
+		foreach($this as $node)
+			self::pq($node, $this)->wrapAll($wrapper);
 		return $this;
 	}
 	
@@ -1176,8 +1175,8 @@ class phpQuery implements Iterator {
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function wrapInner($wrapper) {
-		foreach($this as $el)
-			$el->contents()->wrapAll($wrapper);
+		foreach($this as $node)
+			self::pq($node, $this)->contents()->wrapAll($wrapper);
 		return $this;
 	}
 	
@@ -1271,32 +1270,7 @@ class phpQuery implements Iterator {
 		$this->elements = $newStack;
 		return $this;
 	}
-
-	/**
-	 * Replaces current element with $content and changes stack to new element(s) (except text nodes).
-	 * Can be reverted with end().
-	 * 
-	 * NON JQUERY-COMPATIBLE METHOD!
-	 *
-	 * @param string|phpQuery $with
-	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @todo unneeded ?
-	 */
-//	public function replace($content) {
-//		$stack = array();
-//		// safer...
-//		$each = clone $this;
-//		foreach( $each as $node ) {
-//			$prev = $node->before($content)->_prev();
-//			if ( $this->isMarkup($content) )
-//				$stack[] = $prev->elements;
-//		}
-//		$stack = $this->before($content);
-//		$this->remove();
-//		$this->elementsBackup = $this->elements;
-//		$this->elements = $stack;
-//		return $this->newInstance();
-//	}
+	
 	/**
 	 * Enter description here...
 	 *
@@ -1325,8 +1299,10 @@ class phpQuery implements Iterator {
 	 * @todo this works ?
 	 */
 	public function replaceAll($selector) {
-		foreach( self::pq($selector, $this) as $el )
-			self::pq($el, $this)->after($this->_clone())->remove();
+		foreach(self::pq($selector, $this) as $node)
+			self::pq($node, $this)
+				->after($this->_clone())
+				->remove();
 		return $this;
 	}
 
@@ -1894,32 +1870,10 @@ class phpQuery implements Iterator {
 	public function index($subject) {
 		$index = -1;
 		foreach($this->newInstance() as $k => $node) {
-			if ($node->elements[0]->isSameNode($subject->elements[0]))
+			if ($node->isSameNode($subject->elements[0]))
 				$index = $k;
 		}
 		return $index;
-	}
-	
-	/**
-	 * @todo Returns JSON representation of stacked HTML elements and it's children.
-	 * Compatible with @link http://programming.arantius.com/dollar-e 
-	 *
-	 * @return string
-	 */
-	public function toJSON() {
-		$json = '';
-		foreach( $this->elements as $node ) {
-			
-		}
-		return $json;
-	}
-	protected function _toJSON($node) {
-		$json = '';
-		switch( $node->type ) {
-			case 3:
-				break;
-		}
-		return $json;
 	}
 	
 	/**

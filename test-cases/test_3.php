@@ -1,6 +1,6 @@
 <?php
-require_once('../phpQuery.php');
-phpQueryClass::$debug = true;
+require_once('../phpQuery/phpQuery.php');
+phpQuery::$debug = true;
 $testName = 'Selectors';
 $tests = array(
 	array(
@@ -36,7 +36,7 @@ $tests = array(
 		)
 	),
 	array(
-		'*[@rel="test"]',
+		'*[rel="test"]',
 		array(
 			'p',
 			'p'
@@ -59,7 +59,7 @@ $tests = array(
 		)
 	),
 	array(
-		"[@content*=html]",
+		"[content*=html]",
 		array(
 			'meta'
 		)
@@ -72,30 +72,50 @@ $tests = array(
 		)
 	),
 	array(
-		"script[@src]:not([@src^=<?php])",
+		"script[src]:not([src^=<?php])",
 		array(
 			'script'
 		)
 	),
+//	array(
+//		'li:not([ul/li])',
+//		array(
+//			'li',
+//			'li#testID',
+//			'li',
+//			'li.nested',
+//			'li.second',
+//		)
+//	),
 	array(
-		'li:not([ul/li])',
+		'li:has(ul)',
 		array(
-			'li',
+			'li#i_have_nested_list',
+		)
+	),
+	array(
+		'p[rel] + p',
+		array(
+			'p.title',
+			'p.noTitle',
+		)
+	),
+	array(
+		'ul:first > li:first ~ *',
+		array(
 			'li#testID',
 			'li',
-			'li.nested',
-			'li.second',
 		)
 	),
 );
 
-phpQuery('test.html');
+phpQuery::newDocumentFile('test.html');
 foreach( $tests as $k => $test ) {
-	$tests[ $k ][2] = phpQuery( $test[0] )->whois();
+	$tests[ $k ][2] = pq( $test[0] )->whois();
 }
 foreach( $tests as $test ) {
 	if ( $test[1] == $test[2] )
-		print "Test '{$test[0]}' passed :)";
+		print "Test '{$test[0]}' PASSED :)";
 	else {
 		print "Test '{$test[0]}' <strong>FAILED</strong> !!!";
 		print_r($test[2]);

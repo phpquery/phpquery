@@ -71,7 +71,7 @@ class phpQuery implements Iterator {
 	 * 1. Import HTML into existing DOM (without any attaching):
 	 * - Import into last used DOM:
 	 *   pq('<div/>')				// DOESNT accept text nodes at beginning of input string !
-	 * - Import into DOM with ID 'domId':
+	 * - Import into DOM with ID from $pq->getDocumentId():
 	 *   pq('<div/>', 'domId')
 	 * - Import into same DOM as DOMNode belongs to:
 	 *   pq('<div/>', DOMNode)
@@ -81,12 +81,12 @@ class phpQuery implements Iterator {
 	 * 2. Run query:
 	 * - Run query on last used DOM:
 	 *   pq('div.myClass')
-	 * - Run query on DOM with ID 'domId':
+	 * - Run query on DOM with ID from $pq->getDocumentId():
 	 *   pq('div.myClass', 'domId')
 	 * - Run query on same DOM as DOMNode belongs to and use node(s)as root for query:
 	 *   pq('div.myClass', DOMNode)
 	 * - Run query on DOM from $phpQueryObject and use object's stack as root nodes for query:
-	 *   pq('div.myClass', $phpQueryObject )
+	 *   pq('div.myClass', phpQuery)
 	 * 
 	 * @param string|DOMNode|DOMNodeList|array	$arg1	HTML markup, CSS Selector, DOMNode or array of DOMNodes
 	 * @param string|phpQuery|DOMNode	$context	DOM ID from $pq->getDocumentId(), phpQuery object (determines also query root) or DOMNode (determines also query root)
@@ -131,7 +131,8 @@ class phpQuery implements Iterator {
 			 */
 			if ($arg1->domId == $domId)
 				return $arg1;
-			$phpQuery = new phpQuery($domId);
+			$class = get_class($arg1);
+			$phpQuery = new $class($domId);
 			$phpQuery->elements = array();
 			foreach($arg1->elements as $node)
 				$phpQuery->elements[] = $phpQuery->DOM->importNode($node, true);
@@ -257,29 +258,6 @@ class phpQuery implements Iterator {
 			throw new Exception("Can't load '{$html}'");
 			return;
 		}
-//		if (! $DOM['document']->encoding ) {
-//			if ( self::$debug )
-//				print(
-//					"No encoding selected, reloading with default: ".self::$defaultEncoding
-//				);
-////			$DOM['document'] = new DOMDocument('1.0', 'utf-8');
-//			$html = '<meta http-equiv="Content-Type" content="text/html;charset='
-//				.self::$defaultEncoding.'">'
-//				.$html;
-//			if ( self::$debug )
-//				print($html);
-//			self::loadHtml($DOM, $html);
-////			if ( $DOM['documentFragment'] ) {
-////				$head = $DOM['document']
-////					->getElementsByTagName('head')
-////					->item(0);
-////				if ( $head->childNodes->length == 1 ) {
-////					$head->removeChild($head->firstChild);
-////					$head->parentNode->removeChild($head);
-////				}
-////			}
-//				
-//		}
 		$DOM['xpath'] = new DOMXPath(
 			$DOM['document']
 		);
@@ -1155,11 +1133,11 @@ class phpQuery implements Iterator {
 		return pq($wrapper)
 			->_clone()
 			->insertBefore($this->elements[0])
-			->map(array(self, 'wrapAllCallback'))
+			->map(array(self, '_wrapAllCallback'))
 			->append($this);
 	}
 	
-	protected function wrapAllCallback($node) {
+	protected function _wrapAllCallback($node) {
 		$deepest = $node;
 		while($deepest->firstChild && $deepest->firstChild instanceof DOMELEMENT)
 			$deepest = $deepest->firstChild;
@@ -1201,10 +1179,32 @@ class phpQuery implements Iterator {
 	 * @param String|phpQuery
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
+	public function wrapPHP($codeBefore, $codeAfter) {
+		foreach($this as $node)
+			self::pq($node, $this->domId)->wrapAllPHP($codeBefore, $codeAfter);
+		return $this;
+	}
+	
+	/**
+	 * Enter description here...
+	 *
+	 * @param String|phpQuery
+	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 */
 	public function wrapInner($wrapper) {
 		foreach($this as $node)
 			self::pq($node, $this->domId)->contents()->wrapAll($wrapper);
 		return $this;
+	}
+	
+	/**
+	 * Enter description here...
+	 *
+	 * @param String|phpQuery
+	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 */
+	public function wrapInnerPHP($wrapper) {
+	//	return $this->wrapInner("<php><!-- {$wrapper} --></php>");
 	}
 	
 	/**
@@ -1259,8 +1259,9 @@ class phpQuery implements Iterator {
 	 * Enter description here...
 	 *
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @todo $level
 	 */
-	public function end() {
+	public function end($level = 1) {
 //		$this->elements = array_pop( $this->history );
 //		return $this;
 		$this->previous->DOM = $this->DOM;
@@ -1653,6 +1654,7 @@ class phpQuery implements Iterator {
 	/**
 	 * Enter description here...
 	 *
+	 * @todo accept many arguments, which are joined, arrays maybe also
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function prependPHP( $content ) {
@@ -2260,6 +2262,7 @@ class phpQuery implements Iterator {
 	public function andSelf() {
 		if ( $this->previous )
 			$this->elements = array_merge($this->elements, $this->previous->elements);
+		return $this;
 	}	
 	
 	/**
@@ -2381,12 +2384,13 @@ class phpQuery implements Iterator {
 	/**
 	 * Enter description here...
 	 *
-	 * @param unknown_type $callback
+	 * @param array|string $callback
+	 * @param array $scope External variables passed to callback. Use compact('varName1', 'varName2'...).
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function each($callback) {
+	public function each($callback, $scope = null) {
 		foreach($this->newInstance() as $node)
-			call_user_func($callback, $node);
+			call_user_func($callback, $node, $scope);
 		return $this;
 	}
 	
@@ -2531,22 +2535,19 @@ class phpQuery implements Iterator {
 		var_dump(array("{$when}/history", $history));
 	}
 }
-if (! function_exists('pq')) {
+//if (! function_exists('pq'))
 	/**
-	 * Equivalent of:
-	 * <code>
-	 * phpQuery::pq($arg1, $arg2, ...)
-	 * </code>
+	 * Shortcut to phpQuery::pq($arg1, $context)
 	 * Chainable.
 	 *
+	 * @see phpQuery::pq()
 	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	function pq() {
+	function pq($arg1, $context = null) {
 		$args = func_get_args();
 		return call_user_func_array(
 			array('phpQuery', 'pq'),
 			$args
 		);
 	}
-}
 ?>

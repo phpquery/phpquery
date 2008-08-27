@@ -1404,10 +1404,12 @@ class phpQuery implements Iterator {
 	public function html($html = null) {
 		if (! is_null($html) ) {
 			$this->debug("Inserting data with 'html'");
-			if ( self::isMarkup( $html ) ) {
+			if ( self::isMarkup($html) ) {
 				$toInserts = array();
 				$DOM = new DOMDocument();
-				@$DOM->loadHtml( $html );
+				// FIXME tempolary
+				$html = utf8_decode($html);
+				@$DOM->loadHtml($html);
 				foreach($DOM->documentElement->firstChild->childNodes as $node)
 					$toInserts[] = $this->DOM->importNode($node, true);
 			} else {
@@ -1783,6 +1785,8 @@ class phpQuery implements Iterator {
 					if ( self::isMarkup( $target ) ) {
 						// TODO use phpQuery::loadHtml
 						$DOM = new DOMDocument('1.0', 'utf-8');
+						// FIXME tempolary
+						$target = utf8_decode($target);
 						@$DOM->loadHtml($target);
 						foreach($DOM->documentElement->firstChild->childNodes as $node) {
 							$insertTo[] = $this->DOM->importNode( $node, true );
@@ -1800,6 +1804,8 @@ class phpQuery implements Iterator {
 					if ( self::isMarkup( $target ) ) {
 						// TODO use phpQuery::loadHtml
 						$DOM = new DOMDocument('1.0', 'utf-8');
+						// FIXME tempolary
+						$target = utf8_decode($target);
 						@$DOM->loadHtml($target);
 						$insertFrom = array();
 						foreach($DOM->documentElement->firstChild->childNodes as $node) {

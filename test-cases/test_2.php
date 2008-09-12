@@ -18,6 +18,27 @@ print_r($result->whois());
 print "\n";
 
 
+$testName = 'Filter with multiplie selectors';
+$testResult = array(
+	'p.body',
+);
+$testDOM = phpQuery::newDocumentFile('test.html');
+$single = $testDOM->find('p')->filter('.body')
+	->add(
+		$testDOM->find('p')->filter('.title')
+	)
+;
+$double = $testDOM->find('p')
+	->filter('.body, .title');
+if (count($single) == count($double))
+	print "Test '{$testName}' PASSED :)";
+else
+	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
+print "\n";
+print_r($single->whois());
+print "\n";
+print_r($double->whois());
+print "\n";
 
 
 $testName = 'Loading document without meta charset';

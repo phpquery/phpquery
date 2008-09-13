@@ -635,7 +635,7 @@ class phpQueryPlugins {
 			throw new Exception("Method '{$method}' doesnt exist");
 	}
 }
-class phpQueryObject implements Iterator, Countable {
+class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	public $domId = null;
 	/**
 	 * Alias for $Document
@@ -1977,6 +1977,10 @@ class phpQueryObject implements Iterator, Countable {
 				foreach($DOM->documentElement->firstChild->childNodes as $node)
 					$toInserts[] = $this->DOM->importNode($node, true);
 			} else {
+				// FIXME tempolary, utf8 only
+				// http://code.google.com/p/phpquery/issues/detail?id=17#c12
+				if (mb_detect_encoding($html) == 'ASCII')
+					$html	= mb_convert_encoding($html,'UTF-8','HTML-ENTITIES');
 				$toInserts = array($this->DOM->createTextNode($html));
 			}
 			$this->_empty();
@@ -2304,8 +2308,12 @@ class phpQueryObject implements Iterator, Countable {
 						}
 					// insert selected element
 					} else {
+						// FIXME tempolary, utf8 only
+						// http://code.google.com/p/phpquery/issues/detail?id=17#c12
+						if (mb_detect_encoding($target) == 'ASCII')
+							$target	= mb_convert_encoding($target,'UTF-8','HTML-ENTITIES');
 						$insertFrom = array(
-							$this->DOM->createTextNode( $target )
+							$this->DOM->createTextNode($target)
 						);
 					}
 				}
@@ -3042,6 +3050,22 @@ class phpQueryObject implements Iterator, Countable {
 		return $this->valid;
 	}
 	// ITERATOR INTERFACE END
+
+	// ARRAYACCESS INTERFACE
+	public function offsetExists($offset) {
+		return $this->find($offset)->size() > 0;
+	}
+	public function offsetGet($offset) {
+		return $this->find($offset);
+	}
+	public function offsetSet($offset, $value) {
+		$this->find($offset)->replaceWith($value);
+	}
+	public function offsetUnset($offset) {
+		// empty
+		throw new Exception("Can't do unset, use array interface only for calling queries and replacing HTML.");
+	}
+	// ARRAYACCESS INTERFACE END
 
 	/**
 	 * Returns node's XPath.

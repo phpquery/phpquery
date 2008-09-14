@@ -17,7 +17,7 @@ define('DOMDOCUMENT', 'DOMDocument');
 define('DOMELEMENT', 'DOMElement');
 define('DOMNODELIST', 'DOMNodeList');
 define('DOMNODE', 'DOMNode');
-define('PHPQUERY', 'phpQueryObject');
+define('PHPQUERYOBJECT', 'phpQueryObject');
 
 abstract class phpQuery {
 	public static $debug = false;
@@ -43,7 +43,7 @@ abstract class phpQuery {
 	public static $pluginsLoaded = array();
 	public static $pluginsMethods = array();
 	public static $pluginsStaticMethods = array();
-	public static $ajaxDomains = array(
+	public static $ajaxAllowedHosts = array(
 		'.'
 	);
 	/**
@@ -115,7 +115,8 @@ abstract class phpQuery {
 			$domId = self::$lastDomId;
 			if (! $domId)
 				throw new Exception("Can't use last used DOM, because there isn't any. Use phpQuery::newDocument() instead.");
-		} else if (is_object($context) && ($context instanceof PHPQUERY || is_subclass_of($context, 'phpQueryObject')))
+//		} else if (is_object($context) && ($context instanceof PHPQUERY || is_subclass_of($context, 'phpQueryObject')))
+		} else if (is_object($context) && $context instanceof phpQueryObject)
 			$domId = $context->domId;
 		else if ($context instanceof DOMDOCUMENT) {
 			foreach(phpQuery::$documents as $id => $document) {
@@ -138,8 +139,8 @@ abstract class phpQuery {
 			}
 		} else
 			$domId = $context;
-//		if ($arg1 instanceof PHPQUERY) {
-		if (is_object($arg1) && (get_class($arg1) == 'phpQueryObject' || $arg1 instanceof PHPQUERY || is_subclass_of($arg1, 'phpQueryObject'))) {
+		if ($arg1 instanceof PHPQUERYOBJECT) {
+//		if (is_object($arg1) && (get_class($arg1) == 'phpQueryObject' || $arg1 instanceof PHPQUERY || is_subclass_of($arg1, 'phpQueryObject'))) {
 			/**
 			 * Return $arg1 or import $arg1 stack if document differs:
 			 * pq(pq('<div/>'))
@@ -183,7 +184,8 @@ abstract class phpQuery {
 			 * pq('div.myClass')
 			 */
 			$phpQuery = new phpQueryObject($domId);
-			if ($context && ($context instanceof PHPQUERY || is_subclass_of($context, 'phpQueryObject')))
+//			if ($context && ($context instanceof PHPQUERY || is_subclass_of($context, 'phpQueryObject')))
+			if ($context && $context instanceof PHPQUERYOBJECT)
 				$phpQuery->elements = $context->elements;
 			else if ($context && $context instanceof DOMNODELIST) {
 				$phpQuery->elements = array();
@@ -390,7 +392,7 @@ abstract class phpQuery {
 	 * @return string
 	 */
 	public static function unsafePhpTags($content) {
-		if ($content instanceof phpQuery)
+		if ($content instanceof phpQueryObject)
 			$content = $content->htmlOuter();
 		/* <php>...</php> to <?php...?> */
 		$content = preg_replace_callback(
@@ -512,6 +514,14 @@ abstract class phpQuery {
 				'timeout'      => $options['timeout'],
 			));
 //			'maxredirects' => 0,
+		foreach(self::$ajaxAllowedHosts as $k => $host)
+			if ($host == '.')
+				self::$ajaxAllowedHosts[$k] = $_SERVER['HTTP_HOST'];
+		$host = parse_url($options['url'], PHP_URL_HOST);
+		if (! in_array($host, self::$ajaxAllowedHosts)) {
+			throw new Exception("Request not permitted, host '$host' not present in phpQuery::\$ajaxAllowedHosts");
+			return false;
+		}
 		$client->setUri($options['url']);
 		$client->setMethod($options['type']);
 		$client->setHeaders(array(
@@ -3312,7 +3322,8 @@ function pq($arg1, $context = null) {
 }
 // add plugins dir to include path
 set_include_path(
-	get_include_path().':'.dirname(__FILE__).'/plugins/'
+	get_include_path()
+		.':'.dirname(__FILE__).'/plugins/'
 );
 // why ? no __call nor __get for statics in php...
 phpQuery::$plugins = new phpQueryPlugins();

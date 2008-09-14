@@ -14,13 +14,27 @@ else
 	print "Test '{$testName}' <strong>FAILED</strong> !!!";
 print "\n";
 
-$testName = 'HTML entite append';
+$testName = 'Text node HTML entite append';
 $result = phpQuery::newDocumentFile('test.html')
 	->find('li:first')
 		->find('p:first')
 			->_empty()
 			->append('&eacute;');
 if (trim($result->html()) == 'é')
+	print "Test '{$testName}' passed :)";
+else {
+	print "Test '{$testName}' <strong>FAILED</strong> !!!";
+	print $result->html();
+}
+print "\n";
+
+$testName = 'DOMElement node HTML entite append';
+$result = phpQuery::newDocumentFile('test.html')
+	->find('li:first')
+		->find('p:first')
+			->_empty()
+			->append('<span>&eacute;</span>');
+if (trim($result->html()) == '<span>é</span>')
 	print "Test '{$testName}' passed :)";
 else {
 	print "Test '{$testName}' <strong>FAILED</strong> !!!";

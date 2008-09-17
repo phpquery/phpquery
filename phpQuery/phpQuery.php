@@ -6,10 +6,10 @@
  *
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
  * @link http://code.google.com/p/phpquery/
- * @link http://meta20.net/phpQuery
+ * @link http://phpquery-library.blogspot.com/
  * @link http://jquery.com
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.9.4 beta1
+ * @version 0.9.4 beta2
  */
 
 // class names for instanceof

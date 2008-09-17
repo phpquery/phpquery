@@ -7,6 +7,7 @@ set_include_path(
 
 require_once('../phpQuery/phpQuery.php');
 phpQuery::$debug = true;
+phpQuery::$ajaxAllowedHosts[] = 'wikipedia.org';
 $pq = phpQuery::ajax(array(
 	'url' => 'http://wikipedia.org/',
 	'success' => 'v87shs79d8fhs9d'

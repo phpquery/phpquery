@@ -3,17 +3,20 @@ require_once('../phpQuery/phpQuery.php');
 phpQuery::$debug = true;
 
 $testName = 'Wrap';
-$testResult = 2;
-phpQuery::newDocumentFile('test.html')
+$p = phpQuery::newDocumentFile('test.html')
 	->find('p')
-		->slice(1, 3)
-			->wrap('<div class="wrapper">');
-$result = pq('.wrapper');
-if ( $result->size() == $testResult )
+		->slice(1, 3);
+$p->wrap('<div class="wrapper">');
+$result = true;
+foreach($p as $node) {
+	if (! pq($node)->parent()->is('.wrapper'))
+		$result = false;
+}
+if ($result)
 	print "Test '{$testName}' PASSED :)";
 else
 	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
-$result->dump();
+$p->dump();
 print "\n";
 
 

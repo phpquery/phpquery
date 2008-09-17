@@ -26,6 +26,10 @@ abstract class phpQuery {
 //	public static $defaultDoctype = 'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"';
 	public static $defaultDoctype = '';
 	public static $defaultEncoding = 'UTF-8';
+	/**
+	 * @todo
+	 * @var unknown_type
+	 */
 	public static $pluginsAutoload = array(
 //		'iframe',
 	);
@@ -82,7 +86,7 @@ abstract class phpQuery {
 	 * 1. Import HTML into existing DOM (without any attaching):
 	 * - Import into last used DOM:
 	 *   pq('<div/>')				// DOESNT accept text nodes at beginning of input string !
-	 * - Import into DOM with ID from $pq->getDocumentId():
+	 * - Import into DOM with ID from $pq->getDocumentID():
 	 *   pq('<div/>', 'domId')
 	 * - Import into same DOM as DOMNode belongs to:
 	 *   pq('<div/>', DOMNode)
@@ -92,7 +96,7 @@ abstract class phpQuery {
 	 * 2. Run query:
 	 * - Run query on last used DOM:
 	 *   pq('div.myClass')
-	 * - Run query on DOM with ID from $pq->getDocumentId():
+	 * - Run query on DOM with ID from $pq->getDocumentID():
 	 *   pq('div.myClass', 'domId')
 	 * - Run query on same DOM as DOMNode belongs to and use node(s)as root for query:
 	 *   pq('div.myClass', DOMNode)
@@ -100,7 +104,7 @@ abstract class phpQuery {
 	 *   pq('div.myClass', phpQuery)
 	 *
 	 * @param string|DOMNode|DOMNodeList|array	$arg1	HTML markup, CSS Selector, DOMNode or array of DOMNodes
-	 * @param string|phpQuery|DOMNode	$context	DOM ID from $pq->getDocumentId(), phpQuery object (determines also query root) or DOMNode (determines also query root)
+	 * @param string|phpQuery|DOMNode	$context	DOM ID from $pq->getDocumentID(), phpQuery object (determines also query root) or DOMNode (determines also query root)
 	 *
 	 * @return	phpQuery|false			phpQuery object or false in case of error.
 	 */
@@ -119,27 +123,20 @@ abstract class phpQuery {
 		} else if (is_object($context) && $context instanceof phpQueryObject)
 			$domId = $context->domId;
 		else if ($context instanceof DOMDOCUMENT) {
-			foreach(phpQuery::$documents as $id => $document) {
-				if ($context->isSameNode($document['document']))
-					$domId = $id;
-			}
+			$domId = self::getDocumentID($context);
 			if (! $domId) {
-				throw new Exception('Orphaned DOMNode');
-				// TODO create new dom
-//				$domId = self::newDocument($context);
+				//throw new Exception('Orphaned DOMDocument');
+				$domId = self::newDocument($context)->getDocumentID();
 			}
 		} else if ($context instanceof DOMNODE) {
-			foreach(phpQuery::$documents as $id => $document) {
-				if ($context->ownerDocument->isSameNode($document['document']))
-					$domId = $id;
-			}
+			$domId = self::getDocumentID($context);
 			if (! $domId){
 				throw new Exception('Orphaned DOMNode');
 //				$domId = self::newDocument($context->ownerDocument);
 			}
 		} else
 			$domId = $context;
-		if ($arg1 instanceof PHPQUERYOBJECT) {
+		if ($arg1 instanceof phpQueryObject) {
 //		if (is_object($arg1) && (get_class($arg1) == 'phpQueryObject' || $arg1 instanceof PHPQUERY || is_subclass_of($arg1, 'phpQueryObject'))) {
 			/**
 			 * Return $arg1 or import $arg1 stack if document differs:
@@ -199,7 +196,7 @@ abstract class phpQuery {
 	/**
 	 * Sets defaults document to $id. Document has to be loaded prior
 	 * to using this method.
-	 * $id can be retrived via getDocumentId() or getDocumentIdRef().
+	 * $id can be retrived via getDocumentID() or getDocumentIDRef().
 	 *
 	 * @param unknown_type $id
 	 */
@@ -208,7 +205,7 @@ abstract class phpQuery {
 	}
 	/**
 	 * Returns document with id $id or last selected.
-	 * $id can be retrived via getDocumentId() or getDocumentIdRef().
+	 * $id can be retrived via getDocumentID() or getDocumentIDRef().
 	 * Chainable.
 	 *
 	 * @see phpQuery::selectDocument()
@@ -245,7 +242,7 @@ abstract class phpQuery {
 		$domId = self::createDomFromFile($file);
 		return new phpQueryObject($domId);
 	}
-	public static function createDomFromFile($file, $domId = null) {
+	protected static function createDomFromFile($file, $domId = null) {
 		return self::createDom(
 			file_get_contents($file, $domId)
 		);
@@ -257,21 +254,37 @@ abstract class phpQuery {
 	 * @param unknown_type $domId
 	 * @return unknown New DOM ID
 	 */
-	public static function createDom($html, $domId = null) {
+	protected static function createDom($html, $domId = null) {
 		$id = $domId
 			? $domId
 			: md5(microtime());
+		$document = null;
+		if ($html instanceof DOMDOCUMENT) {
+			if (self::getDocumentID($html)) {
+				// document already exists in phpQuery::$documents, make a copy
+				$document = clone $html;
+			} else {
+				// new document, add it to phpQuery::$documents
+				$document = $html;
+			}
+		} else {
+			$document = new DOMDocument();
+		}
 		// create document
 		phpQuery::$documents[ $id ] = array(
 			'documentFragment' => true,
-			'document' =>  new DOMDocument(),
+			'document' => $document,
 			'eventNodes' => array(),
+			'eventGlobals' => array(),
+			'xpath' => null,
 		);
 		$DOM =& phpQuery::$documents[ $id ];
-		// load data
-		if (! self::loadHtml($DOM, $html)) {
-			throw new Exception("Can't load '{$html}'");
-			return;
+		if (!($html instanceof DOMDOCUMENT)) {
+			// load markup
+			if (! self::loadHtml($DOM, $html)) {
+				throw new Exception("Can't load '{$html}'");
+				return;
+			}
 		}
 		$DOM['xpath'] = new DOMXPath(
 			$DOM['document']
@@ -391,7 +404,7 @@ abstract class phpQuery {
 	 * @param phpQuery|string $content
 	 * @return string
 	 */
-	public static function unsafePhpTags($content) {
+	public static function unsafePHPTags($content) {
 		if ($content instanceof phpQueryObject)
 			$content = $content->htmlOuter();
 		/* <php>...</php> to <?php...?> */
@@ -472,39 +485,33 @@ abstract class phpQuery {
 			print $text;
 	}
 	/**
-	 * Enter description here...
+	 * Make an AJAX request.
 	 *
-	 * @param unknown_type $options
+	 * @param array See $options http://docs.jquery.com/Ajax/jQuery.ajax#toptions
+	 * Additional options are:
+	 * 'document' - document for global events, @see phpQuery::getDocumentID()
+	 * 'http_referer' - TODO; not implemented
+	 * 'requested_with' - TODO; not implemented (X-Requested-With)
 	 * @return Zend_Http_Client
 	 * @link http://docs.jquery.com/Ajax/jQuery.ajax
-	 * @TODO options['http_referer']
+	 *
+	 * @TODO $options['cache']
+	 * @TODO $options['processData']
 	 */
-	static public function ajax($options = array(), $xhr = null) {
-		/* TODO:
-		 * cache
-		 *
-		 * callbacks:
-		 * beforeSend (XMLHttpRequest)
-		 * complete(XMLHttpRequest, textStatus)
-		 * dataFilter(data, type)
-		 * error (XMLHttpRequest, textStatus, errorThrown)
-		 * success(data, textStatus) {
-		 *
-		 *
-		 * global - trigger global ajax event or not
-		 *
-		 * "X-Requested-With", "XMLHttpRequest"
-		 */
+	public static function ajax($options = array(), $xhr = null) {
 		$options = array_merge(
 			self::$ajaxSettings, $options
 		);
-//		print_r($options);
-		// http://framework.zend.com/manual/en/zend.http.html
+		$documentID = isset($options['document'])
+			? self::getDocumentID($options['document'])
+			: null;
 		if ($xhr) {
+			// reuse existing XHR object, but clean it up
 			$client = $xhr;
 			$client->setParameterPost(null);
 			$client->setParameterGet(null);
 		} else {
+			// create new XHR object
 			require_once('Zend/Http/Client.php');
 			$client = new Zend_Http_Client();
 			$client->setCookieJar();
@@ -545,8 +552,7 @@ abstract class phpQuery {
 				? self::$ajaxSettings['accepts'][ $options['dataType'] ].", */*"
 				: self::$ajaxSettings['accepts']['_default']
 		);
-//		if (!$options['processData'])
-			// TODO preccess data
+		// TODO $options['processData']
 		if ($options['data'] instanceof phpQueryObject) {
 			$serialized = $options['data']->serializeArray($options['data']);
 			$options['data'] = array();
@@ -558,25 +564,38 @@ abstract class phpQuery {
 		} else if (strtolower($options['type']) == 'post') {
 			$client->setParameterPost($options['data']);
 		}
+		if (self::$active == 0 && $options['global'])
+			phpQueryEvent::trigger($documentID, 'ajaxStart');
 		self::$active++;
+		// beforeSend callback
 		if (isset($options['beforeSend']) && $options['beforeSend'] && is_callable($options['beforeSend']))
 			call_user_func_array($options['beforeSend'], array($client));
-		// do request
+		// ajaxSend event
+		if ($options['global'])
+			phpQueryEvent::trigger($documentID, 'ajaxSend', array($client, $options));
 		self::debug("{$options['type']}: {$options['url']}\n");
 		self::debug("Data: <pre>".var_export($options['data'], true)."</pre>\n");
+		// request
 		$response = $client->request();
 		if ($response->isSuccessful()) {
 			// XXX tempolary
 			self::$lastModified = $response->getHeader('Last-Modified');
 			if (isset($options['success']) && $options['success'] && is_callable($options['success']))
 				call_user_func_array($options['success'], array($response->getBody(), $response->getStatus()));
+			if ($options['global'])
+				phpQueryEvent::trigger($documentID, 'ajaxSuccess', array($client, $options));
 		} else {
 			if (isset($options['error']) && $options['error'] && is_callable($options['error']))
-				call_user_func_array($options['error'], array($response, $response->getStatus(), $response->getMessage()));
+				call_user_func_array($options['error'], array($client, $response->getStatus(), $response->getMessage()));
+			if ($options['global'])
+				phpQueryEvent::trigger($documentID, 'ajaxError', array($client, /*$response->getStatus(),*/$response->getMessage(), $options));
 		}
 		if (isset($options['complete']) && $options['complete'] && is_callable($options['complete']))
-			call_user_func_array($options['complete'], array($response, $response->getStatus()));
-		self::$active--;
+			call_user_func_array($options['complete'], array($client, $response->getStatus()));
+		if ($options['global'])
+			phpQueryEvent::trigger($documentID, 'ajaxComplete', array($client, $options));
+		if ($options['global'] && ! --self::$active)
+			phpQueryEvent::trigger($documentID, 'ajaxStop');
 		return $client;
 //		if (is_null($domId))
 //			$domId = self::$lastDomId ? self::$lastDomId : false;
@@ -588,11 +607,11 @@ abstract class phpQuery {
 	 * @param array|phpQuery $data
 	 *
 	 */
-	static public function param($data) {
+	public static function param($data) {
 		return http_build_query($data, null, '&');
 	}
 
-	static public function get($url, $data, $callback, $type) {
+	public static function get($url, $data, $callback, $type) {
 		if (!is_array($data)) {
 			$callback = $data;
 			$data = null;
@@ -606,7 +625,7 @@ abstract class phpQuery {
 		));
 	}
 
-	static public function post($url, $data, $callback, $type) {
+	public static function post($url, $data, $callback, $type) {
 		if (!is_array($data)) {
 			$callback = $data;
 			$data = null;
@@ -619,18 +638,167 @@ abstract class phpQuery {
 			'dataType' => $type,
 		));
 	}
-
-	static public function getJSON() {
-		;
-	}
-
-	static public function ajaxSetup($options) {
+	public static function ajaxSetup($options) {
 		self::$ajaxSettings = array_merge(
 			self::$ajaxSettings,
 			$options
 		);
 	}
+	/**
+	 * Returns JSON representation of $data.
+	 *
+	 * @static
+	 * @param mixed $data
+	 * @return string
+	 */
+	public static function toJSON($data) {
+		if (function_exists('json_encode'))
+			return json_encode($data);
+		require_once('Zend/Json/Encoder');
+		return Zend_Json_Encoder::encode($data);
+	}
+	/**
+	 * Parses JSON into proper PHP type.
+	 *
+	 * @static
+	 * @param string $json
+	 * @return mixed
+	 */
+	public static function parseJSON($json) {
+		if (function_exists('json_decode'))
+			return json_decode($json, true);
+		require_once('Zend/Json/Decoder');
+		return Zend_Json_Decoder::decode($json);
+	}
+	/**
+	 * Returns source's document ID.
+	 *
+	 * @param $source DOMNode|phpQueryObject
+	 * @return string
+	 */
+	public static function getDocumentID($source) {
+		if ($source instanceof DOMDOCUMENT) {
+			foreach(phpQuery::$documents as $id => $document) {
+				if ($source->isSameNode($document['document']))
+					return $id;
+			}
+		} else if ($source instanceof DOMNODE) {
+			foreach(phpQuery::$documents as $id => $document) {
+				if ($source->ownerDocument->isSameNode($document['document']))
+					return $id;
+			}
+		} else if ($source instanceof phpQueryObject)
+			return $source->getDocumentID();
+		else if (is_string($source) && isset(phpQuery::$documents[$source]))
+			return $source;
+	}
+	/**
+	 * Get DOMDocument object related to $source.
+	 * Returns null if such document doesn't exist.
+	 *
+	 * @param $source DOMNode|phpQueryObject|string
+	 * @return string
+	 */
+	public static function getDOMDocument($source) {
+		if ($source instanceof DOMDOCUMENT)
+			return $source;
+		$source = self::getDocumentID($source);
+		return $source
+			? self::$documents[$id]['document']
+			: null;
+	}
+
+	// UTILITIES
+	// http://docs.jquery.com/Utilities
+
+	/**
+	 *
+	 * @return unknown_type
+	 * @link http://docs.jquery.com/Utilities/jQuery.makeArray
+	 */
+	public static function makeArray($obj) {
+		$array = array();
+		if (is_object($object) && $object instanceof DOMNODELIST) {
+			foreach($object as $value)
+				$array[] = $value;
+		} else if (is_object($object) && ! ($object instanceof Iterator)) {
+			foreach(get_object_vars($object) as $name => $value)
+				$array[0][$name] = $value;
+		} else {
+			foreach($object as $name => $value)
+				$array[0][$name] = $value;
+		}
+		return $array;
+	}
+	public static function inArray($value, $array) {
+		return in_array($value, $array);
+	}
+	/**
+	 *
+	 * @param $object
+	 * @param $callback
+	 * @return unknown_type
+	 * @link http://docs.jquery.com/Utilities/jQuery.each
+	 */
+	public static function each($object, $callback) {
+		if (is_object($object) && ! ($object instanceof Iterator)) {
+			foreach(get_object_vars($object) as $name => $value)
+				call_user_func_array($callback, array($name, $value));
+		} else {
+			foreach($object as $name => $value)
+				call_user_func_array($callback, array($name, $value));
+		}
+	}
+	/**
+	 *
+	 * @link http://docs.jquery.com/Utilities/jQuery.map
+	 */
+	public static function map($array, $callback) {
+		$result = array();
+		foreach($array as $v) {
+			$vv = call_user_func_array($callback, array($v));
+			if (is_array($vv))  {
+				foreach($vv as $vvv)
+					$result[] = $vvv;
+			} else if ($vv !== null) {
+				$result[$k] = $vv;
+			}
+		}
+		return $result;
+	}
+	/**
+	 *
+	 * @param $array
+	 * @param $callback
+	 * @param $invert
+	 * @return unknown_type
+	 * @link http://docs.jquery.com/Utilities/jQuery.grep
+	 */
+	public static function grep($array, $callback, $invert = false) {
+		$result = array();
+		foreach($array as $k => $v) {
+			$r = call_user_func_array($callback, array($v, $k));
+			if ($r === !(bool)$invert)
+				$result[] = $v;
+		}
+		return $result;
+	}
+	public static function unique($array) {
+		return array_unique($array);
+	}
+	public static function isFunction($function) {
+		return is_callable($function);
+	}
+	public static function trim($str) {
+		return trim($str);
+	}
 }
+/**
+ * Plugins static namespace class.
+ *
+ * @author Tobiasz Cudnik
+ * @package phpQuery
+ */
 class phpQueryPlugins {
 	public function __call($method, $args) {
 		if (isset(phpQuery::$pluginsStaticMethods[$method])) {
@@ -648,42 +816,72 @@ class phpQueryPlugins {
 class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	public $domId = null;
 	/**
-	 * Alias for $Document
+	 * Alias for $document
 	 *
 	 * @var DOMDocument
+	 * @see phpQueryObject::$document
+	 * @depracated
 	 */
 	public $DOM = null;
 	/**
 	 * DOMDocument class.
 	 *
-	 * @var unknown_type
+	 * @var DOMDocument
 	 */
 	public $document = null;
+	/**
+	 * Document ID.
+	 *
+	 * @var string
+	 */
 	protected $docId = null;
 	/**
-	 * Enter description here...
+	 * XPath interface.
 	 *
 	 * @var DOMXPath
 	 */
 	public $XPath = null;
-	protected $elementsBackup = array();
+	/**
+	 * Stack of selected elements.
+	 *
+	 * @var array
+	 */
 	public $elements = array();
+	/**
+	 * Number of selected elements.
+	 *
+	 * @var int
+	 */
+	public $length = 0;
+	protected $elementsBackup = array();
 	protected $previous = null;
 	protected $root = array();
+	/**
+	 * Indicated if doument is just a fragment (no <html> tag).
+	 *
+	 * Every document is realy a full document, so even documentFragments can
+	 * be queried against <html>, but getDocument(id)->htmlOuter() will return
+	 * only contents of <body>.
+	 *
+	 * @var bool
+	 */
 	public $documentFragment = true;
 	/**
-	 * Iterator helpers
-	 *
+	 * Iterator interface helper
 	 */
 	protected $elementsInterator = array();
+	/**
+	 * Iterator interface helper
+	 */
 	protected $valid = false;
+	/**
+	 * Iterator interface helper
+	 */
 	protected $current = null;
 	/**
-	 * Other helpers
+	 * Chars indicating regex comparsion.
 	 */
 	protected $regexpChars = array('^','*','$');
-	// TODO check this within insert(), it probably not needed
-	protected $tmpNodes = array();
 	/**
 	 * Enter description here...
 	 *
@@ -705,6 +903,15 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 		$this->root = $this->DOM->documentElement;
 //		$this->toRoot();
 		$this->elements = array($this->root);
+	}
+	public function __get($attr) {
+		switch($attr) {
+			case 'length':
+				return $this->size();
+			break;
+			default:
+				return $this->$attr;
+		}
 	}
 	/**
 	 * Saves actual object to $var by reference.
@@ -730,8 +937,13 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 			|| $this->root->isSameNode($node);
 	}
 
-
-	protected function importMarkup($html) {
+	/**
+	 *
+	 * @param $html
+	 * @return unknown_type
+	 * @protected
+	 */
+	public function importMarkup($html) {
 		$this->debug('Importing markup...');
 		$this->elementsBackup = $this->elements;
 		$this->elements = array();
@@ -796,7 +1008,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * <code>
 	 * $myDocumentId;
 	 * phpQuery::newDocument('<div/>')
-	 *     ->getDocumentIdRef($myDocumentId)
+	 *     ->getDocumentIDRef($myDocumentId)
 	 *     ->find('div')->...
 	 * </code>
 	 *
@@ -805,7 +1017,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * @see phpQuery::newDocumentFile
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function getDocumentIdRef(&$domId) {
+	public function getDocumentIDRef(&$documentID) {
 		$domId = $this->domId;
 		return $this;
 	}
@@ -814,7 +1026,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function getDocumentId() {
+	public function getDocumentID() {
 		return $this->domId;
 	}
 	/**
@@ -1073,10 +1285,10 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	}
 	/**
 	 * Return matched DOM nodes.
+	 * jQuery difference.
 	 *
-	 * @todo return DOMNodeList insted of array
 	 * @param int $index
-	 * @return array|DOMElement Single DOMElement or array of DOMElement.
+	 * @return array|string Returns string if $index != null
 	 */
 	public function getText($index = null) {
 		if ($index)
@@ -1451,8 +1663,31 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 
 	/**
 	 * Enter description here...
+	 * jQuery difference.
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @link http://docs.jquery.com/Traversing/filter
+	 */
+	public function filterCallback($callback, $_skipHistory = false) {
+		if (! $_skipHistory ) {
+			$this->elementsBackup = $this->elements;
+			$this->debug(array("Filtering:", $selectors));
+		}
+		$newStack = array();
+		foreach($this->elements as $index => $node) {
+			if (false !== call_user_func_array($callback, array($index, $node)))
+				$newStack[] = $node;
+		}
+		$this->elements = $newStack;
+		return $_skipHistory
+			? $this
+			: $this->newInstance();
+	}
+	/**
+	 * Enter description here...
+	 *
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @link http://docs.jquery.com/Traversing/filter
 	 */
 	public function filter( $selectors, $_skipHistory = false ) {
 		if (! $_skipHistory )
@@ -1588,51 +1823,8 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * @TODO support more than event in $type (space-separated)
 	 */
 	public function trigger($type, $data = array()) {
-		// trigger: function(type, data, elem, donative, extra) {
-		// TODO
-		$namespace = null;
-		if (strpos($type, '.') !== false)
-			list($name, $namespace) = explode('.', $type);
-		else
-			$name = $type;
-		foreach($this->elements as $node) {
-			$event = new phpQueryDomEvent(array(
-				'type' => $type,
-				'target' => $node,
-				'timeStamp' => time(),
-			));
-			while($node) {
-				$this->debug("Triggering event '{$type}' on node ".$this->whois($node));
-				$event->currentTarget = $node;
-				$eventNode = $this->getEventNode($node);
-				if (isset($eventNode->eventHandlers)) {
-					foreach($eventNode->eventHandlers as $eventType => $handlers) {
-						$eventNamespace = null;
-						if (strpos($type, '.') !== false)
-							list($eventName, $eventNamespace) = explode('.', $eventType);
-						else
-							$eventName = $eventType;
-						if ($name != $eventName)
-							continue;
-						if ($namespace && $eventNamespace && $namespace != $eventNamespace)
-							continue;
-						foreach($handlers as $handler) {
-							$event->data = $handler['data']
-								? $handler['data']
-								: null;
-							$return = call_user_func_array($handler['callback'], array_merge(array($event), $data));
-						}
-						if ($return === false) {
-							$event->bubbles = false;
-						}
-					}
-				}
-				// to bubble or not to bubble...
-				if (! $event->bubbles)
-					break;
-				$node = $node->parentNode;
-			}
-		}
+		foreach($this->elements as $node)
+			phpQueryEvent::trigger($this->getDocumentID(), $type, $data, $node);
 		return $this;
 	}
 	/**
@@ -1651,30 +1843,9 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 			$callback = $data;
 			$data = null;
 		}
-		foreach($this->elements as $node) {
-			$eventNode = $this->getEventNode($node);
-			if (! $eventNode)
-				$eventNode = $this->setEventNode($node);
-			if (!isset($eventNode->eventHandlers[$type]))
-				$eventNode->eventHandlers[$type] = array();
-			$eventNode->eventHandlers[$type][] = array(
-				'callback' => $callback,
-				'data' => $data,
-			);
-		}
+		foreach($this->elements as $node)
+			phpQueryEvent::add($this->getDocumentID(), $node, $type, $data, $callback);
 		return $this;
-	}
-	protected function getEventNode($node) {
-		foreach(phpQuery::$documents[$this->domId]['eventNodes'] as $eventNode) {
-			if ($node->isSameNode($eventNode))
-				return $eventNode;
-		}
-	}
-	protected function setEventNode($node) {
-		phpQuery::$documents[$this->domId]['eventNodes'][] = $node;
-		return phpQuery::$documents[$this->domId]['eventNodes'][
-			count(phpQuery::$documents[$this->domId]['eventNodes'])-1
-		];
 	}
 	/**
 	 * Enter description here...
@@ -1686,20 +1857,8 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * @TODO support more than event in $type (space-separated)
 	 */
 	public function unbind($type = null, $callback = null) {
-		foreach($this->elements as $node) {
-			$eventNode = $this->getEventNode($node);
-			if (! $eventNode)
-				continue;
-			if (isset($eventNode->eventHandlers[$type])) {
-				if ($callback) {
-					foreach($eventNode->eventHandlers[$type] as $k => $handler)
-						if ($handler['callback'] == $callback)
-							unset($eventNode->eventHandlers[$type][$k]);
-				} else {
-					unset($eventNode->eventHandlers[$type]);
-				}
-			}
-		}
+		foreach($this->elements as $node)
+			phpQueryEvent::remove($this->getDocumentID(), $node, $type, $callback);
 		return $this;
 	}
 	/**
@@ -1718,7 +1877,6 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	public function submit() {
 		return $this->trigger('submit');
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1860,16 +2018,17 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function size() {
-		return $this->length();
+		return count( $this->elements );
 	}
 
 	/**
 	 * Enter description here...
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @depracated Use length as attribute
 	 */
 	public function length() {
-		return count( $this->elements );
+		return $this->size();
 	}
 	public function count() {
 		return $this->length();
@@ -1916,7 +2075,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 			$newStack[] = $node->cloneNode(true);
 		}
 		$this->elements = $newStack;
-		return $this;
+		return $this->newInstance();
 	}
 
 	/**
@@ -2650,7 +2809,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 			return $this;
 		$stack = array();
 		$this->elementsBackup = $this->elements;
-		$found = phpQuery::pq($selector, $this->getDocumentId());
+		$found = phpQuery::pq($selector, $this->getDocumentID());
 		$this->merge($found->elements);
 		return $this->newInstance();
 	}
@@ -2733,8 +2892,14 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * @return string|array|phpQuery
 	 */
 	public function attr($attr = null, $value = null) {
+		if (! is_null( $value )) {
+			// TODO tempolary solution
+			// http://code.google.com/p/phpquery/issues/detail?id=17
+			if (mb_detect_encoding($value) == 'ASCII')
+				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
+		}
 		foreach( $this->elements as $node ) {
-			if (! is_null( $value )) {
+			if (! is_null($value)) {
 				$loop = $attr == '*'
 					? $this->getNodeAttrs($node)
 					: array($attr);
@@ -2758,6 +2923,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 
 	/**
 	 * Enter description here...
+	 * jQuery difference.
 	 *
 	 * @param string $attr
 	 * @param mixed $value
@@ -2773,6 +2939,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 
 	/**
 	 * Enter description here...
+	 * jQuery difference.
 	 *
 	 * @param string $attr
 	 * @param mixed $value
@@ -2801,8 +2968,13 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * @todo check CDATA ???
 	 */
 	public function attrPHP( $attr, $value ) {
-		if (! is_null( $value ))
+		if (! is_null( $value )) {
 			$value = '<?php '.$value.' ?>';
+			// TODO tempolary solution
+			// http://code.google.com/p/phpquery/issues/detail?id=17
+			if (mb_detect_encoding($value) == 'ASCII')
+				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
+		}
 		foreach( $this->elements as $node ) {
 			if (! is_null( $value )) {
 //				$attrNode = $this->DOM->createAttribute($attr);
@@ -3012,15 +3184,19 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * @todo add $scope and $args as in each() ???
 	 */
 	public function map($callback) {
-		$stack = array();
+//		$stack = array();
+////		foreach($this->newInstance() as $node) {
 //		foreach($this->newInstance() as $node) {
-		foreach($this->newInstance() as $node) {
-			$result = call_user_func($callback, $node);
-			if ($result)
-				$stack[] = $result;
-		}
-		return $this->newInstance($stack);
+//			$result = call_user_func($callback, $node);
+//			if ($result)
+//				$stack[] = $result;
+//		}
+		return $this->newInstance(
+			phpQuery::map($this->elements, $callback)
+		);
 	}
+
+	// INTERFACE IMPLEMENTATIONS
 
 	// ITERATOR INTERFACE
 	public function rewind(){
@@ -3114,7 +3290,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 			? $return[0]
 			: $return;
 	}
-
+	// HELPERS
 	public function whois($oneNode = null) {
 		$return = array();
 		$loop = $oneNode
@@ -3133,7 +3309,6 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 			? $return[0]
 			: $return;
 	}
-	// HELPERS
 	/**
 	 * Dump htmlOuter and preserve chain. Usefull for debugging.
 	 *
@@ -3153,71 +3328,158 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 		var_dump($this->htmlOuter());
 		die();
 	}
-	public function dumpStack() {
-		print __FILE__.':'.__LINE__;
-		$i = 1;
-		foreach( $this->elements as $node )
-			$this->debug("Node ".$i++.": ".$this->whois($node));
-		return $this;
-	}
-	protected function dumpHistory($when = null) {
-		print __FILE__.':'.__LINE__;
-		foreach( $this->history as $nodes ) {
-			$history[] = array();
-			foreach( $nodes as $node ) {
-				$history[ count($history)-1 ][] = $this->whois( $node );
+}
+/**
+ * Event handling class.
+ *
+ * @author Tobiasz Cudnik
+ * @package phpQuery
+ * @static
+ */
+class phpQueryEvent {
+	/**
+	 * Trigger a type of event on every matched element.
+	 *
+	 * @param DOMNode|phpQueryObject|string $document
+	 * @param unknown_type $type
+	 * @param unknown_type $data
+	 *
+	 * @TODO exclusive events (with !)
+	 * @TODO global events
+	 * @TODO support more than event in $type (space-separated)
+	 */
+	public function trigger($document, $type, $data = array(), $node = null) {
+		// trigger: function(type, data, elem, donative, extra) {
+		$documentID = phpQuery::getDocumentID($document);
+		$namespace = null;
+		if (strpos($type, '.') !== false)
+			list($name, $namespace) = explode('.', $type);
+		else
+			$name = $type;
+		if (! $node) {
+			if (self::issetGlobal($documentID, $type)) {
+				$pq = phpQuery::getDocument($documentID);
+				// TODO check add($pq->document)
+				$pq->find('*')->add($pq->document)
+					->trigger($type, $data);
+			}
+		} else {
+			$event = new DOMEvent(array(
+				'type' => $type,
+				'target' => $node,
+				'timeStamp' => time(),
+			));
+			while($node) {
+				phpQuery::debug("Triggering event '{$type}' on node ".$this->whois($node));
+				$event->currentTarget = $node;
+				$eventNode = self::getNode($documentID, $node);
+				if (isset($eventNode->eventHandlers)) {
+					foreach($eventNode->eventHandlers as $eventType => $handlers) {
+						$eventNamespace = null;
+						if (strpos($type, '.') !== false)
+							list($eventName, $eventNamespace) = explode('.', $eventType);
+						else
+							$eventName = $eventType;
+						if ($name != $eventName)
+							continue;
+						if ($namespace && $eventNamespace && $namespace != $eventNamespace)
+							continue;
+						foreach($handlers as $handler) {
+							$event->data = $handler['data']
+								? $handler['data']
+								: null;
+							$return = call_user_func_array($handler['callback'], array_merge(array($event), $data));
+						}
+						if ($return === false) {
+							$event->bubbles = false;
+						}
+					}
+				}
+				// to bubble or not to bubble...
+				if (! $event->bubbles)
+					break;
+				$node = $node->parentNode;
 			}
 		}
-		var_dump(array("{$when}/history", $history));
-	}
-}
-class phpQueryAjaxResponse {
-	/**
-	 * Enter description here...
-	 *
-	 * @var Zend_Http_Response
-	 */
-	public $xhr = null;
-	public $domId = null;
-	public function __construct($xhr, $domId = null) {
-		$this->xhr = $xhr;
-		$this->domId = $domId;
 	}
 	/**
-	 * Enter description here...
+	 * Binds a handler to one or more events (like click) for each matched element.
+	 * Can also bind custom events.
 	 *
+	 * @param DOMNode|phpQueryObject|string $document
+	 * @param unknown_type $type
+	 * @param unknown_type $data Optional
 	 * @param unknown_type $callback
-	 * @return phpQueryObject|null
+	 *
+	 * @TODO support '!' (exclusive) events
+	 * @TODO support more than event in $type (space-separated)
 	 */
-	public function success($callback = null) {
-		if ($callback)
-			// TODO params
-			call_user_func_array($callback, array());
-		else {
-			if ($this->domId === false)
-				// FIXME prevents overloading...
-				return phpQuery::newDocument($this->xhr->getBody());
-			else
-				return phpQuery::pq($this->xhr->getBody(), $this->domId);
+	public function add($document, $node, $type, $data, $callback = null) {
+		$documentID = phpQuery::getDocumentID($document);
+//		if (is_null($callback) && is_callable($data)) {
+//			$callback = $data;
+//			$data = null;
+//		}
+		$eventNode = self::getNode($documentID, $node);
+		if (! $eventNode)
+			$eventNode = self::setNode($documentID, $node);
+		if (!isset($eventNode->eventHandlers[$type]))
+			$eventNode->eventHandlers[$type] = array();
+		$eventNode->eventHandlers[$type][] = array(
+			'callback' => $callback,
+			'data' => $data,
+		);
+	}
+	/**
+	 * Enter description here...
+	 *
+	 * @param DOMNode|phpQueryObject|string $document
+	 * @param unknown_type $type
+	 * @param unknown_type $callback
+	 *
+	 * @TODO namespace events
+	 * @TODO support more than event in $type (space-separated)
+	 */
+	public static function remove($document, $node, $type = null, $callback = null) {
+		$documentID = phpQuery::getDocumentID($document);
+		$eventNode = self::getNode($documentID, $node);
+		if (is_object($eventNode) && isset($eventNode->eventHandlers[$type])) {
+			if ($callback) {
+				foreach($eventNode->eventHandlers[$type] as $k => $handler)
+					if ($handler['callback'] == $callback)
+						unset($eventNode->eventHandlers[$type][$k]);
+			} else {
+				unset($eventNode->eventHandlers[$type]);
+			}
 		}
 	}
-//	public function complete($callback) {
-//	}
-	public function error($callback) {
-		if ($this->xhr->getStatus() < 200 || $this->xhr->getStatus() >= 300) {
-			// TODO params
-			call_user_func_array($callback, array());
+	protected static function getNode($documentID, $node) {
+		foreach(phpQuery::$documents[$documentID]['eventNodes'] as $eventNode) {
+			if ($node->isSameNode($eventNode))
+				return $eventNode;
 		}
+	}
+	protected static function setNode($documentID, $node) {
+		phpQuery::$documents[$documentID]['eventNodes'][] = $node;
+		return phpQuery::$documents[$documentID]['eventNodes'][
+			count(phpQuery::$documents[$documentID]['eventNodes'])-1
+		];
+	}
+	protected static function issetGlobal($documentID, $type) {
+		return isset(phpQuery::$documents[$documentID])
+			? in_array($type, phpQuery::$documents[$documentID]['eventGlobals'])
+			: false;
 	}
 }
 /**
- * DOM Event class.
+ * DOMEvent class.
+ *
  * Based on
  * @link http://developer.mozilla.org/En/DOM:event
- *
+ * @author Tobiasz Cudnik
+ * @todo implement array_access
  */
-class phpQueryDomEvent {
-	// TODO implements array_access
+class DOMEvent {
 	/**
 	 * Returns a boolean indicating whether the event bubbles up through the DOM or not.
 	 *
@@ -3320,9 +3582,10 @@ function pq($arg1, $context = null) {
 		$args
 	);
 }
-// add plugins dir to include path
+// add plugins dir and Zend framework to include path
 set_include_path(
 	get_include_path()
+		.':'.dirname(__FILE__).'/'
 		.':'.dirname(__FILE__).'/plugins/'
 );
 // why ? no __call nor __get for statics in php...

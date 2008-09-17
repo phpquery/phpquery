@@ -12,6 +12,10 @@ set_include_path(
  * @link http://code.google.com/p/phpquery/
  * @todo local files support (safe...)
  * @todo respond with proper HTTP code
+ * @todo use Zend_Json_Encoder
+ * @todo use Zend_Json_Encoder
+ * @todo 2.0: JSON RPC - Zend_Json_Server
+ * @todo 2.0: XML RPC ?
  */
 class jQueryServer {
 	/**

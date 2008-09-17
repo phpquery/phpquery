@@ -6,7 +6,7 @@ $testResult = <<<EOF
 <div class="articles">
 			div.articles text node
             <ul>
-                
+
             <li>
                 	<p>This is paragraph of first LI</p>
                     <p class="title">News 1 title</p>
@@ -25,7 +25,7 @@ $testResult = <<<EOF
                 </li>
 </ul>
 <p>paragraph after UL</p>
-        </div>	
+        </div>
 EOF;
 $rows = array(
 	array(
@@ -59,9 +59,25 @@ $result = pq('.articles')->htmlOuter();
 //print htmlspecialchars("<pre>{$result}</pre>").'<br />';
 $similarity = 0.0;
 similar_text($testResult, $result, $similarity);
-if ( $similarity > 95 )
+if ($similarity > 90)
 	print "Test '{$testName}' passed :)";
 else
-	print "Test '{$testName}' <strong>FAILED</strong> !!!";
+	print "Test '{$testName}' <strong>FAILED</strong> ($similarity) !!!";
+print "\n";
+
+
+$testName = 'Parent && children';
+$result = phpQuery::newDocumentFile('test.html');
+$parent = $result->find('ul:first');
+$children = $parent->find('li:first');
+$e = null;
+try {
+	$children->before('<li>test</li>');
+} catch(Exception $e) {
+	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
+}
+if (! $e) {
+	print "Test '{$testName}' PASSED :)";
+}
 print "\n";
 ?>

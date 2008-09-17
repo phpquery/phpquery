@@ -2669,9 +2669,12 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 		return $this;
 	}
 	public function __call($method, $args) {
+		$aliasMethods = array('clone', 'empty');
 		if (method_exists($this, $method))
 			return call_user_method_array(array($this, $method), $args);
-		else if (isset(phpQuery::$pluginsMethods[$method])) {
+		else if (in_array($method, $aliasMethods)) {
+			return call_user_func_array(array($this, '_'.$method), $args);
+		} else if (isset(phpQuery::$pluginsMethods[$method])) {
 			array_unshift($args, $this);
 			$class = phpQuery::$pluginsMethods[$method];
 			$realClass = "phpQueryObjectPlugin_$class";
@@ -2687,7 +2690,10 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	}
 
 	/**
-	 * Enter description here...
+	 * Safe rename of next().
+	 *
+	 * Use it ONLY when need to call next() on an iterated object (in same time).
+	 * Normaly there is no need to do such thing ;)
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
@@ -2698,8 +2704,9 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	}
 
 	/**
-	 * Enter description here...
+	 * Use prev() and next().
 	 *
+	 * @deprecated
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function _prev( $selector = null ) {
@@ -3221,8 +3228,8 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	}
 
 	public function next($cssSelector = null){
-		if ($cssSelector)
-			return $this->_next($cssSelector);
+//		if ($cssSelector || $this->valid)
+//			return $this->_next($cssSelector);
 		$this->current++;
 		$this->valid = isset( $this->elementsInterator[ $this->current ] )
 			? true
@@ -3231,6 +3238,9 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 			$this->elements = array(
 				$this->elementsInterator[ $this->current ]
 			);
+		else {
+			$this->_next($cssSelector);
+		}
 	}
 	public function valid(){
 		return $this->valid;

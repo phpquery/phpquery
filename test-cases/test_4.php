@@ -75,7 +75,7 @@ $p = phpQuery::newDocumentFile('test.html')
 	->toReference($document)
 	->find('p:first');
 foreach(array(0,1,2) as $i) {
-	$p->_clone()
+	$p->clone()
 		->addClass("clone-test")
 		->addClass("class-$i")
 		->insertBefore($p);

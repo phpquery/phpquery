@@ -86,4 +86,21 @@ else {
 	print "Test '$testName' <strong>FAILED</strong> !!! ";
 }
 print "\n";
+
+// SIBLINGS
+$testName = 'Next';
+$testResult = 3;
+$document;
+$result = phpQuery::newDocumentFile('test.html')
+	->find('li:first')
+	->next()
+	->next()
+	->prev()
+	->is('#testID');
+if ($result)
+	print "Test '$testName' PASSED :)";
+else {
+	print "Test '$testName' <strong>FAILED</strong> !!! ";
+}
+print "\n";
 ?>

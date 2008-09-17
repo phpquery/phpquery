@@ -568,7 +568,7 @@ abstract class phpQuery {
 			phpQueryEvent::trigger($documentID, 'ajaxStart');
 		self::$active++;
 		// beforeSend callback
-		if (isset($options['beforeSend']) && $options['beforeSend'] && is_callable($options['beforeSend']))
+		if (isset($options['beforeSend']) && $options['beforeSend'])
 			call_user_func_array($options['beforeSend'], array($client));
 		// ajaxSend event
 		if ($options['global'])
@@ -580,17 +580,17 @@ abstract class phpQuery {
 		if ($response->isSuccessful()) {
 			// XXX tempolary
 			self::$lastModified = $response->getHeader('Last-Modified');
-			if (isset($options['success']) && $options['success'] && is_callable($options['success']))
+			if (isset($options['success']) && $options['success'])
 				call_user_func_array($options['success'], array($response->getBody(), $response->getStatus()));
 			if ($options['global'])
 				phpQueryEvent::trigger($documentID, 'ajaxSuccess', array($client, $options));
 		} else {
-			if (isset($options['error']) && $options['error'] && is_callable($options['error']))
+			if (isset($options['error']) && $options['error'])
 				call_user_func_array($options['error'], array($client, $response->getStatus(), $response->getMessage()));
 			if ($options['global'])
 				phpQueryEvent::trigger($documentID, 'ajaxError', array($client, /*$response->getStatus(),*/$response->getMessage(), $options));
 		}
-		if (isset($options['complete']) && $options['complete'] && is_callable($options['complete']))
+		if (isset($options['complete']) && $options['complete'])
 			call_user_func_array($options['complete'], array($client, $response->getStatus()));
 		if ($options['global'])
 			phpQueryEvent::trigger($documentID, 'ajaxComplete', array($client, $options));
@@ -786,6 +786,13 @@ abstract class phpQuery {
 	public static function unique($array) {
 		return array_unique($array);
 	}
+	/**
+	 *
+	 * @param $function
+	 * @return unknown_type
+	 * @TODO there are problems with non-static methods, second parameter pass it
+	 * 	but doesnt verify is method is really callable
+	 */
 	public static function isFunction($function) {
 		return is_callable($function);
 	}
@@ -916,11 +923,11 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	/**
 	 * Saves actual object to $var by reference.
 	 * Useful when need to break chain.
-	 * @param $var
+	 * @param phpQueryObject $var
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function toReference(&$var) {
-		return $var =& $this;
+		return $var = $this;
 	}
 	public function documentFragment($state = null) {
 		if ( $state ) {
@@ -1782,12 +1789,43 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * Enter description here...
 	 *
 	 * @link http://docs.jquery.com/Ajax/load
+	 * @return phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @todo Support $selector
 	 */
-	public function load() {
-
+	public function load($url, $data = null, $callback = null) {
+		if (strpos($url, ' ') !== false) {
+			$matches = null;
+			preg_match('@^(.+?) (.*)$@', $url, $matches);
+			$url = $matches[1];
+			$selector = $matches[2];
+			// this sucks, but what to do ?
+			$this->_loadSelector = $selector;
+		}
+		$ajax = array(
+			'url' => $url,
+			'type' => $data ? 'POST' : 'GET',
+			'data' => $data,
+			'complete' => $callback,
+			'success' => array($this, '__loadSuccess')
+		);
+		phpQuery::ajax($ajax);
+		return $this;
 	}
-
-
+	/**
+	 * @protected
+	 * @param $html
+	 * @return unknown_type
+	 */
+	public function __loadSuccess($html) {
+		if ($this->_loadSelector) {
+			$html = phpQuery::newDocument($html)->find($this->_loadSelector);
+			unset($this->_loadSelector);
+		}
+		foreach($this as $node) {
+			phpQuery::pq($node, $this->getDocumentID())
+				->html($html);
+		}
+	}
 	/**
 	 * Enter description here...
 	 *
@@ -2063,6 +2101,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 
 	/**
 	 * Enter description here...
+	 * Normal use ->clone() .
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
@@ -2787,7 +2826,6 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * Enter description here...
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * FIXME ->not(':eq(2)')
 	 */
 	public function not($selector = null) {
 		$stack = array();
@@ -2896,7 +2934,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 *
 	 * @param unknown_type $attr
 	 * @param unknown_type $value
-	 * @return string|array|phpQuery
+	 * @return string|array|phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function attr($attr = null, $value = null) {
 		if (! is_null( $value )) {
@@ -2934,7 +2972,8 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 *
 	 * @param string $attr
 	 * @param mixed $value
-	 * @return phpQuery
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @todo use attr() function (encoding issues etc).
 	 */
 	public function attrPrepend($attr, $value) {
 		foreach( $this->elements as $node )
@@ -2950,7 +2989,8 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 *
 	 * @param string $attr
 	 * @param mixed $value
-	 * @return phpQuery
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @todo use attr() function (encoding issues etc).
 	 */
 	public function attrAppend($attr, $value) {
 		foreach( $this->elements as $node )
@@ -3040,7 +3080,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQuery
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function andSelf() {
 		if ( $this->previous )
@@ -3143,6 +3183,8 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	}
 
 	/**
+	 * Proper name without underscore (just ->empty()) also works.
+	 *
 	 * Removes all child nodes from the set of matched elements.
 	 *
 	 * Example:
@@ -3226,7 +3268,17 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	public function key(){
 		return $this->current;
 	}
-
+	/**
+	 * Double-function method.
+	 *
+	 * First: main iterator interface method.
+	 * Second: Returning next sibling, alias for _next().
+	 *
+	 * Proper functionality is choosed automagicaly.
+	 *
+	 * @see phpQueryObject::_next()
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 */
 	public function next($cssSelector = null){
 //		if ($cssSelector || $this->valid)
 //			return $this->_next($cssSelector);
@@ -3239,7 +3291,8 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 				$this->elementsInterator[ $this->current ]
 			);
 		else {
-			$this->_next($cssSelector);
+			$this->current--;
+			return $this->_next($cssSelector);
 		}
 	}
 	public function valid(){

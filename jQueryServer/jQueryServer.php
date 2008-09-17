@@ -8,6 +8,7 @@ set_include_path(
  *
  * Backend class using phpQuery.
  *
+ * @version 0.5
  * @author Tobiasz Cudnik tobiasz.cudnik/gmail.com
  * @link http://code.google.com/p/phpquery/
  * @todo local files support (safe...)

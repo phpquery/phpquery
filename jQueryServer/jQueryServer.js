@@ -1,3 +1,18 @@
+/**
+ * jQuery Server Plugin
+ *
+ * Server-side AJAX requests supporting jQuery manipulations
+ * before sending content to the browser.
+ * 
+ * Example:
+ * $.server({url: ${URL})
+ * 	.find('.my-class')
+ * 	.client(${CALLBACK});
+ *
+ * @version 0.5
+ * @author Tobiasz Cudnik tobiasz.cudnik/gmail.com
+ * @link http://code.google.com/p/phpquery/
+ */
 jQuery.extend({
 	serverConfig: function() {
 		if (typeof jQueryServerConfig != 'undefined')

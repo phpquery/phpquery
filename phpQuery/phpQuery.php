@@ -1793,6 +1793,10 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	 * @todo Support $selector
 	 */
 	public function load($url, $data = null, $callback = null) {
+		if ($data && ! is_array($data)) {
+			$callback = $data;
+			$data = null;
+		}
 		if (strpos($url, ' ') !== false) {
 			$matches = null;
 			preg_match('@^(.+?) (.*)$@', $url, $matches);

@@ -66,4 +66,41 @@ else {
 	print "Test 'Index' <strong>FAILED</strong> !!! ";
 }
 print "\n";
+
+// CLONE
+$testName = 'Clone';
+$testResult = 3;
+$document;
+$p = phpQuery::newDocumentFile('test.html')
+	->toReference($document)
+	->find('p:first');
+foreach(array(0,1,2) as $i) {
+	$p->clone()
+		->addClass("clone-test")
+		->addClass("class-$i")
+		->insertBefore($p);
+}
+if (pq('.clone-test')->size() == $testResult)
+	print "Test '$testName' PASSED :)";
+else {
+	print "Test '$testName' <strong>FAILED</strong> !!! ";
+}
+print "\n";
+
+// SIBLINGS
+$testName = 'Next';
+$testResult = 3;
+$document;
+$result = phpQuery::newDocumentFile('test.html')
+	->find('li:first')
+	->next()
+	->next()
+	->prev()
+	->is('#testID');
+if ($result)
+	print "Test '$testName' PASSED :)";
+else {
+	print "Test '$testName' <strong>FAILED</strong> !!! ";
+}
+print "\n";
 ?>

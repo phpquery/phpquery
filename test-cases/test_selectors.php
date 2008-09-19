@@ -122,4 +122,17 @@ foreach( $tests as $test ) {
 	}
 	print "<br /><br />";
 }
+
+//
+$testName = 'Complicated selector 1';
+phpQuery::newDocumentFile('test.html');
+pq('<select name="test[]"><option value=3>test</option></select>')
+	->appendTo('body');
+$result = pq('select[name="test[]"]:has(option[value=3])');
+if ( $result->size() == 1 )
+	print "Test '{$testName}' PASSED :)";
+else
+	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
+$result->dump();
+print "\n";
 ?>

@@ -54,19 +54,25 @@ class phpQueryPlugin_WebBrowser {
 		$xhr = phpQuery::ajax(array(
 			'type' => 'GET',
 			'url' => $url,
+			'dataType' => 'html',
 		));
 		if ($xhr->getLastResponse()->isSuccessful()) {
 			call_user_func_array($callback, array(
-				self::browserReceive($xhr)->WebBrowser($callback)
+				self::browserReceive($xhr)//->WebBrowser($callback)
 			));
+			return true;
 		} else
 			return false;
 	}
 	public static function browserPost($url, $data, $callback) {
 	}
+	/**
+	 * @param Zend_Http_Client $xhr
+	 */
 	public static function browserReceive($xhr) {
 		// TODO handle meta redirects
 		$body = $xhr->getLastResponse()->getBody();
+
 		// XXX error ???
 		if (strpos($body, '<!doctype html>') !== false) {
 			$body = '<html>'
@@ -76,7 +82,29 @@ class phpQueryPlugin_WebBrowser {
 		$pq = phpQuery::newDocument($body);
 		$pq->document->xhr = $xhr;
 		$pq->document->location = $xhr->getUri();
-		return $pq;
+		$refresh = $pq->find('meta[http-equiv=refresh]')->add('meta[http-equiv=Refresh]');
+		if ($refresh->size()) {
+//			print htmlspecialchars(var_export($xhr->getCookieJar()->getAllCookies(), true));
+//			print htmlspecialchars(var_export($xhr->getLastResponse()->getHeader('Set-Cookie'), true));
+			phpQuery::debug("Meta redirect... '{$refresh->attr('content')}'\n");
+			// there is a refresh, so get the new url
+			$content = $refresh->attr('content');
+			$urlRefresh = substr($content, strpos($content, '=')+1);
+			$urlRefresh = trim($urlRefresh, '\'"');
+			// make ajax call, passing last $xhr object to preserve important stuff
+			$xhr = phpQuery::ajax(array(
+				'type' => 'GET',
+				'url' => $urlRefresh,
+				'dataType' => 'html',
+			), $xhr);
+			if ($xhr->getLastResponse()->isSuccessful()) {
+				// if all is ok, repeat this method...
+				return call_user_func_array(
+					array('phpQueryPlugin_WebBrowser', 'browserReceive'), array($xhr)
+				);
+			}
+		} else
+			return $pq;
 	}
 	public static function hadleClick($e) {
 		$node = phpQuery::pq($e->target);
@@ -115,8 +143,8 @@ class phpQueryPlugin_WebBrowser {
 		foreach($node->serializeArray($defaultSubmit) as $r)
 			$data[ $r['name'] ] = $r['value'];
 		$options = array(
-			'type' => $node->attr('type')
-				? $node->attr('type')
+			'type' => $node->attr('method')
+				? $node->attr('method')
 				: 'GET',
 			'url' => resolve_url($e->data[0], $node->attr('action')),
 			'data' => $data,

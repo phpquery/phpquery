@@ -10,6 +10,7 @@
  * @link http://jquery.com
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  * @version 0.9.4 beta2
+ * @package phpQuery
  */
 
 // class names for instanceof
@@ -19,6 +20,12 @@ define('DOMNODELIST', 'DOMNodeList');
 define('DOMNODE', 'DOMNode');
 define('PHPQUERYOBJECT', 'phpQueryObject');
 
+/**
+ * Static namespace for phpQuery functions.
+ *
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ * @package phpQuery
+ */
 abstract class phpQuery {
 	public static $debug = false;
 	public static $documents = array();
@@ -510,6 +517,8 @@ abstract class phpQuery {
 			$client = $xhr;
 			$client->setParameterPost(null);
 			$client->setParameterGet(null);
+			$client->setAuth(false);
+			$client->setHeaders("If-Modified-Since", null);
 		} else {
 			// create new XHR object
 			require_once('Zend/Http/Client.php');
@@ -532,14 +541,12 @@ abstract class phpQuery {
 		$client->setUri($options['url']);
 		$client->setMethod($options['type']);
 		$client->setHeaders(array(
-			'contentType' => $options['contentType'],
+//			'content-type' => $options['contentType'],
 			'user-agent' => 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9a8) Gecko/2007100619 GranParadiso/3.0a8',
 			'accept-charset' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
 		));
 		if ($options['username'])
 			$client->setAuth($options['username'], $options['password']);
-		else
-			$client->setAuth(false);
 		if (isset($options['ifModified']) && $options['ifModified'])
 			$client->setHeaders("If-Modified-Since",
 				self::$lastModified
@@ -562,6 +569,7 @@ abstract class phpQuery {
 		if (strtolower($options['type']) == 'get') {
 			$client->setParameterGet($options['data']);
 		} else if (strtolower($options['type']) == 'post') {
+			$client->setEncType($options['contentType']);
 			$client->setParameterPost($options['data']);
 		}
 		if (self::$active == 0 && $options['global'])
@@ -574,7 +582,8 @@ abstract class phpQuery {
 		if ($options['global'])
 			phpQueryEvent::trigger($documentID, 'ajaxSend', array($client, $options));
 		self::debug("{$options['type']}: {$options['url']}\n");
-		self::debug("Data: <pre>".var_export($options['data'], true)."</pre>\n");
+		self::debug("Options: <pre>".var_export($options, true)."</pre>\n");
+		self::debug("Cookies: <pre>".var_export($client->getCookieJar()->getMatchingCookies($options['url']), true)."</pre>\n");
 		// request
 		$response = $client->request();
 		if ($response->isSuccessful()) {
@@ -803,7 +812,7 @@ abstract class phpQuery {
 /**
  * Plugins static namespace class.
  *
- * @author Tobiasz Cudnik
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
  * @package phpQuery
  */
 class phpQueryPlugins {
@@ -820,7 +829,14 @@ class phpQueryPlugins {
 			throw new Exception("Method '{$method}' doesnt exist");
 	}
 }
-class phpQueryObject implements Iterator, Countable, ArrayAccess {
+/**
+ * Main class of phpQuery library.
+ *
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ * @package phpQuery
+ */
+class phpQueryObject
+	implements Iterator, Countable, ArrayAccess {
 	public $domId = null;
 	/**
 	 * Alias for $document
@@ -913,6 +929,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 	}
 	public function __get($attr) {
 		switch($attr) {
+			// FIXME doesnt work at all ?
 			case 'length':
 				return $this->size();
 			break;
@@ -1073,7 +1090,7 @@ class phpQueryObject implements Iterator, Countable, ArrayAccess {
 				continue;
 			if (!$input->is('[name]'))
 				continue;
-			if ($input->is('[type=radio]') && !$input->is('[checked]'))
+			if ($input->is('[type=checkbox]') && !$input->is('[checked]'))
 				continue;
 			// jquery diff
 			if ($submit && $input->is('[type=submit]')) {
@@ -3415,7 +3432,7 @@ class phpQueryEvent {
 	 * @TODO global events
 	 * @TODO support more than event in $type (space-separated)
 	 */
-	public function trigger($document, $type, $data = array(), $node = null) {
+	public static function trigger($document, $type, $data = array(), $node = null) {
 		// trigger: function(type, data, elem, donative, extra) {
 		$documentID = phpQuery::getDocumentID($document);
 		$namespace = null;
@@ -3437,7 +3454,7 @@ class phpQueryEvent {
 				'timeStamp' => time(),
 			));
 			while($node) {
-				phpQuery::debug("Triggering event '{$type}' on node ".$this->whois($node));
+				phpQuery::debug("Triggering event '{$type}' on node ".phpQueryObject::whois($node)."\n");
 				$event->currentTarget = $node;
 				$eventNode = self::getNode($documentID, $node);
 				if (isset($eventNode->eventHandlers)) {
@@ -3481,7 +3498,7 @@ class phpQueryEvent {
 	 * @TODO support '!' (exclusive) events
 	 * @TODO support more than event in $type (space-separated)
 	 */
-	public function add($document, $node, $type, $data, $callback = null) {
+	public static function add($document, $node, $type, $data, $callback = null) {
 		$documentID = phpQuery::getDocumentID($document);
 //		if (is_null($callback) && is_callable($data)) {
 //			$callback = $data;
@@ -3543,8 +3560,9 @@ class phpQueryEvent {
  *
  * Based on
  * @link http://developer.mozilla.org/En/DOM:event
- * @author Tobiasz Cudnik
- * @todo implement array_access
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ * @package phpQuery
+ * @todo implement ArrayAccess ?
  */
 class DOMEvent {
 	/**
@@ -3641,6 +3659,8 @@ class DOMEvent {
  *
  * @see phpQuery::pq()
  * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ * @package phpQuery
  */
 function pq($arg1, $context = null) {
 	$args = func_get_args();

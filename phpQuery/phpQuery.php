@@ -504,6 +504,7 @@ abstract class phpQuery {
 	 *
 	 * @TODO $options['cache']
 	 * @TODO $options['processData']
+	 * @TODO support callbackStructure like each() and map()
 	 */
 	public static function ajax($options = array(), $xhr = null) {
 		$options = array_merge(
@@ -3200,6 +3201,8 @@ class phpQueryObject
 	 * @param unknown_type $attr
 	 * @param unknown_type $value
 	 * @return string|array|phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @todo uncheck other radios in group
+	 * @todo unselect other selecte's options when !multiply
 	 */
 	public function attr($attr = null, $value = null) {
 		if (! is_null( $value )) {
@@ -3213,14 +3216,55 @@ class phpQueryObject
 				$loop = $attr == '*'
 					? $this->getNodeAttrs($node)
 					: array($attr);
-				foreach( $loop as $a ) {
-					if ( $value )
+				foreach($loop as $a) {
+					$event = null;
+					if ($value) {
+						// identifi
+						$isInputValue = $node->tagName == 'input'
+							&& (
+								in_array($node->getAttribute('type'),
+									array('text', 'password', 'hidden'))
+								|| !$node->getAttribute('type')
+							);
+						$isRadio = $node->tagName == 'input'
+							&& $node->getAttribute('type') == 'radio';
+						$isCheckbox = $node->tagName == 'input'
+							&& $node->getAttribute('type') == 'checkbox';
+						$isOption = $node->tagName == 'option'
+							&& $node->getAttribute('type') == 'radio';
+						// detect 'change' event
+						if ($isInputValue && $a == 'value'
+							&& $value != $node->getAttribute($a)) {
+							$event = new DOMEvent(array(
+								'target' => $node,
+								'type' => 'change'
+							));
+						} else if (($isRadio || $isCheckbox)
+							&& $a == 'checked' && !$node->getAttribute($a)) {
+							$event = new DOMEvent(array(
+								'target' => $node,
+								'type' => 'change'
+							));
+						} else if ($isOption && $node->parentNode
+							&& $a == 'selected' && !$node->getAttribute($a)) {
+							$event = new DOMEvent(array(
+								'target' => $node->parentNode,
+								'type' => 'change'
+							));
+						}
+					}
+					if ($value)
 						$node->setAttribute($a, $value);
 					else
 						$node->removeAttribute($a);
+					if ($event) {
+						phpQueryEvent::trigger($this->getDocumentID(),
+							$event->type, array($event)
+						);
+					}
 				}
-			} else if ( $attr == '*' ) {
-				// jQuery diff
+			} else if ($attr == '*') {
+				// jQuery difference
 				$return = array();
 				foreach( $node->attributes as $n => $v)
 					$return[$n] = $v->value;
@@ -3900,13 +3944,15 @@ class DOMEvent {
 		foreach($data as $k => $v) {
 			$this->$k = $v;
 		}
+		if (! $this->timeStamp)
+			$this->timeStamp = time();
 	}
 	/**
 	 * Cancels the event (if it is cancelable).
 	 *
 	 */
 	public function preventDefault() {
-		// TODO;
+		$this->runDefault = false;
 	}
 	/**
 	 * Stops the propagation of events further along in the DOM.

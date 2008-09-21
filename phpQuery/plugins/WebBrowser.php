@@ -2,7 +2,6 @@
 /**
  * WebBrowser plugin.
  *
- * @
  */
 class phpQueryObjectPlugin_WebBrowser {
 	/**
@@ -15,6 +14,7 @@ class phpQueryObjectPlugin_WebBrowser {
 	 * Enter description here...
 	 *
 	 * @param phpQueryObject $self
+	 * @todo support 'reset' event
 	 */
 	public static function WebBrowser($self, $callback, $location = null) {
 		$self = $self->_clone()->toRoot();
@@ -30,41 +30,78 @@ class phpQueryObjectPlugin_WebBrowser {
 	}
 }
 class phpQueryPlugin_WebBrowser {
-	public static $xhr = null;
-	/**
-	 * Limit binded methods to specified ones.
-	 *
-	 * @var array
-	 */
-//	public $phpQueryMethods = array('WebBrowserBind');
-	/**
-	 * Handler for default WebBrowser events.
-	 * Same parameters as for AjaxSuccess event.
-	 *
-	 * @param unknown_type $callback
-	 * @TODO bind with normal bind('webbrowser') :)))
-	 */
-	public static function browserGet($url, $callback) {
-//		$success = $ajaxOptions['success'];
-//		$error = $ajaxOptions['error'];
-//		$complete = $ajaxOptions['complete'];
-//		$ajaxOptions['success'] = null;
-//		$ajaxOptions['error'] = null;
-//		$ajaxOptions['complete'] = null;
+	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
 		$xhr = phpQuery::ajax(array(
 			'type' => 'GET',
 			'url' => $url,
 			'dataType' => 'html',
 		));
+		$paramStructure = null;
+		if (func_num_args() > 2) {
+			$paramStructure = func_get_args();
+			$paramStructure = array_slice($paramStructure, 2);
+		}
 		if ($xhr->getLastResponse()->isSuccessful()) {
-			call_user_func_array($callback, array(
-				self::browserReceive($xhr)//->WebBrowser($callback)
-			));
+			phpQuery::callbackRun($callback,
+				array(self::browserReceive($xhr)),
+				$paramStructure
+			);
+//			call_user_func_array($callback, array(
+//				self::browserReceive($xhr)//->WebBrowser($callback)
+//			));
 			return true;
 		} else
 			return false;
 	}
-	public static function browserPost($url, $data, $callback) {
+	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		$xhr = phpQuery::ajax(array(
+			'type' => 'POST',
+			'url' => $url,
+			'dataType' => 'html',
+			'data' => $data,
+		));
+		$paramStructure = null;
+		if (func_num_args() > 3) {
+			$paramStructure = func_get_args();
+			$paramStructure = array_slice($paramStructure, 3);
+		}
+		if ($xhr->getLastResponse()->isSuccessful()) {
+			phpQuery::callbackRun($callback,
+				array(self::browserReceive($xhr)),
+				$paramStructure
+			);
+//			call_user_func_array($callback, array(
+//				self::browserReceive($xhr)//->WebBrowser($callback)
+//			));
+			return true;
+		} else
+			return false;
+	}
+	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		$xhr = phpQuery::ajax(
+			self::ajaxSettingsPrepare($ajaxSettings)
+		);
+		$paramStructure = null;
+		if (func_num_args() > 2) {
+			$paramStructure = func_get_args();
+			$paramStructure = array_slice($paramStructure, 2);
+		}
+		if ($xhr->getLastResponse()->isSuccessful()) {
+			phpQuery::callbackRun($callback,
+				array(self::browserReceive($xhr)),
+				$paramStructure
+			);
+//			call_user_func_array($callback, array(
+//				self::browserReceive($xhr)//->WebBrowser($callback)
+//			));
+			return true;
+		} else
+			return false;
+	}
+	protected static function ajaxSettingsPrepare($settings) {
+		unset($settings['success']);
+		unset($settings['error']);
+		return $settings;
 	}
 	/**
 	 * @param Zend_Http_Client $xhr

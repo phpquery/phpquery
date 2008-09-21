@@ -108,19 +108,21 @@ class phpQueryPlugin_WebBrowser {
 	}
 	public static function hadleClick($e) {
 		$node = phpQuery::pq($e->target);
-		if (!$node->is('a') || !$node->is('[href]'))
-			return;
-		// TODO document.location
-		$xhr = isset($node->document->xhr)
-			? $node->document->xhr
-			: null;
-		$xhr = phpQuery::ajax(array(
-			'url' => resolve_url($e->data[0], $node->attr('href')),
-		), $xhr);
-		if ($xhr->getLastResponse()->isSuccessfull())
-			call_user_func_array($e->data[1], array(
-				self::browserReceive($xhr, $e->data[1])
-			));
+		$type = null;
+		if ($node->is('a[href]')) {
+			// TODO document.location
+			$xhr = isset($node->document->xhr)
+				? $node->document->xhr
+				: null;
+			$xhr = phpQuery::ajax(array(
+				'url' => resolve_url($e->data[0], $node->attr('href')),
+			), $xhr);
+			if ($xhr->getLastResponse()->isSuccessfull())
+				call_user_func_array($e->data[1], array(
+					self::browserReceive($xhr, $e->data[1])
+				));
+		} else if ($node->is(':submit') && $node->parents('form')->size())
+			$node->parents('form')->trigger('submit', array($e));
 	}
 	/**
 	 * Enter description here...
@@ -136,11 +138,15 @@ class phpQueryPlugin_WebBrowser {
 		$xhr = isset($node->document->xhr)
 			? $node->document->xhr
 			: null;
-		$defaultSubmit = pq($e->target)->is('[type=submit]')
+		$submit = pq($e->target)->is(':submit')
 			? $e->target
-			: $node->find('input[type=submit]:first')->get(0);
+				// will this work ?
+//			: $node->find(':submit:first')->get(0);
+			: $node->find('*:submit:first')->get(0);
 		$data = array();
-		foreach($node->serializeArray($defaultSubmit) as $r)
+		foreach($node->serializeArray($submit) as $r)
+		// XXXt.c maybe $node->not(':submit')->add($sumit) would be better ?
+//		foreach($node->serializeArray($submit) as $r)
 			$data[ $r['name'] ] = $r['value'];
 		$options = array(
 			'type' => $node->attr('method')

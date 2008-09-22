@@ -107,6 +107,170 @@ $tests = array(
 			'li',
 		)
 	),
+	// CSS3 pseudoclasses
+	array(
+		'li:only-child',
+		array(
+			'li.nested',
+		)
+	),
+	array(
+		'p[rel=test]:parent',
+		array(
+			'p',
+			'p',
+		)
+	),
+	array(
+		'li:first-child',
+		array(
+			'li',
+			'li#i_have_nested_list',
+			'li.nested',
+		)
+	),
+	array(
+		':last-child',
+		array(
+			'html',
+			'script',
+			'body',
+			'p.body',
+			'p.body',
+			'li',
+			'p.body',
+			'p.after',
+			'ul',
+			'ul',
+			'li.nested',
+			'li.second',
+		)
+	),
+	array(
+		':nth-child(1n+1)',
+		array(
+			'html',
+			'head',
+			'meta',
+			'div.articles',
+			'ul',
+			'li',
+			'p',
+			'p',
+			'p',
+			'li#i_have_nested_list',
+			'ul',
+			'li.nested',
+		)
+	),
+	array(
+		':nth-child(3n+6)',
+		array(
+			'script',
+			'p.body',
+			'p.body',
+			'li',
+			'p.body',
+		)
+	),
+	array(
+		':nth-child(2n)',
+		array(
+			'title',
+			'script',
+			'body',
+			'p.title',
+			'li#testID',
+			'p.title',
+			'p.noTitle',
+			'p.after',
+			'ul',
+			'li.second',
+		)
+	),
+//	array(
+//		':nth-child(1)',
+//		array(
+//			'html',
+//			'head',
+//			'meta',
+//			'div.articles',
+//			'ul',
+//			'li',
+//			'p',
+//			'p',
+//			'p',
+//			'li#i_have_nested_list',
+//			'ul',
+//			'li.nested',
+//		)
+//	),
+//	array(
+//		':nth-child(odd)',
+//		array(
+//			'html',
+//			'head',
+//			'meta',
+//			'script',
+//			'div.articles',
+//			'ul',
+//			'li',
+//			'p',
+//			'p.body',
+//			'p',
+//			'p.body',
+//			'li',
+//			'p',
+//			'p.body',
+//			'li#i_have_nested_list',
+//			'ul',
+//			'li.nested',
+//		)
+//	),
+//	array(
+//		':nth-child(even)',
+//		array(
+//			'title',
+//			'script',
+//			'body',
+//			'p.title',
+//			'li#testID',
+//			'p.title',
+//			'p.noTitle',
+//			'p.after',
+//			'ul',
+//			'li.second',
+//		)
+//	),
+//	array(
+//		':empty',
+//		array(
+//			'meta',
+//			'script',
+//			'script',
+//			'li.nested',
+//		)
+//	),
+
+
+//	array(
+//		'',
+//		array(
+//			'',
+//		)
+//	),
+//	array(
+//		'',
+//		array(
+//			'',
+//		)
+//	),
+//	array(
+//		'',
+//		array(
+//			'',
+//		)
+//	),
 );
 
 phpQuery::newDocumentFile('test.html');
@@ -122,4 +286,17 @@ foreach( $tests as $test ) {
 	}
 	print "<br /><br />";
 }
+
+//
+$testName = 'Complicated selector 1';
+phpQuery::newDocumentFile('test.html');
+pq('<select name="test[]"><option value=3>test</option></select>')
+	->appendTo('body');
+$result = pq('select[name="test[]"]:has(option[value=3])');
+if ( $result->size() == 1 )
+	print "Test '{$testName}' PASSED :)";
+else
+	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
+$result->dump();
+print "\n";
 ?>

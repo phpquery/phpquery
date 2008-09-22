@@ -30,7 +30,7 @@ $single = $testDOM->find('p')->filter('.body')
 ;
 $double = $testDOM->find('p')
 	->filter('.body, .title');
-if (count($single) == count($double))
+if ($single->length == count($double))
 	print "Test '{$testName}' PASSED :)";
 else
 	print "Test '{$testName}' <strong>FAILED</strong> !!! ";

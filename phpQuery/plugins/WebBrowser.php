@@ -2,7 +2,6 @@
 /**
  * WebBrowser plugin.
  *
- * @
  */
 class phpQueryObjectPlugin_WebBrowser {
 	/**
@@ -15,6 +14,7 @@ class phpQueryObjectPlugin_WebBrowser {
 	 * Enter description here...
 	 *
 	 * @param phpQueryObject $self
+	 * @todo support 'reset' event
 	 */
 	public static function WebBrowser($self, $callback, $location = null) {
 		$self = $self->_clone()->toRoot();
@@ -30,43 +30,94 @@ class phpQueryObjectPlugin_WebBrowser {
 	}
 }
 class phpQueryPlugin_WebBrowser {
-	public static $xhr = null;
-	/**
-	 * Limit binded methods to specified ones.
-	 *
-	 * @var array
-	 */
-//	public $phpQueryMethods = array('WebBrowserBind');
-	/**
-	 * Handler for default WebBrowser events.
-	 * Same parameters as for AjaxSuccess event.
-	 *
-	 * @param unknown_type $callback
-	 * @TODO bind with normal bind('webbrowser') :)))
-	 */
-	public static function browserGet($url, $callback) {
-//		$success = $ajaxOptions['success'];
-//		$error = $ajaxOptions['error'];
-//		$complete = $ajaxOptions['complete'];
-//		$ajaxOptions['success'] = null;
-//		$ajaxOptions['error'] = null;
-//		$ajaxOptions['complete'] = null;
+	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
 			'type' => 'GET',
 			'url' => $url,
+			'dataType' => 'html',
 		));
+		$paramStructure = null;
+		if (func_num_args() > 2) {
+			$paramStructure = func_get_args();
+			$paramStructure = array_slice($paramStructure, 2);
+		}
 		if ($xhr->getLastResponse()->isSuccessful()) {
-			call_user_func_array($callback, array(
-				self::browserReceive($xhr)->WebBrowser($callback)
-			));
+			phpQuery::callbackRun($callback,
+				array(self::browserReceive($xhr)),
+				$paramStructure
+			);
+//			call_user_func_array($callback, array(
+//				self::browserReceive($xhr)//->WebBrowser($callback)
+//			));
+			return true;
 		} else
 			return false;
 	}
-	public static function browserPost($url, $data, $callback) {
+	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		self::authorizeHost($url);
+		$xhr = phpQuery::ajax(array(
+			'type' => 'POST',
+			'url' => $url,
+			'dataType' => 'html',
+			'data' => $data,
+		));
+		$paramStructure = null;
+		if (func_num_args() > 3) {
+			$paramStructure = func_get_args();
+			$paramStructure = array_slice($paramStructure, 3);
+		}
+		if ($xhr->getLastResponse()->isSuccessful()) {
+			phpQuery::callbackRun($callback,
+				array(self::browserReceive($xhr)),
+				$paramStructure
+			);
+//			call_user_func_array($callback, array(
+//				self::browserReceive($xhr)//->WebBrowser($callback)
+//			));
+			return true;
+		} else
+			return false;
 	}
+	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		self::authorizeHost($ajaxSettings['url']);
+		$xhr = phpQuery::ajax(
+			self::ajaxSettingsPrepare($ajaxSettings)
+		);
+		$paramStructure = null;
+		if (func_num_args() > 2) {
+			$paramStructure = func_get_args();
+			$paramStructure = array_slice($paramStructure, 2);
+		}
+		if ($xhr->getLastResponse()->isSuccessful()) {
+			phpQuery::callbackRun($callback,
+				array(self::browserReceive($xhr)),
+				$paramStructure
+			);
+//			call_user_func_array($callback, array(
+//				self::browserReceive($xhr)//->WebBrowser($callback)
+//			));
+			return true;
+		} else
+			return false;
+	}
+	protected static function authorizeHost($url) {
+		$host = parse_url($url, PHP_URL_HOST);
+		if ($host)
+			phpQuery::ajaxAllowHost($host);
+	}
+	protected static function ajaxSettingsPrepare($settings) {
+		unset($settings['success']);
+		unset($settings['error']);
+		return $settings;
+	}
+	/**
+	 * @param Zend_Http_Client $xhr
+	 */
 	public static function browserReceive($xhr) {
 		// TODO handle meta redirects
 		$body = $xhr->getLastResponse()->getBody();
+
 		// XXX error ???
 		if (strpos($body, '<!doctype html>') !== false) {
 			$body = '<html>'
@@ -76,23 +127,47 @@ class phpQueryPlugin_WebBrowser {
 		$pq = phpQuery::newDocument($body);
 		$pq->document->xhr = $xhr;
 		$pq->document->location = $xhr->getUri();
-		return $pq;
+		$refresh = $pq->find('meta[http-equiv=refresh]')->add('meta[http-equiv=Refresh]');
+		if ($refresh->size()) {
+//			print htmlspecialchars(var_export($xhr->getCookieJar()->getAllCookies(), true));
+//			print htmlspecialchars(var_export($xhr->getLastResponse()->getHeader('Set-Cookie'), true));
+			phpQuery::debug("Meta redirect... '{$refresh->attr('content')}'\n");
+			// there is a refresh, so get the new url
+			$content = $refresh->attr('content');
+			$urlRefresh = substr($content, strpos($content, '=')+1);
+			$urlRefresh = trim($urlRefresh, '\'"');
+			// make ajax call, passing last $xhr object to preserve important stuff
+			$xhr = phpQuery::ajax(array(
+				'type' => 'GET',
+				'url' => $urlRefresh,
+				'dataType' => 'html',
+			), $xhr);
+			if ($xhr->getLastResponse()->isSuccessful()) {
+				// if all is ok, repeat this method...
+				return call_user_func_array(
+					array('phpQueryPlugin_WebBrowser', 'browserReceive'), array($xhr)
+				);
+			}
+		} else
+			return $pq;
 	}
 	public static function hadleClick($e) {
 		$node = phpQuery::pq($e->target);
-		if (!$node->is('a') || !$node->is('[href]'))
-			return;
-		// TODO document.location
-		$xhr = isset($node->document->xhr)
-			? $node->document->xhr
-			: null;
-		$xhr = phpQuery::ajax(array(
-			'url' => resolve_url($e->data[0], $node->attr('href')),
-		), $xhr);
-		if ($xhr->getLastResponse()->isSuccessfull())
-			call_user_func_array($e->data[1], array(
-				self::browserReceive($xhr, $e->data[1])
-			));
+		$type = null;
+		if ($node->is('a[href]')) {
+			// TODO document.location
+			$xhr = isset($node->document->xhr)
+				? $node->document->xhr
+				: null;
+			$xhr = phpQuery::ajax(array(
+				'url' => resolve_url($e->data[0], $node->attr('href')),
+			), $xhr);
+			if ($xhr->getLastResponse()->isSuccessfull())
+				call_user_func_array($e->data[1], array(
+					self::browserReceive($xhr, $e->data[1])
+				));
+		} else if ($node->is(':submit') && $node->parents('form')->size())
+			$node->parents('form')->trigger('submit', array($e));
 	}
 	/**
 	 * Enter description here...
@@ -108,15 +183,19 @@ class phpQueryPlugin_WebBrowser {
 		$xhr = isset($node->document->xhr)
 			? $node->document->xhr
 			: null;
-		$defaultSubmit = pq($e->target)->is('[type=submit]')
+		$submit = pq($e->target)->is(':submit')
 			? $e->target
-			: $node->find('input[type=submit]:first')->get(0);
+				// will this work ?
+//			: $node->find(':submit:first')->get(0);
+			: $node->find('*:submit:first')->get(0);
 		$data = array();
-		foreach($node->serializeArray($defaultSubmit) as $r)
+		foreach($node->serializeArray($submit) as $r)
+		// XXXt.c maybe $node->not(':submit')->add($sumit) would be better ?
+//		foreach($node->serializeArray($submit) as $r)
 			$data[ $r['name'] ] = $r['value'];
 		$options = array(
-			'type' => $node->attr('type')
-				? $node->attr('type')
+			'type' => $node->attr('method')
+				? $node->attr('method')
 				: 'GET',
 			'url' => resolve_url($e->data[0], $node->attr('action')),
 			'data' => $data,

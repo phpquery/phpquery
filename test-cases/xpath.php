@@ -1,6 +1,6 @@
 <?php
 // here you can directly run xpath queries to debug your tests
-$Query = "following-sibling::p";
+$Query = "/html[1]//*";
 
 $DOM = new DOMDocument();
 $DOM->loadHTMLFile('test.html');

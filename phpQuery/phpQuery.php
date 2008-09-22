@@ -260,6 +260,7 @@ abstract class phpQuery {
 	 * @param unknown_type $html
 	 * @param unknown_type $domId
 	 * @return unknown New DOM ID
+	 * @todo support PHP tags in input
 	 */
 	protected static function createDom($html, $domId = null) {
 		$id = $domId
@@ -406,11 +407,17 @@ abstract class phpQuery {
 		}
 		return true;
 	}
-	public static function unloadDocuments( $path = null ) {
-		if ( $path )
-			unset( phpQuery::$documents[ $path ] );
-		else
-			unset( phpQuery::$documents );
+	/**
+	 * Unloades all or specified document from memory.
+	 *
+	 * @param mixed $documentID @see phpQuery::getDocumentID() for supported types.
+	 */
+	public static function unloadDocuments($documentID = null) {
+		if ($documentID) {
+			if ($documentID = self::getDocumentID($documentID))
+				unset(phpQuery::$documents[$documentID]);
+		} else
+			unset(phpQuery::$documents);
 	}
 	/**
 	 * Parses phpQuery object or HTML result against PHP tags and makes them active.
@@ -1029,7 +1036,7 @@ class phpQueryObject
 		return $var = $this;
 	}
 	public function documentFragment($state = null) {
-		if ( $state ) {
+		if ($state) {
 			phpQuery::$documents[$this->docId]['documentFragment'] = $state;
 			return $this;
 		}
@@ -1137,11 +1144,14 @@ class phpQueryObject
 	}
 	/**
 	 * Enter description here...
+	 * Unload whole document from memory.
+	 * CAUTION! None further operations will be possible on this document.
+	 * All objects refering to it will be useless.
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function unload() {
-		unset( phpQuery::$documents[ $this->domId ] );
+	public function unloadDocument() {
+		phpQuery::unloadDocuments($this->getDocumentID());
 	}
 	/**
 	 * Enter description here...
@@ -1470,12 +1480,19 @@ class phpQueryObject
 		if (! $this->elements )
 			$this->debug('Stack empty, skipping...');
 		foreach( $this->elements as $k => $stackNode ) {
-			$remove = false;
+			$detachAfter = false;
 			// to work on detached nodes we need temporary place them somewhere
 			// thats because context xpath queries sucks ;]
-			if (! $stackNode->parentNode && ! $this->isRoot($stackNode) ) {
-				$this->root->appendChild($stackNode);
-				$remove = true;
+			$testNode = $stackNode;
+			while ($testNode) {
+				if (! $testNode->parentNode && ! $this->isRoot($testNode) ) {
+					$this->root->appendChild($testNode);
+					$detachAfter = $testNode;
+					break;
+				}
+				$testNode = isset($testNode->parentNode)
+					? $testNode->parentNode
+					: null;
 			}
 			$xpath = $this->getNodeXpath($stackNode);
 			// FIXME deam...
@@ -1509,8 +1526,8 @@ class phpQueryObject
 			if (phpQuery::$debug) {
 				$this->debug("Matched ".count($debug).": ".implode(', ', $debug));
 			}
-			if ( $remove )
-				$stackNode = $this->root->removeChild( $this->root->lastChild );
+			if ($detachAfter)
+				$this->root->removeChild($detachAfter);
 		}
 		$this->elements = $stack;
 	}
@@ -3605,6 +3622,7 @@ class phpQueryObject
 	// INTERFACE IMPLEMENTATIONS
 
 	// ITERATOR INTERFACE
+	// TODO IteratorAggregate
 	public function rewind(){
 		$this->debug('iterating foreach');
 		$this->elementsBackup = $this->elements;

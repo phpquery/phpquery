@@ -196,7 +196,7 @@ abstract class phpQuery {
 				foreach($context as $node)
 					$phpQuery->elements[] = $node;
 			} else if ($context && $context instanceof DOMNODE)
-				$phpQuery->elements = array(DOMNODE);
+				$phpQuery->elements = array($context);
 			return $phpQuery->find($arg1);
 		}
 	}
@@ -302,15 +302,22 @@ abstract class phpQuery {
 	protected static function loadHtmlFile(&$DOM, $file) {
 		return self::loadHtml($DOM, file_get_contents($file));
 	}
+	protected static function isXML($markup) {
+		return strpos($markup, '<?xml') !== false;
+	}
 	protected static function loadHtml(&$DOM, $html) {
-		self::checkDocumentFragment($DOM, $html);
-		if (! self::containsEncoding($html) )
-			$html = self::appendEncoding($html);
-//			$html = mb_convert_encoding($html, 'HTML-ENTITIES', self::$defaultEncoding);
-//			$html = '<meta http-equiv="Content-Type" content="text/html;charset='.self::$defaultEncoding.'">'.$html;
-		// TODO if ! self::containsEncoding() && self::containsHead() then attach encoding inside head
-		// check comments on php.net about problems with charset when loading document without encoding as first line
-		return @$DOM['document']->loadHTML($html);
+		if (! self::isXML($html)) {
+			self::checkDocumentFragment($DOM, $html);
+			if (! self::containsEncoding($html))
+				$html = self::appendEncoding($html);
+			//			$html = mb_convert_encoding($html, 'HTML-ENTITIES', self::$defaultEncoding);
+			//			$html = '<meta http-equiv="Content-Type" content="text/html;charset='.self::$defaultEncoding.'">'.$html;
+			// TODO if ! self::containsEncoding() && self::containsHead() then attach encoding inside head
+			// check comments on php.net about problems with charset when loading document without encoding as first line
+			return @$DOM['document']->loadHTML($html);
+		} else {
+			return $DOM['document']->loadXML($html);
+		}
 	}
 	protected static function checkDocumentFragment(&$DOM, $html) {
 		if ( stripos($html, '<html') !== false ) {
@@ -654,6 +661,10 @@ abstract class phpQuery {
 			$options
 		);
 	}
+	public static function ajaxAllowHost($host) {
+		if ($host && !in_array($host, phpQuery::$ajaxAllowedHosts))
+			phpQuery::$ajaxAllowedHosts[] = $host;
+	}
 	/**
 	 * Returns JSON representation of $data.
 	 *
@@ -859,6 +870,25 @@ abstract class phpQuery {
 	}
 	public static function trim($str) {
 		return trim($str);
+	}
+	/* PLUGINS NAMESPACE */
+	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		if (self::extend('WebBrowser')) {
+			$params = func_get_args();
+			return self::callbackRun(array(self::$plugins, 'browserGet'), $params);
+		}
+	}
+	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		if (self::extend('WebBrowser')) {
+			$params = func_get_args();
+			return self::callbackRun(array(self::$plugins, 'browserPost'), $params);
+		}
+	}
+	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		if (self::extend('WebBrowser')) {
+			$params = func_get_args();
+			return self::callbackRun(array(self::$plugins, 'browser'), $params);
+		}
 	}
 }
 /**
@@ -1908,7 +1938,8 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 */	public function is($selector, $nodes = null) {
+	 */
+	public function is($selector, $nodes = null) {
 		phpQuery::debug(array("Is:", $selector));
 		if (! $selector)
 			return false;
@@ -2119,13 +2150,23 @@ class phpQueryObject
 	 * @param unknown_type $type
 	 * @param unknown_type $data
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO global events
 	 * @TODO support more than event in $type (space-separated)
 	 */
 	public function trigger($type, $data = array()) {
 		foreach($this->elements as $node)
 			phpQueryEvent::trigger($this->getDocumentID(), $type, $data, $node);
 		return $this;
+	}
+	/**
+	 * This particular method triggers all bound event handlers on an element (for a specific event type) WITHOUT executing the browsers default actions.
+	 *
+	 * @param unknown_type $type
+	 * @param unknown_type $data
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @TODO
+	 */
+	public function triggerHandler($type, $data = array()) {
+		// TODO;
 	}
 	/**
 	 * Binds a handler to one or more events (like click) for each matched element.
@@ -2166,8 +2207,20 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function click() {
-		return $this->trigger('click');
+	public function change($callback = null) {
+		if ($callback)
+			return $this->bind('change', $callback);
+		return $this->trigger('change');
+	}
+	/**
+	 * Enter description here...
+	 *
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 */
+	public function select($callback = null) {
+		if ($callback)
+			return $this->bind('select', $callback);
+		return $this->trigger('select');
 	}
 	/**
 	 * Enter description here...
@@ -2175,6 +2228,8 @@ class phpQueryObject
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function submit() {
+		if ($callback)
+			return $this->bind('change', $callback);
 		return $this->trigger('submit');
 	}
 	/**
@@ -2349,18 +2404,6 @@ class phpQueryObject
 			? $this->previous
 			: $this;
 	}
-	/**
-	 * Enter description here...
-	 * XXX what is this ?
-	 *
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 */
-	public function select($selector) {
-		return $this->is($selector)
-			? $this->filter($selector)
-			: $this->find($selector);
-	}
-
 	/**
 	 * Enter description here...
 	 * Normal use ->clone() .
@@ -3202,7 +3245,9 @@ class phpQueryObject
 	 * @param unknown_type $value
 	 * @return string|array|phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 * @todo uncheck other radios in group
+	 * @todo select event
 	 * @todo unselect other selecte's options when !multiply
+	 * @todo  * *`val($val)`* Checks, or selects, all the radio buttons, checkboxes, and select options that match the set of values.
 	 */
 	public function attr($attr = null, $value = null) {
 		if (! is_null( $value )) {
@@ -3987,3 +4032,4 @@ set_include_path(
 // why ? no __call nor __get for statics in php...
 phpQuery::$plugins = new phpQueryPlugins();
 ?>
+

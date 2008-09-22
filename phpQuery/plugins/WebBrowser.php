@@ -31,6 +31,7 @@ class phpQueryObjectPlugin_WebBrowser {
 }
 class phpQueryPlugin_WebBrowser {
 	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
 			'type' => 'GET',
 			'url' => $url,
@@ -54,6 +55,7 @@ class phpQueryPlugin_WebBrowser {
 			return false;
 	}
 	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
 			'type' => 'POST',
 			'url' => $url,
@@ -78,6 +80,7 @@ class phpQueryPlugin_WebBrowser {
 			return false;
 	}
 	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
+		self::authorizeHost($ajaxSettings['url']);
 		$xhr = phpQuery::ajax(
 			self::ajaxSettingsPrepare($ajaxSettings)
 		);
@@ -97,6 +100,11 @@ class phpQueryPlugin_WebBrowser {
 			return true;
 		} else
 			return false;
+	}
+	protected static function authorizeHost($url) {
+		$host = parse_url($url, PHP_URL_HOST);
+		if ($host)
+			phpQuery::ajaxAllowHost($host);
 	}
 	protected static function ajaxSettingsPrepare($settings) {
 		unset($settings['success']);

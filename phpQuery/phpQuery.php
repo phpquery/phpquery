@@ -1,15 +1,16 @@
 <?php
 /**
- * jQuery port to PHP.
- * phpQuery is chainable DOM selector & manipulator.
- * Compatible with jQuery 1.2.
+ * phpQuery is a server-side, chainable, CSS selector driven
+ * Document Object Model (DOM) API based on jQuery JavaScript Library.
+ *
+ * It's almost a full port of jQuery 1.2 to PHP5.
  *
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
  * @link http://code.google.com/p/phpquery/
  * @link http://phpquery-library.blogspot.com/
  * @link http://jquery.com
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.9.4 beta2
+ * @version 0.9.4 RC1
  * @package phpQuery
  */
 
@@ -669,8 +670,14 @@ abstract class phpQuery {
 		);
 	}
 	public static function ajaxAllowHost($host) {
-		if ($host && !in_array($host, phpQuery::$ajaxAllowedHosts))
+		if ($host && !in_array($host, phpQuery::$ajaxAllowedHosts)) {
 			phpQuery::$ajaxAllowedHosts[] = $host;
+			return true;
+		}
+		return false;
+	}
+	public static function ajaxAllowURL($host) {
+		return phpQuery::ajaxAllowHost(parse_url($ajax['url'], PHP_URL_HOST));
 	}
 	/**
 	 * Returns JSON representation of $data.

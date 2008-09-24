@@ -39,6 +39,7 @@ class jQueryServer {
 				&& in_array($referer, $this->config['allowedRefererHosts']);
 			if (! $authorized) {
 				throw new Exception("Host '{$_SERVER['HTTP_REFERER']}' not authorized to make requests.");
+				return;
 			}
 		}
 //		phpQueryClass::$debug = true;

@@ -305,7 +305,7 @@ abstract class phpQuery {
 		return self::loadHtml($DOM, file_get_contents($file));
 	}
 	protected static function isXML($markup) {
-		return strpos($markup, '<?xml') !== false;
+		return strpos($markup, '<?xml') !== false && stripos($markup, 'xhtml') === false;
 	}
 	protected static function loadHtml(&$DOM, $html) {
 		if (! self::isXML($html)) {
@@ -2516,7 +2516,7 @@ class phpQueryObject
 			} else {
 				// FIXME tempolary, utf8 only
 				// http://code.google.com/p/phpquery/issues/detail?id=17#c12
-				if (mb_detect_encoding($html) == 'ASCII')
+				if (function_exists('mb_detect_encoding') && mb_detect_encoding($html) == 'ASCII')
 					$html	= mb_convert_encoding($html,'UTF-8','HTML-ENTITIES');
 				$toInserts = array($this->DOM->createTextNode($html));
 			}
@@ -2847,7 +2847,7 @@ class phpQueryObject
 					} else {
 						// FIXME tempolary, utf8 only
 						// http://code.google.com/p/phpquery/issues/detail?id=17#c12
-						if (mb_detect_encoding($target) == 'ASCII')
+						if (function_exists('mb_detect_encoding') && mb_detect_encoding($target) == 'ASCII')
 							$target	= mb_convert_encoding($target,'UTF-8','HTML-ENTITIES');
 						$insertFrom = array(
 							$this->DOM->createTextNode($target)
@@ -3043,7 +3043,7 @@ class phpQueryObject
 	public function __call($method, $args) {
 		$aliasMethods = array('clone', 'empty');
 		if (method_exists($this, $method))
-			return call_user_method_array(array($this, $method), $args);
+			return call_user_func_array(array($this, $method), $args);
 		else if (in_array($method, $aliasMethods)) {
 			return call_user_func_array(array($this, '_'.$method), $args);
 		} else if (isset(phpQuery::$pluginsMethods[$method])) {
@@ -3277,7 +3277,7 @@ class phpQueryObject
 		if (! is_null( $value )) {
 			// TODO tempolary solution
 			// http://code.google.com/p/phpquery/issues/detail?id=17
-			if (mb_detect_encoding($value) == 'ASCII')
+			if (function_exists('mb_detect_encoding') && mb_detect_encoding($value) == 'ASCII')
 				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
 		}
 		foreach( $this->elements as $node ) {
@@ -3397,7 +3397,7 @@ class phpQueryObject
 			$value = '<?php '.$value.' ?>';
 			// TODO tempolary solution
 			// http://code.google.com/p/phpquery/issues/detail?id=17
-			if (mb_detect_encoding($value) == 'ASCII')
+			if (function_exists('mb_detect_encoding') && mb_detect_encoding($value) == 'ASCII')
 				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
 		}
 		foreach( $this->elements as $node ) {

@@ -1,167 +1,169 @@
 <?php
-require_once('./phpQuery/phpQuery.php');
-//phpQuery::$debug = true;
-//die(file_get_contents('http://google.com/search?hl=pl&q=phpQuery&btnG=Szukaj+w+Google&lr='));
-//phpQuery::extend('WebBrowser');
-//phpQuery::$ajaxAllowedHosts[] = 'http://jquery-api-browser.googlecode.com';
-//
-//phpQuery::$plugins->browserGet('http://jquery-api-browser.googlecode.com/svn/trunk/api-docs.xml', 'success');
+require_once('../phpQuery/phpQuery.php');
 phpQuery::browserGet('http://jquery-api-browser.googlecode.com/svn/trunk/api-docs.xml', 'success');
 /**
  * @param phpQueryObject $pq
  */
 function success($pq) {
-	switch($_GET['page']) {
-		case 'selectors':
+	$docLinks = 'http://docs.jquery.com/';
+	$content = array();
+	$toc = array();
+	$page = $_GET['page'];
+	switch($page) {
+		case 'Selectors':
 		case 1:
 			$categories = $pq->find('cat[value=Selectors] subcat');
-			$content = array();
-//			$content[] = "==Selectors==";
-			$content[] = "In *phpQuery*, as in *jQuery*, supported are following *CSS3* selectors.";
 			foreach($categories as $subcat) {
-				$content[] = '===='.pq($subcat)->attr('value')."====";
+				$catName = pq($subcat)->parent()->attr('value');
+				$subCatName = pq($subcat)->attr('value');
+				$content[] = "====$subCatName====";
+				$toc[] = "&nbsp;* [#".str_replace(' ', '_', $subCatName)." $subCatName]";
 				foreach(pq($subcat)->find('selector') as $selector)
-					$content[] = '&nbsp;*&nbsp;*`'.pq('sample', $selector)->text().'`* '.pq('> desc', $selector)->text();
+					$content[] = '&nbsp;*&nbsp;*['
+						.$docLinks.$catName.'/'.pq($selector)->attr('name').' '
+						.pq('sample', $selector)->text().']* '
+						.pq('> desc', $selector)->text();
 			}
-			$content[] = '';
-			$content[] = "Read more at [http://docs.jquery.com/Selectors Selectors section] on [http://docs.jquery.com/ jQuery Documentation Site].";
+			$content[] = "Read more at [http://docs.jquery.com/$catName $catName] section on [http://docs.jquery.com/ jQuery Documentation Site].";
 		break;
 		case 'Attribues':
 		case 2:
-			$categories = $pq->find('cat[value=Attributes] subcat');
-			$content = array();
-//			$content[] = "==Attributes==";
-			$content[] = "Attributes related methods.";
-			foreach($categories as $subcat) {
-				$content[] = '===='.pq($subcat)->attr('value')."====";
-				foreach(pq($subcat)->find('function') as $function) {
-					$tmp = '&nbsp;*&nbsp;*`'.pq($function)->attr('name').'(';
-					foreach(pq($function)->find('params') as $params) {
-						$tmp .= '$'.pq($params)->attr('name');
-						if (pq($params)->nextAll('params')->length)
-							$tmp .= ', ';
-					}
-					$tmp .= ')`* '.pq('> desc', $function)->text();
-					$content[] = $tmp;
-				}
-			}
-			$content[] = '';
-			$content[] = "Read more at [http://docs.jquery.com/Attributes Attributes section] on [http://docs.jquery.com/ jQuery Documentation Site].";
-		break;
 		case 'Traversing':
 		case 3:
-			$categories = $pq->find('cat[value=Traversing] subcat');
-			$content = array();
-//			$content[] = "==Attributes==";
-			$content[] = "Traversing related methods.";
-			foreach($categories as $subcat) {
-				$content[] = '===='.pq($subcat)->attr('value')."====";
-				foreach(pq($subcat)->find('function') as $function) {
-					$tmp = '&nbsp;*&nbsp;*`'.pq($function)->attr('name').'(';
-					foreach(pq($function)->find('params') as $params) {
-						$tmp .= '$'.pq($params)->attr('name');
-						if (pq($params)->nextAll('params')->length)
-							$tmp .= ', ';
-					}
-					$tmp .= ')`* '.pq('> desc', $function)->text();
-					$content[] = $tmp;
-				}
-			}
-			$content[] = '';
-			$content[] = "Read more at [http://docs.jquery.com/Traversing Traversing section] on [http://docs.jquery.com/ jQuery Documentation Site].";
-		break;
 		case 'Manipulation':
 		case 4:
-			$categories = $pq->find('cat[value=Manipulation] subcat');
-			$content = array();
-//			$content[] = "==Attributes==";
-			$content[] = "Manipulatin related methods.";
-			foreach($categories as $subcat) {
-				$content[] = '===='.pq($subcat)->attr('value')."====";
-				foreach(pq($subcat)->find('function') as $function) {
-					$tmp = '&nbsp;*&nbsp;*`'.pq($function)->attr('name').'(';
-					foreach(pq($function)->find('params') as $params) {
-						$tmp .= '$'.pq($params)->attr('name');
-						if (pq($params)->nextAll('params')->length)
-							$tmp .= ', ';
-					}
-					$tmp .= ')`* '.pq('> desc', $function)->text();
-					$content[] = $tmp;
-				}
-			}
-			$content[] = '';
-			$content[] = "Read more at [http://docs.jquery.com/Manipulation Manipulation section] on [http://docs.jquery.com/ jQuery Documentation Site].";
-		break;
 		case 'Events':
-		case 5:
-			$categories = $pq->find('cat[value=Events] subcat');
-			$content = array();
-//			$content[] = "==Attributes==";
-			$content[] = "Events related methods.";
-			foreach($categories as $subcat) {
-				$content[] = '===='.pq($subcat)->attr('value')."====";
-				foreach(pq($subcat)->find('function') as $function) {
-					$tmp = '&nbsp;*&nbsp;*`'.pq($function)->attr('name').'(';
-					foreach(pq($function)->find('params') as $params) {
-						$tmp .= '$'.pq($params)->attr('name');
-						if (pq($params)->nextAll('params')->length)
-							$tmp .= ', ';
-					}
-					$tmp .= ')`* '.pq('> desc', $function)->text();
-					$content[] = $tmp;
-				}
-			}
-			$content[] = '';
-			$content[] = "Read more at [http://docs.jquery.com/Events Events section] on [http://docs.jquery.com/ jQuery Documentation Site].";
-		break;
-		case 'Ajax':
 		case 6:
-			$categories = $pq->find('cat[value=Ajax] subcat');
-			$content = array();
-//			$content[] = "==Attributes==";
-			$content[] = "Ajax related methods.";
-			foreach($categories as $subcat) {
-				$content[] = '===='.pq($subcat)->attr('value')."====";
-				foreach(pq($subcat)->find('function') as $function) {
-					$tmp = '&nbsp;*&nbsp;*`'.str_replace('jQuery.', 'phpQuery::', pq($function)->attr('name')).'(';
-					foreach(pq($function)->find('params') as $params) {
-						$tmp .= '$'.pq($params)->attr('name');
-						if (pq($params)->nextAll('params')->length)
-							$tmp .= ', ';
-					}
-					$tmp .= ')`* '.pq('> desc', $function)->text();
-					$content[] = $tmp;
-				}
-			}
-			$content[] = '====Options====';
-			foreach($pq->find('cat[value=Ajax] subcat:first function:first option') as $option) {
-					$content[] = '&nbsp;*&nbsp;*`'.pq($option)->attr('name').'`* `'.pq($option)->attr('type').'`';
-			}
-			$content[] = '';
-			$content[] = "Read more at [http://docs.jquery.com/Ajax Ajax section] on [http://docs.jquery.com/ jQuery Documentation Site].";
-		break;
+		case 'Ajax':
+		case 8:
 		case 'Utilities':
-		case 7:
-			$categories = $pq->find('cat[value=Utilities] subcat');
-			$content = array();
-//			$content[] = "==Attributes==";
-			$content[] = "Some handy functions.";
+		case 9:
+			$categories = is_numeric($page)
+				? $pq->find("cat:eq($page) subcat")
+				: $pq->find('cat[value=Attributes] subcat');
 			foreach($categories as $subcat) {
-				$content[] = '===='.pq($subcat)->attr('value')."====";
+				$catName = pq($subcat)->parent()->attr('value');
+				$subCatName = pq($subcat)->attr('value');
+				$content[] = "==$subCatName==";
+				$toc[] = "&nbsp;* [#".str_replace(' ', '_', $subCatName)." $subCatName]";
 				foreach(pq($subcat)->find('function') as $function) {
-					$tmp = '&nbsp;*&nbsp;*`'.str_replace('jQuery.', 'phpQuery::', pq($function)->attr('name')).'(';
+					$url = $docLinks.$catName.'/'.pq($function)->attr('name');
+					$name = $catName == 'Ajax' || $catName == 'Utilities'
+						? str_replace('jQuery.', 'phpQuery::', pq($function)->attr('name'))
+						: pq($function)->attr('name');
+					$tmp = "&nbsp;*&nbsp;*[$url $name]*[$url (";
 					foreach(pq($function)->find('params') as $params) {
 						$tmp .= '$'.pq($params)->attr('name');
 						if (pq($params)->nextAll('params')->length)
 							$tmp .= ', ';
 					}
-					$tmp .= ')`* '.pq('> desc', $function)->text();
+					$tmp .= ')] '.strip_tags(pq('> desc', $function)->text());
 					$content[] = $tmp;
 				}
 			}
+			if ($catName == 'Ajax') {
+				$content[] = '==Options==';
+				$content[] = 'Detailed options description in available at [http://docs.jquery.com/Ajax/jQuery.ajax#toptions jQuery Documentation Site].';
+				foreach($pq->find('cat[value=Ajax] subcat:first function:first option') as $option) {
+						$content[] = '&nbsp;*&nbsp;*`'.pq($option)->attr('name').'`* `'.pq($option)->attr('type').'`';
+				}
+			}
 			$content[] = '';
-			$content[] = "Read more at [http://docs.jquery.com/Utilities Utilities section] on [http://docs.jquery.com/ jQuery Documentation Site].";
+			$content[] = "Read more at [http://docs.jquery.com/$catName $catName] section on [http://docs.jquery.com/ jQuery Documentation Site].";
 		break;
+//		case 'Traversing':
+//		case 3:
+//			$categories = $pq->find('cat[value=Traversing] subcat');
+//			foreach($categories as $subcat) {
+//				$content[] = '===='.pq($subcat)->attr('value')."====";
+//				foreach(pq($subcat)->find('function') as $function) {
+//					$tmp = '&nbsp;*&nbsp;*`'.pq($function)->attr('name').'(';
+//					foreach(pq($function)->find('params') as $params) {
+//						$tmp .= '$'.pq($params)->attr('name');
+//						if (pq($params)->nextAll('params')->length)
+//							$tmp .= ', ';
+//					}
+//					$tmp .= ')`* '.pq('> desc', $function)->text();
+//					$content[] = $tmp;
+//				}
+//			}
+//		break;
+//		case 'Manipulation':
+//		case 4:
+//			$categories = $pq->find('cat[value=Manipulation] subcat');
+//			foreach($categories as $subcat) {
+//				$content[] = '===='.pq($subcat)->attr('value')."====";
+//				foreach(pq($subcat)->find('function') as $function) {
+//					$tmp = '&nbsp;*&nbsp;*`'.pq($function)->attr('name').'(';
+//					foreach(pq($function)->find('params') as $params) {
+//						$tmp .= '$'.pq($params)->attr('name');
+//						if (pq($params)->nextAll('params')->length)
+//							$tmp .= ', ';
+//					}
+//					$tmp .= ')`* '.pq('> desc', $function)->text();
+//					$content[] = $tmp;
+//				}
+//			}
+//		break;
+//		case 'Events':
+//		case 5:
+//			$categories = $pq->find('cat[value=Events] subcat');
+//			foreach($categories as $subcat) {
+//				$content[] = '===='.pq($subcat)->attr('value')."====";
+//				foreach(pq($subcat)->find('function') as $function) {
+//					$tmp = '&nbsp;*&nbsp;*`'.pq($function)->attr('name').'(';
+//					foreach(pq($function)->find('params') as $params) {
+//						$tmp .= '$'.pq($params)->attr('name');
+//						if (pq($params)->nextAll('params')->length)
+//							$tmp .= ', ';
+//					}
+//					$tmp .= ')`* '.pq('> desc', $function)->text();
+//					$content[] = $tmp;
+//				}
+//			}
+//		break;
+//		case 'Ajax':
+//		case 6:
+//			$categories = $pq->find('cat[value=Ajax] subcat');
+//			foreach($categories as $subcat) {
+//				$content[] = '===='.pq($subcat)->attr('value')."====";
+//				foreach(pq($subcat)->find('function') as $function) {
+//					$tmp = '&nbsp;*&nbsp;*`'.str_replace('jQuery.', 'phpQuery::', pq($function)->attr('name')).'(';
+//					foreach(pq($function)->find('params') as $params) {
+//						$tmp .= '$'.pq($params)->attr('name');
+//						if (pq($params)->nextAll('params')->length)
+//							$tmp .= ', ';
+//					}
+//					$tmp .= ')`* '.pq('> desc', $function)->text();
+//					$content[] = $tmp;
+//				}
+//			}
+//			$content[] = '====Options====';
+//			foreach($pq->find('cat[value=Ajax] subcat:first function:first option') as $option) {
+//					$content[] = '&nbsp;*&nbsp;*`'.pq($option)->attr('name').'`* `'.pq($option)->attr('type').'`';
+//			}
+//		break;
+//		case 'Utilities':
+//		case 7:
+//			$categories = $pq->find('cat[value=Utilities] subcat');
+//			foreach($categories as $subcat) {
+//				$content[] = '===='.pq($subcat)->attr('value')."====";
+//				foreach(pq($subcat)->find('function') as $function) {
+//					$tmp = '&nbsp;*&nbsp;*`'.str_replace('jQuery.', 'phpQuery::', pq($function)->attr('name')).'(';
+//					foreach(pq($function)->find('params') as $params) {
+//						$tmp .= '$'.pq($params)->attr('name');
+//						if (pq($params)->nextAll('params')->length)
+//							$tmp .= ', ';
+//					}
+//					$tmp .= ')`* '.pq('> desc', $function)->text();
+//					$content[] = $tmp;
+//				}
+//			}
+//		break;
+	}
+	if ($toc) {
+		array_unshift($toc, '=Table of Contents=');
+		array_unshift($content, implode("<br />\n", $toc));
 	}
 	print implode("<br />\n", $content);
 }

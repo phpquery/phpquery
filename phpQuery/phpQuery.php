@@ -262,6 +262,7 @@ abstract class phpQuery {
 	 * @param unknown_type $domId
 	 * @return unknown New DOM ID
 	 * @todo support PHP tags in input
+	 * @todo change name to createDocument()
 	 */
 	protected static function createDom($html, $domId = null) {
 		$id = $domId
@@ -285,6 +286,7 @@ abstract class phpQuery {
 			'document' => $document,
 			'eventNodes' => array(),
 			'eventGlobals' => array(),
+			'isXML' => false,
 			'xpath' => null,
 		);
 		$DOM =& phpQuery::$documents[ $id ];
@@ -305,7 +307,8 @@ abstract class phpQuery {
 		return self::loadHtml($DOM, file_get_contents($file));
 	}
 	protected static function isXML($markup) {
-		return strpos($markup, '<?xml') !== false && stripos($markup, 'xhtml') === false;
+//		return strpos($markup, '<?xml') !== false && stripos($markup, 'xhtml') === false;
+		return strpos($markup, '<?xml') !== false;
 	}
 	protected static function loadHtml(&$DOM, $html) {
 		if (! self::isXML($html)) {
@@ -316,9 +319,15 @@ abstract class phpQuery {
 			//			$html = '<meta http-equiv="Content-Type" content="text/html;charset='.self::$defaultEncoding.'">'.$html;
 			// TODO if ! self::containsEncoding() && self::containsHead() then attach encoding inside head
 			// check comments on php.net about problems with charset when loading document without encoding as first line
-			return @$DOM['document']->loadHTML($html);
+			return phpQuery::$debug
+				? $DOM['document']->loadHTML($html)
+				: @$DOM['document']->loadHTML($html);
 		} else {
-			return $DOM['document']->loadXML($html);
+			$DOM['isXML'] = true;
+			$DOM['document']->resolveExternals = true;
+			return phpQuery::$debug
+				? $DOM['document']->loadXML($html)
+				: @$DOM['document']->loadXML($html);
 		}
 	}
 	protected static function checkDocumentFragment(&$DOM, $html) {

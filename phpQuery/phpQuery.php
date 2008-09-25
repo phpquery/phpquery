@@ -647,11 +647,13 @@ abstract class phpQuery {
 		return http_build_query($data, null, '&');
 	}
 
-	public static function get($url, $data, $callback, $type) {
+	public static function get($url, $data = null, $callback = null, $type = null) {
+		phpQuery::debug("GET: $url");
 		if (!is_array($data)) {
 			$callback = $data;
 			$data = null;
 		}
+		// TODO some array_values on this shit
 		return self::ajax(array(
 			'type' => 'GET',
 			'url' => $url,

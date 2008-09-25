@@ -323,6 +323,8 @@ abstract class phpQuery {
 				? $DOM['document']->loadHTML($html)
 				: @$DOM['document']->loadHTML($html);
 		} else {
+			// TODO check forcing charset with XML declaration for fragments (no <meta>)
+			$DOM['documentFragment'] = false;
 			$DOM['isXML'] = true;
 			$DOM['document']->resolveExternals = true;
 			return phpQuery::$debug
@@ -2603,10 +2605,11 @@ class phpQueryObject
 		$doctype = isset($DOM->doctype) && is_object($DOM->doctype)
 			? $DOM->doctype->publicId
 			: phpQuery::$defaultDoctype;
-		if ($DOM->isSameNode($this->DOM) && $this->documentFragment && $this->stackIsRoot())
+		if ($DOM->isSameNode($this->DOM) && $this->documentFragment && $this->stackIsRoot()) {
+			$this->debug("Document fragment detected");
 			// double php tags removement ?
 			$return = $this->find('body')->html();
-		else
+		} else
 			$return = phpQuery::isXhtml($DOM)
 				? $this->fixXhtml( $DOM->saveXML() )
 				: $DOM->saveHTML();

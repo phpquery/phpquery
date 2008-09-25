@@ -323,10 +323,17 @@ abstract class phpQuery {
 				? $DOM['document']->loadHTML($html)
 				: @$DOM['document']->loadHTML($html);
 		} else {
-			// TODO check forcing charset with XML declaration for fragments (no <meta>)
+			// TODO check isXHTML() and if yes do containsEncoding() && containsEncoding()
+			// TODO check forcing charset in XML declaration for fragments (no <meta>)
 			$DOM['documentFragment'] = false;
 			$DOM['isXML'] = true;
 			$DOM['document']->resolveExternals = true;
+//			$html = preg_replace('@"http://www.w3.org/[^"]*/([^/]+.dtd)"@', '$1', $html);
+//			$html = preg_replace('@(["\'])http://www.w3.org/(.+?)$1@', '"www.w3.org/$2"', $html);
+			// FIXME tmp stuff, but for know TODO revert this operation when getting markup
+			// see http://pl2.php.net/manual/en/book.dom.php#78929
+			$doctype = preg_replace('@"http://www.w3.org/(.+?)"@', '"www.w3.org/$1"', substr($html, 0, 150));
+			$html = $doctype.substr($html, 150);
 			return phpQuery::$debug
 				? $DOM['document']->loadXML($html)
 				: @$DOM['document']->loadXML($html);
@@ -507,6 +514,12 @@ abstract class phpQuery {
 		} else
 			return preg_match('@<meta\\s+http-equiv\\s*=\\s*(["|\'])Content-Type\\1@i', $html);
 	}
+	/**
+	 *
+	 * @param $dom
+	 * @return unknown_type
+	 * @TODO support strings
+	 */
 	public static function isXhtml($dom) {
 		$doctype = isset($dom->doctype) && is_object($dom->doctype)
 			? $dom->doctype->publicId
@@ -648,13 +661,12 @@ abstract class phpQuery {
 	}
 
 	public static function get($url, $data = null, $callback = null, $type = null) {
-		phpQuery::debug("GET: $url");
 		if (!is_array($data)) {
 			$callback = $data;
 			$data = null;
 		}
 		// TODO some array_values on this shit
-		return self::ajax(array(
+		return phpQuery::ajax(array(
 			'type' => 'GET',
 			'url' => $url,
 			'data' => $data,
@@ -663,12 +675,12 @@ abstract class phpQuery {
 		));
 	}
 
-	public static function post($url, $data, $callback, $type) {
+	public static function post($url, $data = null, $callback = null, $type = null) {
 		if (!is_array($data)) {
 			$callback = $data;
 			$data = null;
 		}
-		return self::ajax(array(
+		return phpQuery::ajax(array(
 			'type' => 'POST',
 			'url' => $url,
 			'data' => $data,
@@ -2589,6 +2601,7 @@ class phpQueryObject
 			);
 		}
 		if (! phpQuery::containsEncoding($this->elements) ) {
+			// TODO WTF ? saveXML only ? same in method above...
 			$html = $this->fixXhtml(
 				$DOM->saveXML()
 			);
@@ -2623,6 +2636,7 @@ class phpQueryObject
 	}
 	protected function fixXhtml($content){
 		return
+			preg_replace('@(<!DOCTYPE [^>]+")(www.w3.org/)@', '$1http://$2',
 			// TODO find out what and why it is. maybe it has some relations with extra new lines ?
 			str_replace(array('&#13;','&#xD;'), '',
 			// strip non-commented cdata
@@ -2631,12 +2645,12 @@ class phpQueryObject
 			preg_replace('@\]\]>(\s*</script>)@', '\1',
 			// textarea can't be short tagged
 			preg_replace('!<textarea([^>]*)/>!', '<textarea\1></textarea>',
-				// cut first line xml declaration
+				// cut first line xml declaration TODO wrong ???
 				implode("\n",
 					array_slice(
 						explode("\n", $content),
 						1
-		)))))));
+		))))))));
 	}
 	public function __toString() {
 		return $this->htmlOuter();
@@ -3945,6 +3959,9 @@ class CallbackParam {
 	public function __construct($index = null) {
 		$this->index = $index;
 	}
+}
+class phpQuery_DOMDocument {
+	// TODOooo...
 }
 /**
  * DOMEvent class.

@@ -571,7 +571,7 @@ abstract class phpQuery {
 			));
 //			'maxredirects' => 0,
 		foreach(self::$ajaxAllowedHosts as $k => $host)
-			if ($host == '.')
+			if ($host == '.' && isset($_SERVER['HTTP_HOST']))
 				self::$ajaxAllowedHosts[$k] = $_SERVER['HTTP_HOST'];
 		$host = parse_url($options['url'], PHP_URL_HOST);
 		if (! in_array($host, self::$ajaxAllowedHosts)) {
@@ -701,8 +701,8 @@ abstract class phpQuery {
 		}
 		return false;
 	}
-	public static function ajaxAllowURL($host) {
-		return phpQuery::ajaxAllowHost(parse_url($ajax['url'], PHP_URL_HOST));
+	public static function ajaxAllowURL($url) {
+		return phpQuery::ajaxAllowHost(parse_url($url, PHP_URL_HOST));
 	}
 	/**
 	 * Returns JSON representation of $data.
@@ -1078,7 +1078,7 @@ class phpQueryObject
 	protected function isRoot( $node ) {
 //		return $node instanceof DOMDOCUMENT || $node->tagName == 'html';
 		return $node instanceof DOMDOCUMENT
-			|| ($node instanceof DOMNODE && $node->tagName == 'html')
+			|| ($node instanceof DOMELEMENT && $node->tagName == 'html')
 			|| $this->root->isSameNode($node);
 	}
 

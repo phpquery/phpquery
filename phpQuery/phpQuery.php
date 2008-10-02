@@ -202,7 +202,7 @@ abstract class phpQuery {
 		}
 	}
 	/**
-	 * Sets defaults document to $id. Document has to be loaded prior
+	 * Sets default document to $id. Document has to be loaded prior
 	 * to using this method.
 	 * $id can be retrived via getDocumentID() or getDocumentIDRef().
 	 *
@@ -212,7 +212,7 @@ abstract class phpQuery {
 		self::$lastDomId = $id;
 	}
 	/**
-	 * Returns document with id $id or last selected.
+	 * Returns document with id $id or last used as phpQueryObject.
 	 * $id can be retrived via getDocumentID() or getDocumentIDRef().
 	 * Chainable.
 	 *
@@ -228,7 +228,7 @@ abstract class phpQuery {
 		return new phpQueryObject($id);
 	}
 	/**
-	 * Creates new document from $html.
+	 * Creates new document from markup.
 	 * Chainable.
 	 *
 	 * @param unknown_type $html
@@ -437,7 +437,7 @@ abstract class phpQuery {
 	 *
 	 * @param mixed $documentID @see phpQuery::getDocumentID() for supported types.
 	 */
-	public static function unloadDocuments($documentID = null) {
+	public static function unloadDocuments($id = null) {
 		if ($documentID) {
 			if ($documentID = self::getDocumentID($documentID))
 				unset(phpQuery::$documents[$documentID]);
@@ -1154,8 +1154,7 @@ class phpQueryObject
 //		}
 //	}
 	/**
-	 * Get objetc's Document ID for later use.
-	 * Value is returned via reference.
+	 * Saves object's DocumentID to $var by reference.
 	 * <code>
 	 * $myDocumentId;
 	 * phpQuery::newDocument('<div/>')
@@ -1173,7 +1172,15 @@ class phpQueryObject
 		return $this;
 	}
 	/**
-	 * Get objetc's Document ID for later use.
+	 * Returns object with stack set to document root.
+	 *
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 */
+	public function getDocument() {
+		return phpQuery::getDocument($this->getDocumentID());
+	}
+	/**
+	 * Get object's Document ID.
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
@@ -1181,8 +1188,7 @@ class phpQueryObject
 		return $this->domId;
 	}
 	/**
-	 * Enter description here...
-	 * Unload whole document from memory.
+	 * Unloads whole document from memory.
 	 * CAUTION! None further operations will be possible on this document.
 	 * All objects refering to it will be useless.
 	 *
@@ -1443,6 +1449,9 @@ class phpQueryObject
 	 *
 	 * @param int $index
 	 * @return array|string Returns string if $index != null
+	 * @todo implement callbacks
+	 * @todo return only arrays ?
+	 * @todo maybe other name...
 	 */
 	public function getText($index = null) {
 		if ($index)
@@ -2536,7 +2545,11 @@ class phpQueryObject
 	public function html($html = null) {
 		if (! is_null($html) ) {
 			$this->debug("Inserting data with 'html'");
-			if (phpQuery::isMarkup($html)) {
+//			if (phpQuery::isMarkup($html)) {
+				// FIXME tempolary, utf8 only
+				// http://code.google.com/p/phpquery/issues/detail?id=17#c12
+				if (function_exists('mb_detect_encoding') && mb_detect_encoding($html) == 'ASCII')
+					$html	= mb_convert_encoding($html,'UTF-8','HTML-ENTITIES');
 				$toInserts = array();
 				$DOM = new DOMDocument();
 				// FIXME tempolary
@@ -2544,13 +2557,13 @@ class phpQueryObject
 				@$DOM->loadHtml($html);
 				foreach($DOM->documentElement->firstChild->childNodes as $node)
 					$toInserts[] = $this->DOM->importNode($node, true);
-			} else {
-				// FIXME tempolary, utf8 only
-				// http://code.google.com/p/phpquery/issues/detail?id=17#c12
-				if (function_exists('mb_detect_encoding') && mb_detect_encoding($html) == 'ASCII')
-					$html	= mb_convert_encoding($html,'UTF-8','HTML-ENTITIES');
-				$toInserts = array($this->DOM->createTextNode($html));
-			}
+//			} else {
+//				// FIXME tempolary, utf8 only
+//				// http://code.google.com/p/phpquery/issues/detail?id=17#c12
+//				if (function_exists('mb_detect_encoding') && mb_detect_encoding($html) == 'ASCII')
+//					$html	= mb_convert_encoding($html,'UTF-8','HTML-ENTITIES');
+//				$toInserts = array($this->DOM->createTextNode($html));
+//			}
 			$this->_empty();
 			// i dont like brackets ! python rules ! ;)
 			foreach( $toInserts as $toInsert )
@@ -3071,6 +3084,7 @@ class phpQueryObject
 		if ($text)
 			return $this->html(htmlentities($text));
 		$args = func_get_args();
+		$args = array_slice($args, 1);
 		$return = '';
 		foreach($this->elements as $node ) {
 			$text = $node->textContent;

@@ -2546,6 +2546,7 @@ class phpQueryObject
 		if (! is_null($html) ) {
 			$this->debug("Inserting data with 'html'");
 //			if (phpQuery::isMarkup($html)) {
+			if (strpos($html, '<') !== false) {
 				// FIXME tempolary, utf8 only
 				// http://code.google.com/p/phpquery/issues/detail?id=17#c12
 				if (function_exists('mb_detect_encoding') && mb_detect_encoding($html) == 'ASCII')
@@ -2557,13 +2558,13 @@ class phpQueryObject
 				@$DOM->loadHtml($html);
 				foreach($DOM->documentElement->firstChild->childNodes as $node)
 					$toInserts[] = $this->DOM->importNode($node, true);
-//			} else {
-//				// FIXME tempolary, utf8 only
-//				// http://code.google.com/p/phpquery/issues/detail?id=17#c12
-//				if (function_exists('mb_detect_encoding') && mb_detect_encoding($html) == 'ASCII')
-//					$html	= mb_convert_encoding($html,'UTF-8','HTML-ENTITIES');
-//				$toInserts = array($this->DOM->createTextNode($html));
-//			}
+			} else {
+				// FIXME tempolary, utf8 only
+				// http://code.google.com/p/phpquery/issues/detail?id=17#c12
+				if (function_exists('mb_detect_encoding') && mb_detect_encoding($html) == 'ASCII')
+					$html	= mb_convert_encoding($html,'UTF-8','HTML-ENTITIES');
+				$toInserts = array($this->DOM->createTextNode($html));
+			}
 			$this->_empty();
 			// i dont like brackets ! python rules ! ;)
 			foreach( $toInserts as $toInsert )

@@ -1,4 +1,4 @@
-#!php
+#!/usr/bin/php
 <?php
 if (!isset($argv[1]) || $argv[1] == 'help' || $argv[1] == '--help' || $argv[1] == '-h')
 	die("Usage: phpquery URL --method1 arg1 arg2 argN --method2 arg1 arg2 argN ...
@@ -30,7 +30,7 @@ function czx023gcs9sg83($html) {
 			$method = substr($param, 2);	// delete --
 			$params = array();
 		} else {
-			$params[] = $param == null
+			$params[] = strtolower($param) == 'null'
 				? null
 				: $param;
 		}

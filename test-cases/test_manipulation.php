@@ -1,6 +1,8 @@
 <?php
 require_once('../phpQuery/phpQuery.php');
 phpQuery::$debug = true;
+
+
 $testName = 'Simple data insertion';
 $testResult = <<<EOF
 <div class="articles">
@@ -78,6 +80,34 @@ try {
 }
 if (! $e) {
 	print "Test '{$testName}' PASSED :)";
+}
+print "\n";
+
+
+$testName = 'HTML insertion';
+$doc = phpQuery::newDocument('<div/>');
+$doc->find('div')->html("La Thermo-sonde de cuisson vous permet de cuire à la
+perfection au four comme au bain-marie. Température: entre <b>0°C et
+210°C</b>.");
+if (pq('div b')->length == 1)
+	print "Test '{$testName}' PASSED :)";
+else {
+	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
+	print $doc;
+}
+print "\n";
+
+
+$testName = 'Text insertion';
+$doc = phpQuery::newDocument('<div/>');
+$string = "La Thermo-sonde de cuisson vous permet de cuire à la perfection au four comme au bain-marie";
+$doc->find('div')->html($string);
+if (trim(pq('div')->html()) == $string)
+	print "Test '{$testName}' PASSED :)";
+else {
+	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
+	print pq('div')->html();
+	print $string;
 }
 print "\n";
 ?>

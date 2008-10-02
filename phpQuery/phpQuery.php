@@ -293,7 +293,7 @@ abstract class phpQuery {
 		if (!($html instanceof DOMDOCUMENT)) {
 			// load markup
 			if (! self::loadHtml($DOM, $html)) {
-				throw new Exception("Can't load '{$html}'");
+				throw new Exception("Can't load '".substr($html, 0, 250)."'");
 				return;
 			}
 		}
@@ -323,6 +323,7 @@ abstract class phpQuery {
 				? $DOM['document']->loadHTML($html)
 				: @$DOM['document']->loadHTML($html);
 		} else {
+			phpQuery::debug('XHTML');
 			// TODO check isXHTML() and if yes do containsEncoding() && containsEncoding()
 			// TODO check forcing charset in XML declaration for fragments (no <meta>)
 			$DOM['documentFragment'] = false;
@@ -334,9 +335,14 @@ abstract class phpQuery {
 			// see http://pl2.php.net/manual/en/book.dom.php#78929
 			$doctype = preg_replace('@"http://www.w3.org/(.+?)"@', '"www.w3.org/$1"', substr($html, 0, 150));
 			$html = $doctype.substr($html, 150);
-			return phpQuery::$debug
+			$return = phpQuery::$debug
 				? $DOM['document']->loadXML($html)
 				: @$DOM['document']->loadXML($html);
+			if (! $return)
+				$return = phpQuery::$debug
+					? $DOM['document']->loadHTML($html)
+					: @$DOM['document']->loadHTML($html);
+			return $return;
 		}
 	}
 	protected static function checkDocumentFragment(&$DOM, $html) {
@@ -2587,7 +2593,7 @@ class phpQueryObject
 	 *
 	 * @return String
 	 */
-	public function htmlOuter() {
+	public function htmlOuter($callback1 = null, $callback2 = null, $callback3 = null) {
 		if ($this->stackIsRoot())
 			return $this->getMarkup();
 		$DOM = new DOMDocument('1.0',
@@ -2609,7 +2615,12 @@ class phpQueryObject
 				$html = str_replace('/>', '>', $html);
 			return $html;
 		}
-		return $this->getMarkup($DOM);
+		$htmlOuter = $this->getMarkup($DOM);
+		$args = func_get_args();
+		foreach($args as $callback) {
+			$htmlOuter = call_user_func_array($callback, array($htmlOuter));
+		}
+		return $htmlOuter;
 	}
 	protected function getMarkup($DOM = null){
 		if (! $DOM)
@@ -3052,10 +3063,23 @@ class phpQueryObject
 		return $this->newInstance();
 	}
 
-	public function text() {
+	/**
+	 * Return joined text content.
+	 * @return string
+	 */
+	public function text($text = null, $callback1 = null, $callback2 = null, $callback3 = null) {
+		if ($text)
+			return $this->html(htmlentities($text));
+		$args = func_get_args();
 		$return = '';
-		foreach( $this->elements as $node ) {
-			$return .= $node->textContent;
+		foreach($this->elements as $node ) {
+			$text = $node->textContent;
+			if (count($this->elements) > 1 && $node->textContent)
+				$text .= "\n";
+			foreach($args as $callback) {
+				$text = call_user_func_array($callback, array($text));
+			}
+			$return .= $text;
 		}
 		return $return;
 	}

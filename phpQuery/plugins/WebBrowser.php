@@ -16,11 +16,14 @@ class phpQueryObjectPlugin_WebBrowser {
 	 * @param phpQueryObject $self
 	 * @todo support 'reset' event
 	 */
-	public static function WebBrowser($self, $callback, $location = null) {
+	public static function WebBrowser($self, $callback = null, $location = null) {
 		$self = $self->_clone()->toRoot();
 		$location = $location
 			? $location
-			: $self->document->xhr->getUri();
+			// TODO use document.location
+			: $self->document->xhr->getUri(true);
+		// FIXME tmp
+		$self->document->WebBrowserCallback = $callback;
 		if (! $location)
 			throw new Exception('Location needed to activate WebBrowser plugin !');
 		else {
@@ -28,8 +31,36 @@ class phpQueryObjectPlugin_WebBrowser {
 			$self->bind('submit', array($location, $callback), array('phpQueryPlugin_WebBrowser', 'handleSubmit'));
 		}
 	}
+	public static function location($self, $url = null) {
+		// TODO if ! $url return actual location ???
+		$xhr = isset($self->document->xhr)
+			? $self->document->xhr
+			: null;
+		$xhr = phpQuery::ajax(array(
+			'url' => $url,
+		), $xhr);
+		$return = false;
+		if ($xhr->getLastResponse()->isSuccessful()) {
+			$return = phpQueryPlugin_WebBrowser::browserReceive($xhr);
+			if (isset($self->document->WebBrowserCallback))
+				call_user_func_array(
+					$self->document->WebBrowserCallback,
+					array($return)
+				);
+		}
+		return $return;
+	}
 }
 class phpQueryPlugin_WebBrowser {
+	/**
+	 *
+	 * @param $url
+	 * @param $callback
+	 * @param $param1
+	 * @param $param2
+	 * @param $param3
+	 * @return Zend_Http_Client
+	 */
 	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
 		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
@@ -50,10 +81,20 @@ class phpQueryPlugin_WebBrowser {
 //			call_user_func_array($callback, array(
 //				self::browserReceive($xhr)//->WebBrowser($callback)
 //			));
-			return true;
+			return $xhr;
 		} else
 			return false;
 	}
+	/**
+	 *
+	 * @param $url
+	 * @param $data
+	 * @param $callback
+	 * @param $param1
+	 * @param $param2
+	 * @param $param3
+	 * @return Zend_Http_Client
+	 */
 	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
 		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
@@ -75,10 +116,19 @@ class phpQueryPlugin_WebBrowser {
 //			call_user_func_array($callback, array(
 //				self::browserReceive($xhr)//->WebBrowser($callback)
 //			));
-			return true;
+			return $xhr;
 		} else
 			return false;
 	}
+	/**
+	 *
+	 * @param $ajaxSettings
+	 * @param $callback
+	 * @param $param1
+	 * @param $param2
+	 * @param $param3
+	 * @return Zend_Http_Client
+	 */
 	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
 		self::authorizeHost($ajaxSettings['url']);
 		$xhr = phpQuery::ajax(
@@ -97,7 +147,7 @@ class phpQueryPlugin_WebBrowser {
 //			call_user_func_array($callback, array(
 //				self::browserReceive($xhr)//->WebBrowser($callback)
 //			));
-			return true;
+			return $xhr;
 		} else
 			return false;
 	}
@@ -126,7 +176,7 @@ class phpQueryPlugin_WebBrowser {
 		}
 		$pq = phpQuery::newDocument($body);
 		$pq->document->xhr = $xhr;
-		$pq->document->location = $xhr->getUri();
+		$pq->document->location = $xhr->getUri(true);
 		$refresh = $pq->find('meta[http-equiv=refresh]')->add('meta[http-equiv=Refresh]');
 		if ($refresh->size()) {
 //			print htmlspecialchars(var_export($xhr->getCookieJar()->getAllCookies(), true));
@@ -136,6 +186,9 @@ class phpQueryPlugin_WebBrowser {
 			$content = $refresh->attr('content');
 			$urlRefresh = substr($content, strpos($content, '=')+1);
 			$urlRefresh = trim($urlRefresh, '\'"');
+			// XXX not secure ?!
+			phpQuery::ajaxAllowURL($urlRefresh);
+//			$urlRefresh = urldecode($urlRefresh);
 			// make ajax call, passing last $xhr object to preserve important stuff
 			$xhr = phpQuery::ajax(array(
 				'type' => 'GET',
@@ -161,10 +214,12 @@ class phpQueryPlugin_WebBrowser {
 				: null;
 			$xhr = phpQuery::ajax(array(
 				'url' => resolve_url($e->data[0], $node->attr('href')),
+				'httpReferer' => $node->document->location,
 			), $xhr);
-			if ($xhr->getLastResponse()->isSuccessfull())
+			// TODO support extended callbacks
+			if ($xhr->getLastResponse()->isSuccessful() && $e->data[1])
 				call_user_func_array($e->data[1], array(
-					self::browserReceive($xhr, $e->data[1])
+					self::browserReceive($xhr)
 				));
 		} else if ($node->is(':submit') && $node->parents('form')->size())
 			$node->parents('form')->trigger('submit', array($e));
@@ -199,14 +254,17 @@ class phpQueryPlugin_WebBrowser {
 				: 'GET',
 			'url' => resolve_url($e->data[0], $node->attr('action')),
 			'data' => $data,
+			'httpReferer' => $node->document->location,
 //			'success' => $e->data[1],
 		);
 		$xhr = phpQuery::ajax($options, $xhr);
-		if ($xhr->getLastResponse()->isSuccessful())
+		// TODO support extended callbacks
+		if ($xhr->getLastResponse()->isSuccessful() && $e->data[1])
 			call_user_func_array($e->data[1], array(
-				self::browserReceive($xhr, $e->data[1])
+				self::browserReceive($xhr)
 			));
 	}
+
 }
 /**
  *

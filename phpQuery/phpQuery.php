@@ -319,7 +319,7 @@ abstract class phpQuery {
 			//			$html = '<meta http-equiv="Content-Type" content="text/html;charset='.self::$defaultEncoding.'">'.$html;
 			// TODO if ! self::containsEncoding() && self::containsHead() then attach encoding inside head
 			// check comments on php.net about problems with charset when loading document without encoding as first line
-			return phpQuery::$debug
+			return phpQuery::$debug === 2
 				? $DOM['document']->loadHTML($html)
 				: @$DOM['document']->loadHTML($html);
 		} else {
@@ -335,11 +335,11 @@ abstract class phpQuery {
 			// see http://pl2.php.net/manual/en/book.dom.php#78929
 			$doctype = preg_replace('@"http://www.w3.org/(.+?)"@', '"www.w3.org/$1"', substr($html, 0, 150));
 			$html = $doctype.substr($html, 150);
-			$return = phpQuery::$debug
+			$return = phpQuery::$debug === 2
 				? $DOM['document']->loadXML($html)
 				: @$DOM['document']->loadXML($html);
 			if (! $return)
-				$return = phpQuery::$debug
+				$return = phpQuery::$debug === 2
 					? $DOM['document']->loadHTML($html)
 					: @$DOM['document']->loadHTML($html);
 			return $return;
@@ -379,12 +379,23 @@ abstract class phpQuery {
 	}
 
 	/**
+	 * Deprecated, use phpQuery::plugin() instead.
+	 *
+	 * @deprecated
+	 * @param $class
+	 * @param $file
+	 * @return unknown_type
+	 */
+	public static function extend($class, $file = null) {
+		return self::plugin($class, $file);
+	}
+	/**
 	 * Extend phpQuery with $class from $file.
 	 *
 	 * @param string $class Extending class name. Real class name can be prepended phpQuery_.
 	 * @param string $file Filename to include. Defaults to "{$class}.php".
 	 */
-	public static function extend($class, $file = null) {
+	public static function plugin($class, $file = null) {
 		// TODO $class checked agains phpQuery_$class
 //		if (strpos($class, 'phpQuery') === 0)
 //			$class = substr($class, 8);
@@ -403,6 +414,8 @@ abstract class phpQuery {
 				? $vars['phpQueryMethods']
 				: get_class_methods($realClass);
 			foreach($loop as $method) {
+				if ($method == '__initialize')
+					continue;
 				if (! is_callable(array($realClass, $method)))
 					continue;
 				if (isset(self::$pluginsStaticMethods[$method])) {
@@ -411,6 +424,8 @@ abstract class phpQuery {
 				}
 				self::$pluginsStaticMethods[$method] = $class;
 			}
+			if (method_exists($realClass, '__initialize'))
+				call_user_func_array(array($realClass, '__initialize'), array());
 		}
 		// object methods
 		if (class_exists('phpQueryObjectPlugin_'.$class)) {
@@ -561,10 +576,12 @@ abstract class phpQuery {
 		if ($xhr) {
 			// reuse existing XHR object, but clean it up
 			$client = $xhr;
-			$client->setParameterPost(null);
-			$client->setParameterGet(null);
+//			$client->setParameterPost(null);
+//			$client->setParameterGet(null);
 			$client->setAuth(false);
 			$client->setHeaders("If-Modified-Since", null);
+			$client->setHeaders("Http-Referer", null);
+			$client->resetParameters();
 		} else {
 			// create new XHR object
 			require_once('Zend/Http/Client.php');
@@ -586,6 +603,8 @@ abstract class phpQuery {
 		}
 		$client->setUri($options['url']);
 		$client->setMethod($options['type']);
+		if (isset($options['httpReferer']) && $options['httpReferer'])
+			$client->setHeaders('Http-Referer', $options['httpReferer']);
 		$client->setHeaders(array(
 //			'content-type' => $options['contentType'],
 			'user-agent' => 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9a8) Gecko/2007100619 GranParadiso/3.0a8',
@@ -623,30 +642,37 @@ abstract class phpQuery {
 		self::$active++;
 		// beforeSend callback
 		if (isset($options['beforeSend']) && $options['beforeSend'])
-			call_user_func_array($options['beforeSend'], array($client));
+			phpQuery::callbackRun($options['beforeSend'], array($client));
 		// ajaxSend event
 		if ($options['global'])
 			phpQueryEvent::trigger($documentID, 'ajaxSend', array($client, $options));
-		self::debug("{$options['type']}: {$options['url']}\n");
-		self::debug("Options: <pre>".var_export($options, true)."</pre>\n");
-		self::debug("Cookies: <pre>".var_export($client->getCookieJar()->getMatchingCookies($options['url']), true)."</pre>\n");
+		if (phpQuery::$debug) {
+			self::debug("{$options['type']}: {$options['url']}\n");
+			self::debug("Options: <pre>".var_export($options, true)."</pre>\n");
+//			if ($client->getCookieJar())
+//				self::debug("Cookies: <pre>".var_export($client->getCookieJar()->getMatchingCookies($options['url']), true)."</pre>\n");
+		}
 		// request
 		$response = $client->request();
+		if (phpQuery::$debug) {
+			self::debug($client->getLastRequest());
+			self::debug($response->getHeaders());
+		}
 		if ($response->isSuccessful()) {
 			// XXX tempolary
 			self::$lastModified = $response->getHeader('Last-Modified');
 			if (isset($options['success']) && $options['success'])
-				call_user_func_array($options['success'], array($response->getBody(), $response->getStatus()));
+				phpQuery::callbackRun($options['success'], array($response->getBody(), $response->getStatus()));
 			if ($options['global'])
 				phpQueryEvent::trigger($documentID, 'ajaxSuccess', array($client, $options));
 		} else {
 			if (isset($options['error']) && $options['error'])
-				call_user_func_array($options['error'], array($client, $response->getStatus(), $response->getMessage()));
+				phpQuery::callbackRun($options['error'], array($client, $response->getStatus(), $response->getMessage()));
 			if ($options['global'])
 				phpQueryEvent::trigger($documentID, 'ajaxError', array($client, /*$response->getStatus(),*/$response->getMessage(), $options));
 		}
 		if (isset($options['complete']) && $options['complete'])
-			call_user_func_array($options['complete'], array($client, $response->getStatus()));
+			phpQuery::callbackRun($options['complete'], array($client, $response->getStatus()));
 		if ($options['global'])
 			phpQueryEvent::trigger($documentID, 'ajaxComplete', array($client, $options));
 		if ($options['global'] && ! --self::$active)
@@ -700,15 +726,22 @@ abstract class phpQuery {
 			$options
 		);
 	}
-	public static function ajaxAllowHost($host) {
-		if ($host && !in_array($host, phpQuery::$ajaxAllowedHosts)) {
-			phpQuery::$ajaxAllowedHosts[] = $host;
-			return true;
+	public static function ajaxAllowHost($host1, $host2 = null, $host3 = null) {
+		$loop = is_array($host1)
+			? $host1
+			: func_get_args();
+		foreach($loop as $host) {
+			if ($host && ! in_array($host, phpQuery::$ajaxAllowedHosts)) {
+				phpQuery::$ajaxAllowedHosts[] = $host;
+			}
 		}
-		return false;
 	}
-	public static function ajaxAllowURL($url) {
-		return phpQuery::ajaxAllowHost(parse_url($url, PHP_URL_HOST));
+	public static function ajaxAllowURL($url1, $url2 = null, $url3 = null) {
+		$loop = is_array($url1)
+			? $url1
+			: func_get_args();
+		foreach($loop as $url)
+			phpQuery::ajaxAllowHost(parse_url($url, PHP_URL_HOST));
 	}
 	/**
 	 * Returns JSON representation of $data.
@@ -849,7 +882,20 @@ abstract class phpQuery {
 		}
 		return $result;
 	}
+	/**
+	 *
+	 * @param $callback Callback
+	 * @param $params
+	 * @param $paramStructure
+	 * @return unknown_type
+	 */
 	public static function callbackRun($callback, $params, $paramStructure = null) {
+		if (! $callback)
+			return true;	// XXX check this
+		if ($callback instanceof Callback) {
+			$paramStructure = $callback->params;var_dump($paramStructure);
+			$callback = $callback->callback;
+		}
 		if (! $paramStructure)
 			return call_user_func_array($callback, $params);
 		$p = 0;
@@ -951,7 +997,9 @@ class phpQueryPlugins {
 				array($realClass, $method),
 				$args
 			);
-			return $this;
+			return $return
+				? $return
+				: $this;
 		} else
 			throw new Exception("Method '{$method}' doesnt exist");
 	}
@@ -1559,6 +1607,7 @@ class phpQueryObject
 					phpQuery::$debug ?
 						$this->debug("Found: ".$this->whois( $node ).", comparing with {$compare}()")
 						: null;
+					// TODO use phpQuery::callbackRun()
 					if (call_user_func_array(array($this, $compare), array($selector, $node)))
 						$matched = true;
 				} else {
@@ -2035,7 +2084,7 @@ class phpQueryObject
 		}
 		$newStack = array();
 		foreach($this->elements as $index => $node) {
-			if (false !== call_user_func_array($callback, array($index, $node)))
+			if (false !== phpQuery::callbackRun($callback, array($index, $node)))
 				$newStack[] = $node;
 		}
 		$this->elements = $newStack;
@@ -2291,7 +2340,7 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function submit() {
+	public function submit($callback = null) {
 		if ($callback)
 			return $this->bind('change', $callback);
 		return $this->trigger('submit');
@@ -2632,7 +2681,7 @@ class phpQueryObject
 		$htmlOuter = $this->getMarkup($DOM);
 		$args = func_get_args();
 		foreach($args as $callback) {
-			$htmlOuter = call_user_func_array($callback, array($htmlOuter));
+			$htmlOuter = phpQuery::callbackRun($callback, array($htmlOuter));
 		}
 		return $htmlOuter;
 	}
@@ -3092,7 +3141,7 @@ class phpQueryObject
 			if (count($this->elements) > 1 && $node->textContent)
 				$text .= "\n";
 			foreach($args as $callback) {
-				$text = call_user_func_array($callback, array($text));
+				$text = phpQuery::callbackRun($callback, array($text));
 			}
 			$return .= $text;
 		}
@@ -3103,9 +3152,20 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function extend($class, $file) {
+	public function plugin($class, $file) {
 		phpQuery::extend($class, $file);
 		return $this;
+	}
+	/**
+	 * Deprecated, use $pq->plugin() instead.
+	 *
+	 * @deprecated
+	 * @param $class
+	 * @param $file
+	 * @return unknown_type
+	 */
+	public static function extend($class, $file = null) {
+		return $this->plugin($class, $file);
 	}
 	public function __call($method, $args) {
 		$aliasMethods = array('clone', 'empty');
@@ -3910,7 +3970,7 @@ class phpQueryEvent {
 							$event->data = $handler['data']
 								? $handler['data']
 								: null;
-							$return = call_user_func_array($handler['callback'], array_merge(array($event), $data));
+							$return = phpQuery::callbackRun($handler['callback'], array_merge(array($event), $data));
 						}
 						if ($return === false) {
 							$event->bubbles = false;
@@ -3991,6 +4051,31 @@ class phpQueryEvent {
 		return isset(phpQuery::$documents[$documentID])
 			? in_array($type, phpQuery::$documents[$documentID]['eventGlobals'])
 			: false;
+	}
+}
+/**
+ * Callback class implementing ParamStructures, pattern similar to Currying.
+ *
+ * @link http://code.google.com/p/phpquery/wiki/Callbacks#Param_Structures
+ * @author Tobiasz Cudnik
+ */
+class Callback {
+	public $callback = null;
+	public $params = null;
+	public function __construct($callback, $param1 = null, $param2 = null, $param3 = null) {
+		$params = func_get_args();
+		$params = array_slice($params, 1);
+		if ($callback instanceof Callback) {
+			// TODO implement recurention
+		} else {
+			$this->callback = $callback;
+			$this->params = $params;
+		}
+	}
+	// TODO test me !!!
+	public function param() {
+		$params = func_get_args();
+		return new Callback($this->callback, $this->params+$params);
 	}
 }
 class CallbackParam {
@@ -4126,5 +4211,6 @@ set_include_path(
 );
 // why ? no __call nor __get for statics in php...
 phpQuery::$plugins = new phpQueryPlugins();
+if (file_exists(dirname(__FILE__).'/bootstrap.php'))
+	require_once dirname(__FILE__).'/bootstrap.php';
 ?>
-

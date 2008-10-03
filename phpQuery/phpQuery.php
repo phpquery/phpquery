@@ -893,7 +893,7 @@ abstract class phpQuery {
 		if (! $callback)
 			return true;	// XXX check this
 		if ($callback instanceof Callback) {
-			$paramStructure = $callback->params;var_dump($paramStructure);
+			$paramStructure = $callback->params;
 			$callback = $callback->callback;
 		}
 		if (! $paramStructure)

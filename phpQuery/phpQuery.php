@@ -4256,8 +4256,8 @@ function pq($arg1, $context = null) {
 // add plugins dir and Zend framework to include path
 set_include_path(
 	get_include_path()
-		.'PATH_SEPARATOR'.dirname(__FILE__).'/'
-		.'PATH_SEPARATOR'.dirname(__FILE__).'/plugins/'
+		.PATH_SEPARATOR.dirname(__FILE__).'/'
+		.PATH_SEPARATOR.dirname(__FILE__).'/plugins/'
 );
 // why ? no __call nor __get for statics in php...
 phpQuery::$plugins = new phpQueryPlugins();

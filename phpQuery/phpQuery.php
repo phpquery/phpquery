@@ -655,6 +655,7 @@ abstract class phpQuery {
 		// request
 		$response = $client->request();
 		if (phpQuery::$debug) {
+			self::debug('Status: '.$response->getStatus().' / '.$response->getMessage());
 			self::debug($client->getLastRequest());
 			self::debug($response->getHeaders());
 		}
@@ -892,6 +893,12 @@ abstract class phpQuery {
 	public static function callbackRun($callback, $params, $paramStructure = null) {
 		if (! $callback)
 			return true;	// XXX check this
+		if ($callback instanceof CallbackReference) {
+			// TODO support ParamStructure to select which $param push to reference
+			if (isset($params[0]))
+				$callback->callback = $params[0];
+			return true;
+		}
 		if ($callback instanceof Callback) {
 			$paramStructure = $callback->params;
 			$callback = $callback->callback;
@@ -981,6 +988,9 @@ abstract class phpQuery {
 			return self::callbackRun(array(self::$plugins, 'browser'), $params);
 		}
 	}
+	public static function __import($documentWrapper, $content) {
+		// TODO $content - DOMNode, string
+	}
 }
 /**
  * Plugins static namespace class.
@@ -1027,6 +1037,11 @@ class phpQueryObject
 	 * @var DOMDocument
 	 */
 	public $document = null;
+	/**
+	 *
+	 * @var array
+	 */
+	public $documentWrapper = null;
 	/**
 	 * Document ID.
 	 *
@@ -1094,6 +1109,7 @@ class phpQueryObject
 		}
 		$this->domId = $domId;
 		phpQuery::$lastDomId = $domId;
+		$this->documentWrapper = phpQuery::$documents[$domId];
 		$this->document = phpQuery::$documents[$domId]['document'];
 		$this->DOM = $this->document;
 		$this->XPath = phpQuery::$documents[$domId]['xpath'];
@@ -1340,6 +1356,10 @@ class phpQueryObject
 			)
 		);
 		$queries = array(array());
+		if (! $query)
+			return $queries;
+		if ($query{0} == ':')
+			$query = '*'.$query;
 		$return =& $queries[0];
 		$specialChars = array('>',' ');
 //		$specialCharsMapping = array('/' => '>');
@@ -2342,8 +2362,18 @@ class phpQueryObject
 	 */
 	public function submit($callback = null) {
 		if ($callback)
-			return $this->bind('change', $callback);
+			return $this->bind('submit', $callback);
 		return $this->trigger('submit');
+	}
+	/**
+	 * Enter description here...
+	 *
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 */
+	public function click($callback = null) {
+		if ($callback)
+			return $this->bind('click', $callback);
+		return $this->trigger('click');
 	}
 	/**
 	 * Enter description here...
@@ -2684,6 +2714,12 @@ class phpQueryObject
 			$htmlOuter = phpQuery::callbackRun($callback, array($htmlOuter));
 		}
 		return $htmlOuter;
+	}
+	public function xml($xml = null) {
+		// TODO
+	}
+	public function xmlOuter($callback1 = null, $callback2 = null, $callback3 = null) {
+		// TODO
 	}
 	protected function getMarkup($DOM = null){
 		if (! $DOM)
@@ -3943,6 +3979,8 @@ class phpQueryEvent {
 		} else {
 			if (isset($data[0]) && $data[0] instanceof DOMEvent) {
 				$event = $data[0];
+				$event->relatedTarget = $event->target;
+				$event->target = $node;
 				$data = array_slice($data, 1);
 			} else {
 				$event = new DOMEvent(array(
@@ -3995,6 +4033,7 @@ class phpQueryEvent {
 	 *
 	 * @TODO support '!' (exclusive) events
 	 * @TODO support more than event in $type (space-separated)
+	 * @TODO support binding to global events
 	 */
 	public static function add($document, $node, $type, $data, $callback = null) {
 		$documentID = phpQuery::getDocumentID($document);
@@ -4078,6 +4117,11 @@ class Callback {
 		return new Callback($this->callback, $this->params+$params);
 	}
 }
+class CallbackReference extends Callback{
+	public function __contruct(&$reference){
+		$this->callback = $reference;
+	}
+}
 class CallbackParam {
 	public $index = null;
 	public function __construct($index = null) {
@@ -4125,6 +4169,8 @@ class DOMEvent {
 	/**
 	 * Used to indicate which phase of the event flow is currently being evaluated.
 	 *
+	 * NOT IMPLEMENTED
+	 *
 	 * @var unknown_type
 	 * @link http://developer.mozilla.org/en/DOM/event.eventPhase
 	 */
@@ -4132,11 +4178,15 @@ class DOMEvent {
 	/**
 	 * The explicit original target of the event (Mozilla-specific).
 	 *
+	 * NOT IMPLEMENTED
+	 *
 	 * @var unknown_type
 	 */
 	public $explicitOriginalTarget; // moz only
 	/**
 	 * The original target of the event, before any retargetings (Mozilla-specific).
+	 *
+	 * NOT IMPLEMENTED
 	 *
 	 * @var unknown_type
 	 */
@@ -4206,8 +4256,8 @@ function pq($arg1, $context = null) {
 // add plugins dir and Zend framework to include path
 set_include_path(
 	get_include_path()
-		.':'.dirname(__FILE__).'/'
-		.':'.dirname(__FILE__).'/plugins/'
+		.'PATH_SEPARATOR'.dirname(__FILE__).'/'
+		.'PATH_SEPARATOR'.dirname(__FILE__).'/plugins/'
 );
 // why ? no __call nor __get for statics in php...
 phpQuery::$plugins = new phpQueryPlugins();

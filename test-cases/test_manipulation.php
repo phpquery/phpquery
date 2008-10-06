@@ -110,6 +110,25 @@ if (pq('div')->length == 2) {
 print "\n";
 
 
+$testName = 'HTML insertion 3';
+$doc = phpQuery::newDocument('<div><p/></div>');
+$string = 'Hors paragraphe.
+<img align="right" src="http://www.stlouisstpierre.com/institution/images/plan.jpg">
+<p>Éditorial de l\'institution Saint-Pierre.</p>
+ Hors paragraphe.';
+$doc->find('p')->html($string);
+if (pq('img')->length == 1) {
+	print "Test '{$testName}' PASSED :)";
+	print $doc->htmlOuter();
+} else {
+	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
+	print $doc->htmlOuter('htmlentities');
+}
+print "\n";
+
+
+
+
 $testName = 'Text insertion';
 $doc = phpQuery::newDocument('<div><p/></div>');
 $string = "La Thermo-sonde de cuisson vous permet de cuire à la perfection au four comme au bain-marie";

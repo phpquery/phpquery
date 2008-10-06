@@ -2134,6 +2134,8 @@ class phpQueryObject
 			$this->debug(array("Filtering:", $selectors));
 		$stack = array();
 		foreach ( $selectors as $selector ) {
+			if (! ($node instanceof DOMELEMENT))
+				continue;
 			if (! $selector )
 				break;
 			// avoid first space or /

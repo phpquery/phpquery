@@ -85,29 +85,40 @@ print "\n";
 
 
 $testName = 'HTML insertion';
-$doc = phpQuery::newDocument('<div/>');
-$doc->find('div')->html("La Thermo-sonde de cuisson vous permet de cuire à la
-perfection au four comme au bain-marie. Température: entre <b>0°C et
-210°C</b>.");
-if (pq('div b')->length == 1)
+$doc = phpQuery::newDocument('<div><p/></div>');
+$string = "La Thermo-sonde de cuisson vous permet de cuire à la perfection au four comme au bain-marie. Température: entre <b>0°C et 210°C</b>.";
+$doc->find('p')->html($string);
+if (pq('p')->length == 1)
 	print "Test '{$testName}' PASSED :)";
 else {
 	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
-	print $doc;
+	print $doc->htmlOuter('htmlentities');
+}
+print "\n";
+
+
+$testName = 'HTML insertion 2';
+$doc = phpQuery::newDocument('<div><p/></div>');
+$string = "<div>La Thermo-sonde de cuisson vous permet de cuire à la perfection au four comme au bain-marie. Température: entre <b>0°C et 210°C</b>.</div>";
+$doc->find('p')->html($string);
+if (pq('div')->length == 2) {
+	print "Test '{$testName}' PASSED :)";
+} else {
+	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
+	print $doc->htmlOuter('htmlentities');
 }
 print "\n";
 
 
 $testName = 'Text insertion';
-$doc = phpQuery::newDocument('<div/>');
+$doc = phpQuery::newDocument('<div><p/></div>');
 $string = "La Thermo-sonde de cuisson vous permet de cuire à la perfection au four comme au bain-marie";
-$doc->find('div')->html($string);
-if (trim(pq('div')->html()) == $string)
+$doc->find('p')->html($string);
+if (trim(pq('p:first')->html()) == $string)
 	print "Test '{$testName}' PASSED :)";
 else {
 	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
-	print pq('div')->html();
-	print $string;
+	print $doc->htmlOuter('htmlentities');
 }
 print "\n";
 ?>

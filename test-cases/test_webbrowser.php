@@ -1,18 +1,16 @@
 <?php
-//error_reporting(E_ALL);
 require_once('../phpQuery/phpQuery.php');
 phpQuery::$debug = true;
-//die(file_get_contents('http://google.com/search?hl=pl&q=phpQuery&btnG=Szukaj+w+Google&lr='));
 phpQuery::extend('WebBrowser');
+
 phpQuery::$ajaxAllowedHosts[] = 'gmail.com';
 phpQuery::$ajaxAllowedHosts[] = 'google.com';
 phpQuery::$ajaxAllowedHosts[] = 'www.google.com';
 phpQuery::$ajaxAllowedHosts[] = 'www.google.pl';
 phpQuery::$ajaxAllowedHosts[] = 'mail.google.com';
-//phpQuery::$ajaxAllowedHosts[] = '';
-//phpQuery::$plugins->WebBrowserBind('WebBrowser');
-//phpQuery::$plugins->browserGet('http://google.com/', 'success1');
-phpQuery::$plugins->browserGet('https://www.google.com/accounts/Login', 'success1');
+
+// Google search results
+phpQuery::$plugins->browserGet('http://google.com/', 'success1');
 /**
  *
  * @param $pq phpQueryObject
@@ -20,25 +18,13 @@ phpQuery::$plugins->browserGet('https://www.google.com/accounts/Login', 'success
  */
 function success1($pq) {
 	print 'success1 callback';
-//	print 'SETCOOKIE'.$pq->document->xhr->getLastResponse()->getHeader('Set-Cookie');
 	$pq
 		->WebBrowser('success2')
-//		/* google results */
-//			->find('input[name=q]')
-//			->val('phpQuery')
-//			->parents('form')
-//				->submit()
-		/* gmail login */
-		// it doesnt work and i dont know why... :(
-		->find('#Email')
-			->val('XXX')->end()
-		->find('#Passwd')
-			->val('XXX')
+			->find('input[name=q]')
+			->val('phpQuery')
 			->parents('form')
 				->submit()
 	;
-//		->find('a:contains(Polski)')
-//			->click();
 }
 /**
  *
@@ -46,17 +32,19 @@ function success1($pq) {
  * @return unknown_type
  */
 function success2($pq) {
-	$url = 'http://mail.google.com/';
-	phpQuery::ajaxAllowURL($url);
-	$pq->WebBrowser('success3')->location($url);
-//	print 'success2 callback';
-//	print $pq
-//		->find('script')->remove()->end();
-}
-function success3($pq) {
-	print 'success3 callback';
+	print 'success2 callback';
 	print $pq
 		->find('script')->remove()->end();
+}
+
+// Gmail login (not working...)
+phpQuery::plugin("Scripts");
+phpQuery::newDocument('<div/>')
+	->script('google_login')
+	->location('http://mail.google.com/')
+	->toReference($pq);
+if ($pq) {
+	print $pq->script('safe_print');
 }
 
 //	if ( $result->whois() == $testResult )

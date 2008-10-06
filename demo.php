@@ -3,11 +3,12 @@
 require('phpQuery/phpQuery.php');
 
 // intialize new DOM from markup
-phpQuery::newDocument('<div>mydiv<ul><li>1</li><li>2</li><li>3</li></ul></div>')
-	->find('ul > li')
-		->addClass('my-new-class')
-		->filter(':last')
-			->addClass('last-li');
+$doc = phpQuery::newDocument('</div>');
+$doc['div']->append('<ul><li>1</li><li>2</li><li>3</li></ul>');
+$doc['ul > li']
+	->addClass('my-new-class')
+	->filter(':last')
+		->addClass('last-li');
 
 // query all unordered lists in last used DOM
 pq('ul')->insertAfter('div');

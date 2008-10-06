@@ -43,7 +43,7 @@ class phpQueryObjectPlugin_WebBrowser {
 		if ($xhr->getLastResponse()->isSuccessful()) {
 			$return = phpQueryPlugin_WebBrowser::browserReceive($xhr);
 			if (isset($self->document->WebBrowserCallback))
-				call_user_func_array(
+				phpQuery::callbackRun(
 					$self->document->WebBrowserCallback,
 					array($return)
 				);
@@ -78,7 +78,7 @@ class phpQueryPlugin_WebBrowser {
 				array(self::browserReceive($xhr)),
 				$paramStructure
 			);
-//			call_user_func_array($callback, array(
+//			phpQuery::callbackRun($callback, array(
 //				self::browserReceive($xhr)//->WebBrowser($callback)
 //			));
 			return $xhr;
@@ -113,7 +113,7 @@ class phpQueryPlugin_WebBrowser {
 				array(self::browserReceive($xhr)),
 				$paramStructure
 			);
-//			call_user_func_array($callback, array(
+//			phpQuery::callbackRun($callback, array(
 //				self::browserReceive($xhr)//->WebBrowser($callback)
 //			));
 			return $xhr;
@@ -144,7 +144,7 @@ class phpQueryPlugin_WebBrowser {
 				array(self::browserReceive($xhr)),
 				$paramStructure
 			);
-//			call_user_func_array($callback, array(
+//			phpQuery::callbackRun($callback, array(
 //				self::browserReceive($xhr)//->WebBrowser($callback)
 //			));
 			return $xhr;
@@ -218,7 +218,7 @@ class phpQueryPlugin_WebBrowser {
 			), $xhr);
 			// TODO support extended callbacks
 			if ($xhr->getLastResponse()->isSuccessful() && $e->data[1])
-				call_user_func_array($e->data[1], array(
+				phpQuery::callbackRun($e->data[1], array(
 					self::browserReceive($xhr)
 				));
 		} else if ($node->is(':submit') && $node->parents('form')->size())
@@ -238,8 +238,8 @@ class phpQueryPlugin_WebBrowser {
 		$xhr = isset($node->document->xhr)
 			? $node->document->xhr
 			: null;
-		$submit = pq($e->target)->is(':submit')
-			? $e->target
+		$submit = pq($e->relatedTarget)->is(':submit')
+			? $e->relatedTarget
 				// will this work ?
 //			: $node->find(':submit:first')->get(0);
 			: $node->find('*:submit:first')->get(0);
@@ -257,10 +257,12 @@ class phpQueryPlugin_WebBrowser {
 			'httpReferer' => $node->document->location,
 //			'success' => $e->data[1],
 		);
+		if ($node->attr('enctype'))
+			$options['contentType'] = $node->attr('enctype');
 		$xhr = phpQuery::ajax($options, $xhr);
 		// TODO support extended callbacks
 		if ($xhr->getLastResponse()->isSuccessful() && $e->data[1])
-			call_user_func_array($e->data[1], array(
+			phpQuery::callbackRun($e->data[1], array(
 				self::browserReceive($xhr)
 			));
 	}

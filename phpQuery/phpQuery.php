@@ -892,7 +892,7 @@ abstract class phpQuery {
 	 */
 	public static function callbackRun($callback, $params, $paramStructure = null) {
 		if (! $callback)
-			return true;	// XXX check this
+			return;
 		if ($callback instanceof CallbackReference) {
 			// TODO support ParamStructure to select which $param push to reference
 			if (isset($params[0]))
@@ -1242,6 +1242,13 @@ class phpQueryObject
 	 */
 	public function getDocument() {
 		return phpQuery::getDocument($this->getDocumentID());
+	}
+	/**
+	 *
+	 * @return DOMDocument
+	 */
+	public function getDOMDocument() {
+		return $this->document;
 	}
 	/**
 	 * Get object's Document ID.
@@ -2635,7 +2642,11 @@ class phpQueryObject
 				// FIXME tempolary
 				$html = utf8_decode($html);
 				@$DOM->loadHtml($html);
-				foreach($DOM->documentElement->firstChild->childNodes as $node)
+				// XXX dirty hack applied when $html doesnt start with some <tag
+				$source = $html[0] != '<'
+					? $DOM->documentElement->firstChild->firstChild
+					: $DOM->documentElement->firstChild;
+				foreach($source->childNodes as $node)
 					$toInserts[] = $this->DOM->importNode($node, true);
 			} else {
 				// FIXME tempolary, utf8 only
@@ -2688,27 +2699,30 @@ class phpQueryObject
 	 */
 	public function htmlOuter($callback1 = null, $callback2 = null, $callback3 = null) {
 		if ($this->stackIsRoot())
-			return $this->getMarkup();
-		$DOM = new DOMDocument('1.0',
-			$this->DOM->encoding
-				? $this->DOM->encoding
-				: phpQuery::$defaultEncoding
-		);
-		foreach( $this->elements as $node ) {
-			$DOM->appendChild(
-				$DOM->importNode( $node, true )
+			$htmlOuter = $this->getMarkup();
+		else {
+			$DOM = new DOMDocument('1.0',
+				$this->DOM->encoding
+					? $this->DOM->encoding
+					: phpQuery::$defaultEncoding
 			);
+			foreach( $this->elements as $node ) {
+				$DOM->appendChild(
+					$DOM->importNode( $node, true )
+				);
+			}
+			if (! phpQuery::containsEncoding($this->elements) ) {
+				// TODO WTF ? saveXML only ? same in method above...
+				$html = $this->fixXhtml(
+					$DOM->saveXML()
+				);
+				if (! phpQuery::isXhtml($this->DOM))
+					$htmlOuter = str_replace('/>', '>', $htmlOuter);
+			} else {
+				$htmlOuter = $this->getMarkup($DOM);
+			}
 		}
-		if (! phpQuery::containsEncoding($this->elements) ) {
-			// TODO WTF ? saveXML only ? same in method above...
-			$html = $this->fixXhtml(
-				$DOM->saveXML()
-			);
-			if (! phpQuery::isXhtml($this->DOM))
-				$html = str_replace('/>', '>', $html);
-			return $html;
-		}
-		$htmlOuter = $this->getMarkup($DOM);
+		// pass thou callbacks
 		$args = func_get_args();
 		foreach($args as $callback) {
 			$htmlOuter = phpQuery::callbackRun($callback, array($htmlOuter));
@@ -4118,7 +4132,13 @@ class Callback {
 	}
 }
 class CallbackReference extends Callback{
-	public function __contruct(&$reference){
+	/**
+	 *
+	 * @param $reference
+	 * @param $paramIndex
+	 * @todo implement $paramIndex; param index choose which callback param will be passed to reference
+	 */
+	public function __contruct(&$reference, $paramIndex = null){
 		$this->callback = $reference;
 	}
 }

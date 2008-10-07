@@ -2616,8 +2616,11 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function remove() {
-		foreach( $this->elements as $node ) {
+	public function remove($selector = null) {
+		$loop = $selector
+			? $this->filter($selector)->elements
+			: $this->elements;
+		foreach($loop as $node) {
 			if (! $node->parentNode )
 				continue;
 			$this->debug("Removing '{$node->tagName}'");

@@ -122,7 +122,6 @@ abstract class phpQuery {
 	 * @return false|phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public static function pq($arg1, $context = null) {
-		// TODO support DOMNodes as $context, find out ownerDocument, search loaded DOMs
 		if (! $context) {
 			$domId = self::$lastDomId;
 			if (! $domId)
@@ -2498,6 +2497,9 @@ class phpQueryObject
 	public function contents() {
 		$stack = array();
 		foreach( $this->elements as $el ) {
+			// FIXME http://code.google.com/p/phpquery/issues/detail?id=56
+			if (! isset($el->childNodes))
+				continue;
 			foreach( $el->childNodes as $node ) {
 				$stack[] = $node;
 			}

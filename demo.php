@@ -20,5 +20,5 @@ foreach(pq('li') as $li) {
 }
 
 // same as pq('anything')->htmlOuter() but on document root (returns doctype etc)
-print phpQuery::getDocument();
+print phpQuery::getDocument($pq->getDocumentID());
 ?>

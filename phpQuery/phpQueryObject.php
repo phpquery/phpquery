@@ -83,6 +83,7 @@ class phpQueryObject
 		$this->documentWrapper =& phpQuery::$documents[$id];
 		$this->document =& $this->documentWrapper->document;
 		$this->xpath =& $this->documentWrapper->xpath;
+		$this->charset =& $this->documentWrapper->charset;
 		$this->documentFragment =& $this->documentWrapper->isDocumentFragment;
 		// TODO check $this->DOM->documentElement;
 //		$this->root = $this->document->documentElement;
@@ -111,7 +112,7 @@ class phpQueryObject
 	}
 	public function documentFragment($state = null) {
 		if ($state) {
-			phpQuery::$documents[$this->docId]['documentFragment'] = $state;
+			phpQuery::$documents[$this->getDocumentID()]['documentFragment'] = $state;
 			return $this;
 		}
 		return $this->documentFragment;
@@ -1580,7 +1581,7 @@ class phpQueryObject
 	 * @return String
 	 */
 	public function htmlOuter($callback1 = null, $callback2 = null, $callback3 = null) {
-		$markup = $this->documentWrapper->markup($this->elements, true);
+		$markup = $this->documentWrapper->markup($this->elements);
 		// pass thou callbacks
 		$args = func_get_args();
 		foreach($args as $callback) {
@@ -2248,7 +2249,9 @@ class phpQueryObject
 		if (! is_null( $value )) {
 			// TODO tempolary solution
 			// http://code.google.com/p/phpquery/issues/detail?id=17
-			if (function_exists('mb_detect_encoding') && mb_detect_encoding($value) == 'ASCII')
+			if (function_exists('mb_detect_encoding')
+				 && mb_detect_encoding($value) == 'ASCII'
+				 && $this->charset = 'utf-8')
 				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
 		}
 		foreach( $this->elements as $node ) {
@@ -2603,6 +2606,7 @@ class phpQueryObject
 	// TODO IteratorAggregate
 	public function rewind(){
 		$this->debug('iterating foreach');
+		phpQuery::selectDocument($this->getDocumentID());
 		$this->elementsBackup = $this->elements;
 		$this->elementsInterator = $this->elements;
 		$this->valid = isset( $this->elements[0] )

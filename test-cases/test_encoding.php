@@ -32,7 +32,7 @@ $testName = 'DOMElement node HTML entite append';
 $result = phpQuery::newDocumentFile('test.html')
 	->find('li:first')
 		->find('p:first')
-			->_empty()
+			->empty()
 			->append('<span>&eacute;</span>');
 if (trim($result->html()) == '<span>é</span>')
 	print "Test '{$testName}' passed :)";

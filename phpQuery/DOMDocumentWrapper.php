@@ -7,6 +7,7 @@
  *
  * @todo check XML catalogs compatibility
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ * @package phpQuery
  */
 class DOMDocumentWrapper {
 	/**

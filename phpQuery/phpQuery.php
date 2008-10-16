@@ -10,7 +10,7 @@
  * @link http://phpquery-library.blogspot.com/
  * @link http://jquery.com
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.9.4 RC1
+ * @version 0.9.5 dev
  * @package phpQuery
  */
 
@@ -221,7 +221,9 @@ abstract class phpQuery {
 	 * @param unknown_type $id
 	 */
 	public static function selectDocument($id) {
-		self::$lastDomId = $id;
+		$id = self::getDocumentID($id);
+		self::debug("Selecting document '$id' as default one");
+		self::$lastDomId = self::getDocumentID($id);
 	}
 	/**
 	 * Returns document with id $id or last used as phpQueryObject.

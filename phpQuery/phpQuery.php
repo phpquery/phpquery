@@ -10,7 +10,7 @@
  * @link http://phpquery-library.blogspot.com/
  * @link http://jquery.com
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.9.5 dev
+ * @version 0.9.5 beta1
  * @package phpQuery
  */
 
@@ -249,18 +249,86 @@ abstract class phpQuery {
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 * @TODO support DOMDocument
 	 */
-	public static function newDocument($markup, $contentType = null) {
+	public static function newDocument($markup = null, $contentType = null) {
+		if (! $markup)
+			$markup = '';
 		$documentID = phpQuery::createDocumentWrapper($markup, $contentType);
 		return new phpQueryObject($documentID);
 	}
-	public static function newDocumentHTML($markup) {
-		return self::newDocument($markup, 'text/html');
+	public static function newDocumentHTML($markup = null, $charset = 'utf-8') {
+		if (!isset($charset))
+			$charset = self::$defaultCharset;
+		return self::newDocument($markup, "text/html;charset=$charset");
 	}
-	public static function newDocumentXML($markup) {
-		return self::newDocument($markup, 'text/html');
+	public static function newDocumentXML($markup = null, $charset = 'utf-8') {
+		return self::newDocument($markup, "text/xml;charset=$charset");
 	}
-	public static function newDocumentXHTML($markup) {
-		return self::newDocument($markup, 'text/html');
+	public static function newDocumentXHTML($markup = null, $charset = 'utf-8') {
+		return self::newDocument($markup, "application/xhtml+xml;charset=$charset");
+	}
+	public static function newDocumentPHP($markup = null, $contentType = "text/html;charset=utf-8") {
+		$markup = phpQuery::phpToMarkup($markup);
+		return self::newDocument($markup, $contentType);
+	}
+	public static function phpToMarkup($php, $charset = 'utf-8') {
+		$regexes = array(
+			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(\')([^\']*)<?php?(.*?)(?:\\?>)([^\']*)\'@s',
+			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(")([^"]*)<?php?(.*?)(?:\\?>)([^"]*)"@s',
+		);
+		foreach($regexes as $regex)
+			while (preg_match($regex, $php, $matches)) {
+				$php = preg_replace_callback(
+					$regex,
+					create_function('$m, $charset = "'.$charset.'"',
+						'return $m[1].$m[2]
+							.htmlspecialchars("<?php".$m[4]."?>", ENT_QUOTES|ENT_NOQUOTES, $charset)
+							.$m[5].$m[2];'
+					),
+					$php
+				);
+}
+		$regex = '@(^|>[^<]*)+?(<\?php(.*?)(\?>))@s';
+//preg_match_all($regex, $php, $matches);
+//var_dump($matches);
+		$php = preg_replace($regex, '\\1<php><!-- \\3 --></php>', $php);
+		return $php;
+	}
+	public static function markupToPHP($content) {
+		if ($content instanceof phpQueryObject)
+			$content = $content->htmlOuter();
+		/* <php>...</php> to <?php...?> */
+		$content = preg_replace_callback(
+			'@<php>\s*<!--(.*?)-->\s*</php>@s',
+			create_function('$m',
+				'return "<'.'?php ".htmlspecialchars_decode($m[1])." ?'.'>";'
+			),
+			$content
+		);
+		/*$content = str_replace(
+			array('<?php<!--', '<?php <!--', '-->?>', '--> ?>'),
+			array('<?php', '<?php', '?>', '?>'),
+			$content
+		);*/
+		$regexes = array(
+			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(\')([^\']*)(?:&lt;|%3C)\\?(?:php)?(.*?)(?:\\?(?:&gt;|%3E))([^\']*)\'@s',
+			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(")([^"]*)(?:&lt;|%3C)\\?(?:php)?(.*?)(?:\\?(?:&gt;|%3E))([^"]*)"@s',
+		);
+		foreach($regexes as $regex)
+			while (preg_match($regex, $content))
+				$content = preg_replace_callback(
+					$regex,
+					create_function('$m',
+						'return $m[1].$m[2].$m[3]."<?php"
+							.str_replace(
+								array("%20", "%3E", "%09", "&#10;", "&#9;", "%7B", "%24", "%7D", "%22", "%5B", "%5D"),
+								array(" ", ">", "	", "\n", "	", "{", "$", "}", \'"\', "[", "]"),
+								htmlspecialchars_decode($m[4])
+							)
+							."?>".$m[5].$m[2];'
+					),
+					$content
+				);
+		return $content;
 	}
 	/**
 	 * Creates new document from file $file.
@@ -275,14 +343,17 @@ abstract class phpQuery {
 		);
 		return new phpQueryObject($documentID);
 	}
-	public static function newDocumentFileHTML($file) {
-		return self::newDocumentFile($file, 'text/html');
+	public static function newDocumentFileHTML($file, $charset = 'utf-8') {
+		return self::newDocumentFile($file, "text/html;charset=$charset");
 	}
-	public static function newDocumentFileXML($file) {
-		return self::newDocumentFile($file, 'text/xml');
+	public static function newDocumentFileXML($file, $charset = 'utf-8') {
+		return self::newDocumentFile($file, "text/xml;charset=$charset");
 	}
-	public static function newDocumentFileXHTML($file) {
-		return self::newDocumentFile($file, 'application/xhtml+xml');
+	public static function newDocumentFileXHTML($file, $charset = 'utf-8') {
+		return self::newDocumentFile($file, "application/xhtml+xml;charset=$charset");
+	}
+	public static function newDocumentFilePHP($file, $contentType = null) {
+		return self::newDocumentPHP(file_get_contents($file), $contentType);
 	}
 	/**
 	 * Reuses existing DOMDocument object.
@@ -412,44 +483,17 @@ abstract class phpQuery {
 	 * Parses phpQuery object or HTML result against PHP tags and makes them active.
 	 *
 	 * @param phpQuery|string $content
+	 * @deprecated
 	 * @return string
 	 */
 	public static function unsafePHPTags($content) {
-		if ($content instanceof phpQueryObject)
-			$content = $content->htmlOuter();
-		/* <php>...</php> to <?php...?> */
-		$content = preg_replace_callback(
-			'@<php>\s*<!--(.*?)-->\s*</php>@s',
-			create_function('$m',
-				'return "<?php ".htmlspecialchars_decode($m[1])." ?>";'
-			),
-			$content
-		);
-		/*$content = str_replace(
-			array('<?php<!--', '<?php <!--', '-->?>', '--> ?>'),
-			array('<?php', '<?php', '?>', '?>'),
-			$content
-		);*/
-		$regexes = array(
-			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(\')([^\']*)(?:&lt;|%3C)\\?(?:php)?(.*?)(?:\\?(?:&gt;|%3E))([^\']*)\'@s',
-			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(")([^"]*)(?:&lt;|%3C)\\?(?:php)?(.*?)(?:\\?(?:&gt;|%3E))([^"]*)"@s',
-		);
-		foreach($regexes as $regex)
-			while (preg_match($regex, $content))
-			$content = preg_replace_callback(
-				$regex,
-				create_function('$m',
-					'return $m[1].$m[2].$m[3]."<?php"
-						.str_replace(
-							array("%20", "%3E", "%09", "&#10;", "&#9;", "%7B", "%24", "%7D", "%22"),
-							array(" ", ">", "	", "\n", "	", "{", "$", "}", \'"\'),
-							htmlspecialchars_decode($m[4])
-						)
-						."?>".$m[5].$m[2];'
-				),
-				$content
-			);
-		return $content;
+		return self::markupToPHP($content);
+	}
+	public static function DOMNodeListToArray($DOMNodeList) {
+		$array = array();
+		foreach($DOMNodeList as $node)
+			$array[] = $node;
+		return $array;
 	}
 	/**
 	 * Checks if $input is HTML string, which has to start with '<'.

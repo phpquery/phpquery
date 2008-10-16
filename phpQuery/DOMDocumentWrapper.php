@@ -61,6 +61,7 @@ class DOMDocumentWrapper {
 	protected function loadMarkup($markup) {
 		$loaded = false;
 		if ($this->contentType) {
+			self::debug("Load markup for content type {$this->contentType}");
 			// content determined by contentType
 			list($contentType, $charset) = $this->contentTypeToArray($this->contentType);
 			switch($contentType) {
@@ -476,6 +477,12 @@ class DOMDocumentWrapper {
 			$markup = '';
 			if (!is_array($nodes) && !($nodes instanceof DOMNODELIST) )
 				$nodes = array($nodes);
+			if ($this->isDocumentFragment && ! $innerMarkup)
+				foreach($nodes as $i => $node)
+					if ($node->isSameNode($this->root))
+						$nodes = array_slice($nodes, 0, $i)
+							+ phpQuery::DOMNodeListToArray($node->childNodes)
+							+ array_slice($nodes, $i+1);
 			if ($this->isXML && ! $innerMarkup) {
 				self::debug("Getting outerXML with charset '{$this->charset}'");
 				// we need outerXML, so we can benefit from

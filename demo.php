@@ -1,26 +1,38 @@
 <?php
 require('phpQuery/phpQuery.php');
 
-// intialize new DOM from markup
-$doc = phpQuery::newDocument('</div>');
-// fill it
-// array syntax works like ->find()
+// INITIALIZE IT
+// $doc = phpQuery::newDocumentHTML($markup);
+// $doc = phpQuery::newDocumentXML();
+// $doc = phpQuery::newDocumentFileXHTML('test.html');
+// $doc = phpQuery::newDocumentFilePHP('test.php');
+// $doc = phpQuery::newDocument('test.xml', 'application/rss+xml');
+// this one defaults to text/html in utf8
+$doc = phpQuery::newDocument('<div/>');
+
+// FILL IT
+// array syntax works like ->find() here
 $doc['div']->append('<ul></ul>');
 $doc['div ul']->html('<li>1</li><li>2</li><li>3</li>');
-// manipulate it
+
+// MANIPULATE IT
 // almost everything can be a chain
 $doc['ul > li']
 	->addClass('my-new-class')
 	->filter(':last')
 		->addClass('last-li');
 
-// query all unordered lists in last selected Document
-// Documents are selected when created, iterated or by phpQuery::selectDocument()
+// SELECT IT
+// pq(); is using selected document as default
+phpQuery::selectDocument($doc);
+// documents are selected when created, iterated or by above method
+// query all unordered lists in last selected document
 pq('ul')->insertAfter('div');
 
-// iterate all LIs from last selected DOM
+// INTERATE
+// all LIs from last selected DOM
 foreach(pq('li') as $li) {
-	// iteration returns plain DOM nodes, not phpQuery objects
+	// iteration returns PLAIN dom nodes, NOT phpQuery objects
 	$tagName = $li->tagName;
 	$childNodes = $li->childNodes;
 	// so you NEED to wrap it within phpQuery, using pq();
@@ -35,6 +47,8 @@ print phpQuery::getDocument(pq('div')->getDocumentID());
 // 3rd way
 print pq('div')->getDocument();
 // 4th way
-print $doc->outerHTML();
+print $doc->htmlOuter();
 // 5th way
 print $doc;
+// another...
+print $doc['ul'];

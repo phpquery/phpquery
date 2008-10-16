@@ -1598,15 +1598,17 @@ class phpQueryObject
 		return $this->htmlOuter();
 	}
 	/**
-	 * Enter description here...
+	 * Just like html(), but returns markup with VALID (dangerous) PHP tags.
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 * @todo support returning markup with PHP tags when called without param
 	 */
-	public function php($code) {
+	public function php($code = null) {
 //		TODO
 //		$args = func_get_args();
-		return $this->html("<php><!-- ".trim($code)." --></php>");
+		return $code
+			? $this->html("<php><!-- ".trim($code)." --></php>")
+			: phpQuery::unsafePHPTags($this->htmlOuter());
 	}
 	/**
 	 * Enter description here...
@@ -2369,7 +2371,7 @@ class phpQueryObject
 	 */
 	public function attrPHP( $attr, $value ) {
 		if (! is_null( $value )) {
-			$value = '<?php '.$value.' ?>';
+			$value = '<'.'?php '.$value.' ?'.'>';
 			// TODO tempolary solution
 			// http://code.google.com/p/phpquery/issues/detail?id=17
 			if (function_exists('mb_detect_encoding') && mb_detect_encoding($value) == 'ASCII')
@@ -2470,8 +2472,8 @@ class phpQueryObject
 //				$attr = $this->DOM->createAttribute('class');
 				$classes = $node->getAttribute('class');
 				$newValue = $classes
-					? $classes.' <?php '.$className.' ?>'
-					: '<?php '.$className.' ?>';
+					? $classes.' <'.'?php '.$className.' ?'.'>'
+					: '<'.'?php '.$className.' ?'.'>';
 				$node->setAttribute('class', $newValue);
 //				$attr->value = $newValue;
 //				$node->removeAttribute('class');
@@ -2479,8 +2481,8 @@ class phpQueryObject
 				/*$attr = $node->setAttribute(
 					'class',
 					$classes = $node->getAttribute('class')
-						? $classes.' <?php<!-- '.$className.'-->?>'
-						: '<?php<!-- '.$className.'-->?>'
+						? $classes.' <'.'?php<!-- '.$className.'-->?'.'>'
+						: '<'.'?php<!-- '.$className.'-->?'.'>'
 				);*/
 //			}
 		}

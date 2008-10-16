@@ -14,6 +14,7 @@ class phpQueryObject
 	 * @var DOMDocument
 	 */
 	public $document = null;
+	public $charset = null;
 	/**
 	 *
 	 * @var DOMDocumentWrapper

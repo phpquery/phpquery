@@ -13,6 +13,7 @@ require_once('phpQuery.php');
 //var_dump($argv);
 if (parse_url($argv[1], PHP_URL_HOST)) {
 	phpQuery::ajaxAllowURL($argv[1]);
+	// TODO support contentType passing (from response headers)
 	phpQuery::get($argv[1], 'czx023gcs9sg83');
 } else {
 	czx023gcs9sg83($argv[1]);
@@ -30,6 +31,7 @@ function czx023gcs9sg83($html) {
 			$method = substr($param, 2);	// delete --
 			$params = array();
 		} else {
+			$param = str_replace('\n', "\n", $param);
 			$params[] = strtolower($param) == 'null'
 				? null
 				: $param;
@@ -38,5 +40,3 @@ function czx023gcs9sg83($html) {
 	if ($method)
 		$pq = call_user_func_array(array($pq, $method), $params);
 	print trim($pq)."\n";
-}
-?>

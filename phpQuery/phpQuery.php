@@ -491,6 +491,8 @@ abstract class phpQuery {
 	}
 	public static function DOMNodeListToArray($DOMNodeList) {
 		$array = array();
+		if (! $DOMNodeList)
+			return $array;
 		foreach($DOMNodeList as $node)
 			$array[] = $node;
 		return $array;

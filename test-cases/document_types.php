@@ -23,8 +23,8 @@ require_once('../phpQuery/DOMDocumentWrapper.php');
 phpQuery::$debug = 2;
 
 /* ENCODINGS */
-print '<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-2">';
-//print '<meta http-equiv="Content-Type" content="text/html;charset=utf-8">';
+//print '<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-2">';
+print '<meta http-equiv="Content-Type" content="text/html;charset=utf-8">';
 
 /* HTML */
 

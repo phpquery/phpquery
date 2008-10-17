@@ -420,10 +420,11 @@ class DOMDocumentWrapper {
 					.'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
 					.'"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
 					.'<fake xmlns="http://www.w3.org/1999/xhtml">'.$markup.'</fake>');
+				$fragment->root = $fragment->document->firstChild->nextSibling;
 			} else {
 				$fragment->loadMakrupXML('<?xml version="1.0" encoding="'.$charset.'"?><fake>'.$markup.'</fake>');
+				$fragment->root = $fragment->document->firstChild;
 			}
-			$fragment->root = $fragment->document->firstChild;
 		} else {
 			$markup2 = '<html><head><meta http-equiv="Content-Type" content="text/html;charset='
 				.$charset.'"></head>';
@@ -479,10 +480,12 @@ class DOMDocumentWrapper {
 				$nodes = array($nodes);
 			if ($this->isDocumentFragment && ! $innerMarkup)
 				foreach($nodes as $i => $node)
-					if ($node->isSameNode($this->root))
+					if ($node->isSameNode($this->root)) {
+					//	var_dump($node);
 						$nodes = array_slice($nodes, 0, $i)
 							+ phpQuery::DOMNodeListToArray($node->childNodes)
 							+ array_slice($nodes, $i+1);
+						}
 			if ($this->isXML && ! $innerMarkup) {
 				self::debug("Getting outerXML with charset '{$this->charset}'");
 				// we need outerXML, so we can benefit from

@@ -608,7 +608,10 @@ class phpQueryObject
 			foreach( $selector as $s ) {
 				// TAG
 				if ( preg_match('@^\w+$@', $s) || $s == '*' ) {
-					$XQuery .= $s;
+					if ($this->documentWrapper->isXHTML) {
+						$XQuery .= "xhtml:{$s}";
+					} else
+						$XQuery .= $s;
 				// ID
 				} else if ( $s[0] == '#' ) {
 					if ( $spaceBefore )

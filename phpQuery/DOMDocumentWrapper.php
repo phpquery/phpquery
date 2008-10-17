@@ -54,8 +54,14 @@ class DOMDocumentWrapper {
 		$this->contentType = strtolower($contentType);
 		if ($this->loadMarkup($markup)) {
 			$this->xpath = new DOMXPath($this->document);
+			$this->afterMarkupLoad();
 			// remember last loaded document
 			return phpQuery::$defaultDocumentID = $id;
+		}
+	}
+	protected function afterMarkupLoad() {
+		if ($this->isXHTML) {
+			$this->xpath->registerNamespace("xhtml", "http://www.w3.org/1999/xhtml");
 		}
 	}
 	protected function loadMarkup($markup) {
@@ -231,11 +237,13 @@ class DOMDocumentWrapper {
 			if ($return)
 				$this->root = $this->document;
 		}
-		if ($return && ! $this->contentType) {
-			if ($this->isXHTML)
-				$this->contentType = 'application/xhtml+xml';
-			else
-				$this->contentType = 'text/xml';
+		if ($return) {
+			if (! $this->contentType) {
+				if ($this->isXHTML)
+					$this->contentType = 'application/xhtml+xml';
+				else
+					$this->contentType = 'text/xml';
+			}
 		}
 		return $return;
 	}
@@ -288,23 +296,6 @@ class DOMDocumentWrapper {
 	protected function charsetFromHTML($markup) {
 		$contentType = $this->contentTypeFromHTML($markup);
 		return $contentType[1];
-//		if ( $html instanceof DOMNODE || is_array($html) ) {
-//			$loop = $html instanceof DOMNODELIST || is_array($html)
-//				? $html
-//				: array($html);
-//			foreach( $loop as $node ) {
-//				if (! $node instanceof DOMELEMENT )
-//					continue;
-//				$isEncoding = isset($node->tagName) && $node->tagName == 'meta'
-//					&& strtolower($node->getAttribute('http-equiv')) == 'content-type';
-//				if ($isEncoding)
-//					return true;
-//				foreach( $node->getElementsByTagName('meta') as $node )
-//					if ( strtolower($node->getAttribute('http-equiv')) == 'content-type' )
-//						return true;
-//			}
-//		} else
-//			return preg_match('@<meta\\s+http-equiv\\s*=\\s*(["|\'])Content-Type\\1@i', $html);
 	}
 	protected function charsetFromXML($markup) {
 		$matches;

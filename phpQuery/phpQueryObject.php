@@ -535,7 +535,10 @@ class phpQueryObject
 					? $testNode->parentNode
 					: null;
 			}
-			$xpath = $this->getNodeXpath($stackNode);
+			// TODO tmp
+			$xpath = $this->documentWrapper->isXHTML
+				? $this->getNodeXpath($stackNode, 'xhtml')
+				: $this->getNodeXpath($stackNode);
 			// FIXME deam...
 			$query = $XQuery == '//' && $xpath == '/html[1]'
 				? '//*'
@@ -2686,11 +2689,13 @@ class phpQueryObject
 	 * @return string
 	 * @TODO use native getNodePath is avaible
 	 */
-	protected function getNodeXpath($oneNode = null) {
+	protected function getNodeXpath($oneNode = null, $namespace = null) {
 		$return = array();
 		$loop = $oneNode
 			? array($oneNode)
 			: $this->elements;
+		if ($namespace)
+			$namespace .= ':';
 		foreach( $loop as $node ) {
 			if ($node instanceof DOMDOCUMENT) {
 				$return[] = '';
@@ -2706,7 +2711,7 @@ class phpQueryObject
 					if ( $isElement && $sibling->tagName == $node->tagName )
 						$i++;
 				}
-				$xpath[] = "{$node->tagName}[{$i}]";
+				$xpath[] = "{$namespace}{$node->tagName}[{$i}]";
 				$node = $node->parentNode;
 			}
 			$xpath = join('/', array_reverse($xpath));

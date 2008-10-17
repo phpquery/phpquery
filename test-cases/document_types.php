@@ -83,9 +83,9 @@ print '<meta http-equiv="Content-Type" content="text/html;charset=utf-8">';
 //	file_get_contents('document-types/document-iso88592-nocharset.xhtml'),
 //	'application/xhtml+xml;charset=iso-8859-2'
 //);
-//$xhtmlUtf = new DOMDocumentWrapper(
-//	file_get_contents('document-types/document-utf8.xhtml')
-//);
+$xhtmlUtf = new DOMDocumentWrapper(
+	file_get_contents('document-types/document-utf8.xhtml')
+);
 //$xhtmlUtfNoCharset = new DOMDocumentWrapper(
 //	file_get_contents('document-types/document-utf8-nocharset.xhtml'),
 //	'application/xhtml+xml'
@@ -95,7 +95,7 @@ print '<meta http-equiv="Content-Type" content="text/html;charset=utf-8">';
 //print var_dump($xhtmlIsoNoCharset->markup(
 //	$xhtmlIsoNoCharset->document->getElementsByTagName('p')
 //));
-//print var_dump($xhtmlUtf->markup());
+print var_dump($xhtmlUtf->markup());
 //print var_dump($xhtmlUtf->markup(
 //	$xhtmlUtf->document->getElementsByTagName('p')
 //));
@@ -117,7 +117,11 @@ print '<meta http-equiv="Content-Type" content="text/html;charset=utf-8">';
 
 //$xmlFragmentUtf = new DOMDocumentWrapper(
 //	file_get_contents('document-types/document-fragment-utf8.xml'),
-//	'text/xml'
+//	'text/xml'nt var_dump($xhtmlFragmentUtf->document->saveXML());
+//$xhtmlFragmentUtf->markup();
+//$xhtmlFragmentUtf->markup(
+//	$xhtmlFragmentUtf->document->getElementsByTagName('p')
+//);
 //);
 //$xmlFragmentUtf->markup();
 //$xmlFragmentUtf->markup(

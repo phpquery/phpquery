@@ -151,8 +151,7 @@ class DOMDocumentWrapper {
 				$this->root = $this->document;
 		}
 		if ($return && ! $this->contentType)
-			// TODO quess content type
-			;
+			$this->contentType = 'text/html';
 		return $return;
 	}
 	protected function loadMakrupXML($markup, $requestedCharset = null) {
@@ -163,8 +162,10 @@ class DOMDocumentWrapper {
 		// check agains XHTML in contentType or markup
 		$isContentTypeXHTML = $this->isXHTML();
 		$isMarkupXHTML = $this->isXHTML($markup);
-		if ($isContentTypeXHTML || $isMarkupXHTML)
+		if ($isContentTypeXHTML || $isMarkupXHTML) {
+			self::debug('Full markup load (XML), XHTML detected');
 			$this->isXHTML = true;
+		}
 		// determine document fragment
 		if (!isset($this->isDocumentFragment))
 			$this->isDocumentFragment = $this->isXHTML
@@ -230,9 +231,12 @@ class DOMDocumentWrapper {
 			if ($return)
 				$this->root = $this->document;
 		}
-		if ($return && ! $this->contentType)
-			// TODO quess content type
-			;
+		if ($return && ! $this->contentType) {
+			if ($this->isXHTML)
+				$this->contentType = 'application/xhtml+xml';
+			else
+				$this->contentType = 'text/xml';
+		}
 		return $return;
 	}
 	protected function isXHTML($markup = null) {
@@ -383,6 +387,9 @@ class DOMDocumentWrapper {
 	protected function documentFragmentCreate($source, $charset = null) {
 		$fake = new DOMDocumentWrapper();
 		$fake->contentType = $this->contentType;
+		$fake->isXML = $this->isXML;
+		$fake->isHTML = $this->isHTML;
+		$fake->isXHTML = $this->isXHTML;
 		$fake->root = $fake->document;
 		if (! $charset)
 			$charset = $this->charset;

@@ -40,3 +40,5 @@ function czx023gcs9sg83($html) {
 	if ($method)
 		$pq = call_user_func_array(array($pq, $method), $params);
 	print trim($pq)."\n";
+}
+?>

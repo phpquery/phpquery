@@ -299,8 +299,8 @@ class phpQueryObject
 			$c = $query[$i];
 			$tmp = '';
 			// TAG
-			if ( $this->isChar($c) || $c == '*' ) {
-				while( isset($query[$i]) && ($this->isChar($query[$i]) || $query[$i] == '*')) {
+			if ( $this->isChar($c) || $c == '*' || $c == '|' ) {
+				while( isset($query[$i]) && ($this->isChar($query[$i]) || $query[$i] == '*' || $query[$i] == '|')) {
 					$tmp .= $query[$i];
 					$i++;
 				}
@@ -537,7 +537,7 @@ class phpQueryObject
 			}
 			// TODO tmp
 			$xpath = $this->documentWrapper->isXHTML
-				? $this->getNodeXpath($stackNode, 'xhtml')
+				? $this->getNodeXpath($stackNode, 'html')
 				: $this->getNodeXpath($stackNode);
 			// FIXME deam...
 			$query = $XQuery == '//' && $xpath == '/html[1]'
@@ -610,9 +610,10 @@ class phpQueryObject
 			$this->elements = $oldStack;
 			foreach( $selector as $s ) {
 				// TAG
-				if ( preg_match('@^\w+$@', $s) || $s == '*' ) {
+				if ( preg_match('@^[\w|\|]+$@', $s) || $s == '*' ) {
+					// TODO support namespaces
 					if ($this->documentWrapper->isXHTML) {
-						$XQuery .= "xhtml:{$s}";
+						$XQuery .= "html:{$s}";
 					} else
 						$XQuery .= $s;
 				// ID
@@ -2256,12 +2257,13 @@ class phpQueryObject
 	 */
 	public function attr($attr = null, $value = null) {
 		if (! is_null( $value )) {
+//			die(var_dump(mb_detect_encoding($value)));
 			// TODO tempolary solution
 			// http://code.google.com/p/phpquery/issues/detail?id=17
-			if (function_exists('mb_detect_encoding')
-				 && mb_detect_encoding($value) == 'ASCII'
-				 && $this->charset = 'utf-8')
-				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
+//			if (function_exists('mb_detect_encoding')
+//				 && mb_detect_encoding($value) == 'ASCII'
+//				 && $this->charset = 'utf-8')
+//				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
 		}
 		foreach( $this->elements as $node ) {
 			if (! is_null($value)) {
@@ -2380,8 +2382,8 @@ class phpQueryObject
 			$value = '<'.'?php '.$value.' ?'.'>';
 			// TODO tempolary solution
 			// http://code.google.com/p/phpquery/issues/detail?id=17
-			if (function_exists('mb_detect_encoding') && mb_detect_encoding($value) == 'ASCII')
-				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
+//			if (function_exists('mb_detect_encoding') && mb_detect_encoding($value) == 'ASCII')
+//				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
 		}
 		foreach( $this->elements as $node ) {
 			if (! is_null( $value )) {

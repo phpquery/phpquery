@@ -61,7 +61,7 @@ class DOMDocumentWrapper {
 	}
 	protected function afterMarkupLoad() {
 		if ($this->isXHTML) {
-			$this->xpath->registerNamespace("xhtml", "http://www.w3.org/1999/xhtml");
+			$this->xpath->registerNamespace("html", "http://www.w3.org/1999/xhtml");
 		}
 	}
 	protected function loadMarkup($markup) {

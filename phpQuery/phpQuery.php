@@ -377,6 +377,10 @@ abstract class phpQuery {
 	 * @todo support passing DOMDocument object from self::loadDocument
 	 */
 	protected static function createDocumentWrapper($html, $contentType = null, $documentID = null) {
+		if (function_exists('domxml_open_mem')) {
+			throw new Exception("Old PHP4 DOM XML extension detected. phpQuery won't work until this extension is enabled.");
+			return null;
+		}
 		$id = $documentID
 			? $documentID
 			: md5(microtime());

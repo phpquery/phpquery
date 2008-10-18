@@ -2676,7 +2676,8 @@ class phpQueryObject
 		return $this->find($offset);
 	}
 	public function offsetSet($offset, $value) {
-		$this->find($offset)->replaceWith($value);
+//		$this->find($offset)->replaceWith($value);
+		$this->find($offset)->html($value);
 	}
 	public function offsetUnset($offset) {
 		// empty

@@ -2007,8 +2007,8 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function plugin($class, $file) {
-		phpQuery::extend($class, $file);
+	public function plugin($class, $file = null) {
+		phpQuery::plugin($class, $file);
 		return $this;
 	}
 	/**

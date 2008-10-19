@@ -12,6 +12,7 @@ phpQuery::$debug = true;
 //$string =  strftime('%B %Y', time());
 //$doc['p:first']->append($string)->dump();
 
+/*
 $doc1 = phpQuery::newDocumentFileXHTML('doc1.html');
 $doc2 = phpQuery::newDocumentFileXHTML('doc2.html');
 $doc3 = phpQuery::newDocumentFileXHTML('doc3.html');
@@ -22,3 +23,6 @@ $doc2['body']
 $doc1['body']
 	->append($doc2['body >*']);
 print $doc1->plugin('Scripts')->script('safe_print');
+*/
+//$doc = phpQuery::newDocument('<p> p1 <b> b1 </b> <b> b2 </b> </p><p> p2 </p>');
+//print $doc['p']->contents()->not('[nodeType=1]');

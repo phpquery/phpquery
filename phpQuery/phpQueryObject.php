@@ -856,13 +856,15 @@ class phpQueryObject
 			case 'parent':
 				$this->elements = $this->map(
 					create_function('$node', '
-						return $node->childNodes->length ? $node : null;')
+						return $node instanceof DOMELEMENT && $node->childNodes->length
+							? $node : null;')
 				)->elements;
 			break;
 			case 'empty':
 				$this->elements = $this->map(
 					create_function('$node', '
-						return $node->childNodes->length ? null : $node;')
+						return $node instanceof DOMELEMENT && $node->childNodes->length
+							? null : $node;')
 				)->elements;
 			break;
 			case 'disabled':
@@ -882,7 +884,7 @@ class phpQueryObject
 			case 'header':
 				$this->elements = $this->map(
 					create_function('$node',
-						'$isHeader = $node->tagName && in_array($node->tagName, array(
+						'$isHeader = isset($node->tagName) && in_array($node->tagName, array(
 							"h1", "h2", "h3", "h4", "h5", "h6", "h7"
 						));
 						return $isHeader
@@ -1067,61 +1069,77 @@ class phpQueryObject
 				$selector = array_slice($selector, 1);
 			// PER NODE selector chunks
 			foreach( $this->elements as $node ) {
-				if (! ($node instanceof DOMELEMENT))
-					continue;
+				// TODO support other nodeTypes
+//				if (! ($node instanceof DOMELEMENT))
+//					continue;
 				$break = false;
 				foreach( $selector as $s ) {
-					// ID
-					if ( $s[0] == '#' ) {
-						if ( $node->getAttribute('id') != substr($s, 1) )
-							$break = true;
-					// CLASSES
-					} else if ( $s[0] == '.' ) {
-						if (! $this->matchClasses( $s, $node ) )
-							$break = true;
-					// ATTRS
-					} else if ( $s[0] == '[' ) {
-						// strip side brackets
-						$attr = trim($s, '[]');
-						if ( strpos($attr, '=') ) {
-							list( $attr, $val ) = explode('=', $attr);
-							if ( $this->isRegexp($attr)) {
-								// switch last character
-								switch( substr($attr, -1) ) {
-									case '^':
-										$pattern = '^'.preg_quote($val, '@');
-										break;
-									case '*':
-										$pattern = '.*'.preg_quote($val, '@').'.*';
-										break;
-									case '$':
-										$pattern = preg_quote($val, '@').'$';
-										break;
-								}
-								// cut last character
-								$attr = substr($attr, 0, -1);
-								if (! preg_match("@{$pattern}@", $node->getAttribute($attr)))
+					if (!($node instanceof DOMELEMENT)) {
+						if ( $s[0] == '[' ) {
+							$attr = trim($s, '[]');
+							if ( strpos($attr, '=') ) {
+								list( $attr, $val ) = explode('=', $attr);
+								if ($attr == 'nodeType' && $node->nodeType != $val)
 									$break = true;
-							} else if ( $node->getAttribute($attr) != $val )
-								$break = true;
-						} else if (! $node->hasAttribute($attr) )
+							}
+						} else
 							$break = true;
-					// PSEUDO CLASSES
-					} else if ( $s[0] == ':' ) {
-						// skip
-					// TAG
-					} else if ( trim($s) ) {
-						if ( $s != '*' ) {
-							if ( isset($node->tagName) ) {
-								if ( $node->tagName != $s )
-									$break = true;
-							} else if ( $s == 'html' && ! $this->isRoot($node) )
+					} else {
+						// ID
+						if ( $s[0] == '#' ) {
+							if ( $node->getAttribute('id') != substr($s, 1) )
 								$break = true;
+						// CLASSES
+						} else if ( $s[0] == '.' ) {
+							if (! $this->matchClasses( $s, $node ) )
+								$break = true;
+						// ATTRS
+						} else if ( $s[0] == '[' ) {
+							// strip side brackets
+							$attr = trim($s, '[]');
+							if ( strpos($attr, '=') ) {
+								list( $attr, $val ) = explode('=', $attr);
+								if ($attr == 'nodeType') {
+									if ($val != $node->nodeType)
+										$break = true;
+								} else if ( $this->isRegexp($attr)) {
+									// switch last character
+									switch( substr($attr, -1) ) {
+										case '^':
+											$pattern = '^'.preg_quote($val, '@');
+											break;
+										case '*':
+											$pattern = '.*'.preg_quote($val, '@').'.*';
+											break;
+										case '$':
+											$pattern = preg_quote($val, '@').'$';
+											break;
+									}
+									// cut last character
+									$attr = substr($attr, 0, -1);
+									if (! preg_match("@{$pattern}@", $node->getAttribute($attr)))
+										$break = true;
+								} else if ( $node->getAttribute($attr) != $val )
+									$break = true;
+							} else if (! $node->hasAttribute($attr) )
+								$break = true;
+						// PSEUDO CLASSES
+						} else if ( $s[0] == ':' ) {
+							// skip
+						// TAG
+						} else if ( trim($s) ) {
+							if ( $s != '*' ) {
+								if ( isset($node->tagName) ) {
+									if ( $node->tagName != $s )
+										$break = true;
+								} else if ( $s == 'html' && ! $this->isRoot($node) )
+									$break = true;
+							}
+						// AVOID NON-SIMPLE SELECTORS
+						} else if ( in_array($s, $notSimpleSelector)) {
+							$break = true;
+							$this->debug(array('Skipping non simple selector', $selector));
 						}
-					// AVOID NON-SIMPLE SELECTORS
-					} else if ( in_array($s, $notSimpleSelector)) {
-						$break = true;
-						$this->debug(array('Skipping non simple selector', $selector));
 					}
 					if ( $break )
 						break;
@@ -1423,10 +1441,10 @@ class phpQueryObject
 	 */
 	public function contents() {
 		$stack = array();
-		foreach( $this->elements as $el ) {
-			// FIXME http://code.google.com/p/phpquery/issues/detail?id=56
-			if (! isset($el->childNodes))
-				continue;
+		foreach($this->stack(1) as $el) {
+			// FIXME (fixed) http://code.google.com/p/phpquery/issues/detail?id=56
+//			if (! isset($el->childNodes))
+//				continue;
 			foreach( $el->childNodes as $node ) {
 				$stack[] = $node;
 			}
@@ -1550,7 +1568,8 @@ class phpQueryObject
 		foreach($loop as $node) {
 			if (! $node->parentNode )
 				continue;
-			$this->debug("Removing '{$node->tagName}'");
+			if (isset($node->tagName))
+				$this->debug("Removing '{$node->tagName}'");
 			$node->parentNode->removeChild( $node );
 		}
 		return $this;
@@ -1624,7 +1643,7 @@ class phpQueryObject
 	 */
 	public function children($selector = null) {
 		$stack = array();
-		foreach( $this->elements as $node ) {
+		foreach($this->stack(1) as $node) {
 			foreach( $node->getElementsByTagName('*') as $newNode ) {
 				if ( $selector && ! $this->is($selector, $newNode) )
 					continue;
@@ -1640,12 +1659,12 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * NON JQUERY-COMPATIBLE METHOD!
+	 * jQuery difference.
 	 *
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function unwrapContent() {
-		foreach( $this->elements as $node ) {
+		foreach($this->stack(1) as $node) {
 			if (! $node->parentNode )
 				continue;
 			$childNodes = array();
@@ -2255,6 +2274,17 @@ class phpQueryObject
 	 * @todo unselect other selecte's options when !multiply
 	 * @todo  * *`val($val)`* Checks, or selects, all the radio buttons, checkboxes, and select options that match the set of values.
 	 */
+	protected function stack($nodeTypes = null) {
+		if (!isset($nodeTypes))
+			return $this->elements;
+		if (!is_array($nodeTypes))
+			$nodeTypes = array($nodeTypes);
+		$return = array();
+		foreach($this->elements as $node)
+			if (in_array($node->nodeType, $nodeTypes))
+				$return[] = $node;
+		return $return;
+	}
 	public function attr($attr = null, $value = null) {
 		if (! is_null( $value )) {
 //			die(var_dump(mb_detect_encoding($value)));
@@ -2265,7 +2295,7 @@ class phpQueryObject
 //				 && $this->charset = 'utf-8')
 //				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
 		}
-		foreach( $this->elements as $node ) {
+		foreach($this->stack(1) as $node) {
 			if (! is_null($value)) {
 				$loop = $attr == '*'
 					? $this->getNodeAttrs($node)
@@ -2273,7 +2303,7 @@ class phpQueryObject
 				foreach($loop as $a) {
 					$event = null;
 					if ($value) {
-						// identifi
+						// identify
 						$isInputValue = $node->tagName == 'input'
 							&& (
 								in_array($node->getAttribute('type'),
@@ -2385,7 +2415,7 @@ class phpQueryObject
 //			if (function_exists('mb_detect_encoding') && mb_detect_encoding($value) == 'ASCII')
 //				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
 		}
-		foreach( $this->elements as $node ) {
+		foreach($this->stack(1) as $node) {
 			if (! is_null( $value )) {
 //				$attrNode = $this->DOM->createAttribute($attr);
 				$node->setAttribute($attr, $value);

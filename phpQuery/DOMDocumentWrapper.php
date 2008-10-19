@@ -244,8 +244,10 @@ class DOMDocumentWrapper {
 				else
 					$this->contentType = 'text/xml';
 			}
+			return $return;
+		} else {
+			throw new Exception("Error loading XML markup");
 		}
-		return $return;
 	}
 	protected function isXHTML($markup = null) {
 		if (! isset($markup)) {
@@ -360,12 +362,16 @@ class DOMDocumentWrapper {
 			$source = array($source);
 		if (is_array($source) || $source instanceof DOMNODELIST) {
 			// dom nodes
+			self::debug('Importing nodes to document');
 			foreach($source as $node)
 				$return[] = $this->document->importNode($node, true);
 		} else {
 			// string markup
 			$fake = $this->documentFragmentCreate($source, $sourceCharset);
-			return $this->import($fake->root->childNodes);
+			if ($fake === false)
+				throw new Exception("Error loading documentFragment markup");
+			else
+				return $this->import($fake->root->childNodes);
 		}
 		return $return;
 	}
@@ -390,7 +396,8 @@ class DOMDocumentWrapper {
 		if (is_array($source) || $source instanceof DOMNODELIST) {
 			// dom nodes
 			// load fake document
-			$this->documentFragmentLoadMarkup($fake, $charset);
+			if (! $this->documentFragmentLoadMarkup($fake, $charset))
+				return false;
 			$nodes = $fake->import($source);
 			foreach($nodes as $node)
 				$fake->root->appendChild($node);
@@ -439,6 +446,8 @@ class DOMDocumentWrapper {
 				? $fragment->document->firstChild->nextSibling->firstChild->nextSibling
 				: $fragment->document->firstChild->nextSibling->firstChild->nextSibling;
 		}
+		if (! $fragment->root)
+			return false;
 		$fragment->isDocumentFragment = true;
 		return true;
 	}

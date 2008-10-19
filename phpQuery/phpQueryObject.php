@@ -432,10 +432,17 @@ class phpQueryObject
 	 * @param int $index
 	 * @return array|DOMElement Single DOMElement or array of DOMElement.
 	 */
-	public function get($index = null) {
-		return ! is_null($index)
+	public function get($index = null, $callback1 = null, $callback2 = null, $callback3 = null) {
+		$return = ! is_null($index)
 			? $this->elements[$index]
 			: $this->elements;
+		// pass thou callbacks
+		$args = func_get_args();
+		$args = array_slice($args, 1);
+		foreach($args as $callback) {
+			$return = phpQuery::callbackRun($callback, array($return));
+		}
+		return $return;
 	}
 	/**
 	 * Return matched DOM nodes.
@@ -447,12 +454,18 @@ class phpQueryObject
 	 * @todo return only arrays ?
 	 * @todo maybe other name...
 	 */
-	public function getText($index = null) {
+	public function getString($index = null, $callback1 = null, $callback2 = null, $callback3 = null) {
 		if ($index)
 			return trim($this->eq($index)->text());
 		$return = array();
 		for($i = 0; $i < $this->size(); $i++) {
 			$return[] = trim($this->eq($i)->text());
+		}
+		// pass thou callbacks
+		$args = func_get_args();
+		$args = array_slice($args, 1);
+		foreach($args as $callback) {
+			$return = phpQuery::callbackRun($callback, array($return));
 		}
 		return $return;
 	}
@@ -1334,7 +1347,7 @@ class phpQueryObject
 	 * @param String|phpQuery
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function wrapAll($wrapper) {
+	public function wrapAllOld($wrapper) {
 		$wrapper = pq($wrapper)->_clone();
 		if (! $wrapper->length() || ! $this->length() )
 			return $this;
@@ -1353,17 +1366,17 @@ class phpQueryObject
 	 * @param String|phpQuery
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
-	public function wrapAllTest($wrapper) {
-		if (! $this->length() )
+	public function wrapAll($wrapper) {
+		if (! $this->length())
 			return $this;
-		return pq($wrapper)
+		return phpQuery::pq($wrapper, $this->getDocumentID())
 			->_clone()
-			->insertBefore($this->elements[0])
-			->map(array(self, '_wrapAllCallback'))
+			->insertBefore($this->get(0))
+			->map(array($this, '___wrapAllCallback'))
 			->append($this);
 	}
 
-	protected function _wrapAllCallback($node) {
+	public function ___wrapAllCallback($node) {
 		$deepest = $node;
 		while($deepest->firstChild && $deepest->firstChild instanceof DOMELEMENT)
 			$deepest = $deepest->firstChild;
@@ -1394,7 +1407,7 @@ class phpQueryObject
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function wrap($wrapper) {
-		foreach($this as $node)
+		foreach($this->stack() as $node)
 			phpQuery::pq($node, $this->getDocumentID())->wrapAll($wrapper);
 		return $this;
 	}
@@ -1406,7 +1419,7 @@ class phpQueryObject
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function wrapPHP($codeBefore, $codeAfter) {
-		foreach($this as $node)
+		foreach($this->stack() as $node)
 			phpQuery::pq($node, $this->getDocumentID())->wrapAllPHP($codeBefore, $codeAfter);
 		return $this;
 	}
@@ -1418,7 +1431,7 @@ class phpQueryObject
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function wrapInner($wrapper) {
-		foreach($this as $node)
+		foreach($this->stack() as $node)
 			phpQuery::pq($node, $this->getDocumentID())->contents()->wrapAll($wrapper);
 		return $this;
 	}
@@ -1430,7 +1443,8 @@ class phpQueryObject
 	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
 	 */
 	public function wrapInnerPHP($wrapper) {
-	//	return $this->wrapInner("<php><!-- {$wrapper} --></php>");
+		// TODO test
+//		return $this->wrapInner("<php><!-- {$wrapper} --></php>");
 	}
 
 	/**
@@ -1889,6 +1903,7 @@ class phpQueryObject
 				}
 				break;
 		}
+		phpQuery::debug("From ".count($insertFrom)."; To ".count($insertTo)." nodes");
 		foreach( $insertTo as $insertNumber => $toNode ) {
 			// we need static relative elements in some cases
 			switch( $type ) {

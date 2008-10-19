@@ -1,7 +1,7 @@
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <?php
 require_once('../phpQuery/phpQuery.php');
-phpQuery::$debug = true;
+phpQuery::$debug = 2;
 
 
 //$doc = phpQuery::newDocumentXML('<article><someMarkupStuff/><p>p</p></article>');
@@ -26,3 +26,14 @@ print $doc1->plugin('Scripts')->script('safe_print');
 */
 //$doc = phpQuery::newDocument('<p> p1 <b> b1 </b> <b> b2 </b> </p><p> p2 </p>');
 //print $doc['p']->contents()->not('[nodeType=1]');
+
+//print phpQuery::newDocumentFileXML('tmp.xml');
+
+
+//$doc = phpQuery::newDocumentXML('text<node>node</node>test');
+//pq('<p/>', $doc)->insertBefore(pq('node'))->append(pq('node'));
+//$doc->contents()->wrap('<p/>');
+//$doc['node']->wrapAll('<p/>');
+//	->contents()
+//	->wrap('<p></p>');
+//print $doc;

@@ -452,7 +452,7 @@ class DOMDocumentWrapper {
 			if ($fragment->isXHTML) {
 				$markup = substr($markup, strpos($markup, '<fake')+43);
 			} else {
-				$markup = substr($markup, strpos($markup, '<fake>')+5);
+				$markup = substr($markup, strpos($markup, '<fake>')+6);
 			}
 		} else {
 				$markup = substr($markup, strpos($markup, '<body>')+6);

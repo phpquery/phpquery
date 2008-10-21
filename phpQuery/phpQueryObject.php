@@ -1253,7 +1253,7 @@ class phpQueryObject
 	 */
 	public function trigger($type, $data = array()) {
 		foreach($this->elements as $node)
-			phpQueryEvent::trigger($this->getDocumentID(), $type, $data, $node);
+			phpQueryEvents::trigger($this->getDocumentID(), $type, $data, $node);
 		return $this;
 	}
 	/**
@@ -1284,7 +1284,7 @@ class phpQueryObject
 			$data = null;
 		}
 		foreach($this->elements as $node)
-			phpQueryEvent::add($this->getDocumentID(), $node, $type, $data, $callback);
+			phpQueryEvents::add($this->getDocumentID(), $node, $type, $data, $callback);
 		return $this;
 	}
 	/**
@@ -1298,7 +1298,7 @@ class phpQueryObject
 	 */
 	public function unbind($type = null, $callback = null) {
 		foreach($this->elements as $node)
-			phpQueryEvent::remove($this->getDocumentID(), $node, $type, $callback);
+			phpQueryEvents::remove($this->getDocumentID(), $node, $type, $callback);
 		return $this;
 	}
 	/**
@@ -2357,7 +2357,7 @@ class phpQueryObject
 					else
 						$node->removeAttribute($a);
 					if ($event) {
-						phpQueryEvent::trigger($this->getDocumentID(),
+						phpQueryEvents::trigger($this->getDocumentID(),
 							$event->type, array($event)
 						);
 					}

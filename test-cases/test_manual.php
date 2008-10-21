@@ -37,3 +37,8 @@ print $doc1->plugin('Scripts')->script('safe_print');
 //	->contents()
 //	->wrap('<p></p>');
 //print $doc;
+
+// http://code.google.com/p/phpquery/issues/detail?id=66
+//$doc = phpQuery::newDocumentXML('<p>123<span/>123</p>');
+//$doc->dump();
+//$doc->children()->wrapAll('<div/>')->dump();

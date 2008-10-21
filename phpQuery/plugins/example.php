@@ -4,9 +4,9 @@
  *
  * Load it like this:
  * phpQuery::plugin('example')
- * phpQuery::plugin('example', 'plugins/example.php')
+ * phpQuery::plugin('example', 'example.php')
  * pq('ul')->plugin('example')
- * pq('ul')->plugin('example', 'plugins/example.php')
+ * pq('ul')->plugin('example', 'example.php')
  *
  * Plugin classes are never intialized, just method calls are forwarded
  * in static way from phpQuery.

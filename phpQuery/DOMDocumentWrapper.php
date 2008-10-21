@@ -72,29 +72,29 @@ class DOMDocumentWrapper {
 			list($contentType, $charset) = $this->contentTypeToArray($this->contentType);
 			switch($contentType) {
 				case 'text/html':
-					$loaded = $this->loadMakrupHTML($markup, $charset);
+					$loaded = $this->loadMarkupHTML($markup, $charset);
 				break;
 				case 'text/xml':
 				case 'application/xhtml+xml':
-					$loaded = $this->loadMakrupXML($markup, $charset);
+					$loaded = $this->loadMarkupXML($markup, $charset);
 				break;
 				default:
 					// for feeds or anything that sometimes doesn't use text/xml
 					if (strpos('xml', $this->contentType) !== false)
-						$loaded = $this->loadMakrupXML($markup, $charset);
+						$loaded = $this->loadMarkupXML($markup, $charset);
 					else
 						phpQuery::debug("Could not determine document type from content type '{$this->contentType}'");
 			}
 		} else {
 			// content type autodetection
 			if ($this->isXML($markup)) {
-				$loaded = $this->loadMakrupXML($markup);
+				$loaded = $this->loadMarkupXML($markup);
 				if (! $loaded && $this->isXHTML) {
 					phpQuery::debug('Loading as XML failed, trying to load as HTML');
-					$loaded = $this->loadMakrupHTML($markup);
+					$loaded = $this->loadMarkupHTML($markup);
 				}
 			} else {
-				$loaded = $this->loadMakrupHTML($markup);
+				$loaded = $this->loadMarkupHTML($markup);
 			}
 		}
 		return $loaded;
@@ -114,7 +114,7 @@ class DOMDocumentWrapper {
 		$this->document->formatOutput = true;
 		$this->document->preserveWhiteSpace = true;
 	}
-	protected function loadMakrupHTML($markup, $requestedCharset = null) {
+	protected function loadMarkupHTML($markup, $requestedCharset = null) {
 		if (phpQuery::$debug)
 			phpQuery::debug('Full markup load (HTML): '.substr($markup, 0, 250));
 		$this->loadMarkupReset();
@@ -160,7 +160,7 @@ class DOMDocumentWrapper {
 			$this->contentType = 'text/html';
 		return $return;
 	}
-	protected function loadMakrupXML($markup, $requestedCharset = null) {
+	protected function loadMarkupXML($markup, $requestedCharset = null) {
 		if (phpQuery::$debug)
 			phpQuery::debug('Full markup load (XML): '.substr($markup, 0, 250));
 		$this->loadMarkupReset();
@@ -421,13 +421,13 @@ class DOMDocumentWrapper {
 		if ($fragment->isXML) {
 			if ($fragment->isXHTML) {
 				// add FAKE element to set default namespace
-				$fragment->loadMakrupXML('<?xml version="1.0" encoding="'.$charset.'"?>'
+				$fragment->loadMarkupXML('<?xml version="1.0" encoding="'.$charset.'"?>'
 					.'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
 					.'"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
 					.'<fake xmlns="http://www.w3.org/1999/xhtml">'.$markup.'</fake>');
 				$fragment->root = $fragment->document->firstChild->nextSibling;
 			} else {
-				$fragment->loadMakrupXML('<?xml version="1.0" encoding="'.$charset.'"?><fake>'.$markup.'</fake>');
+				$fragment->loadMarkupXML('<?xml version="1.0" encoding="'.$charset.'"?><fake>'.$markup.'</fake>');
 				$fragment->root = $fragment->document->firstChild;
 			}
 		} else {
@@ -440,7 +440,7 @@ class DOMDocumentWrapper {
 			if ($noBody)
 				$markup2 .= '</body>';
 			$markup2 .= '</html>';
-			$fragment->loadMakrupHTML($markup2);
+			$fragment->loadMarkupHTML($markup2);
 			// TODO resolv body tag merging issue
 			$fragment->root = $noBody
 				? $fragment->document->firstChild->nextSibling->firstChild->nextSibling

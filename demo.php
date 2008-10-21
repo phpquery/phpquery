@@ -13,14 +13,18 @@ $doc = phpQuery::newDocument('<div/>');
 // FILL IT
 // array syntax works like ->find() here
 $doc['div']->append('<ul></ul>');
-$doc['div ul']->html('<li>1</li><li>2</li><li>3</li>');
+// array set changes inner html
+$doc['div ul'] = '<li>1</li><li>2</li><li>3</li>';
 
 // MANIPULATE IT
 // almost everything can be a chain
+$li;
 $doc['ul > li']
 	->addClass('my-new-class')
 	->filter(':last')
-		->addClass('last-li');
+		->addClass('last-li')
+// save it anywhere in the chain
+		->toReference($li);
 
 // SELECT IT
 // pq(); is using selected document as default

@@ -1658,8 +1658,11 @@ class phpQueryObject
 	public function children($selector = null) {
 		$stack = array();
 		foreach($this->stack(1) as $node) {
-			foreach( $node->getElementsByTagName('*') as $newNode ) {
-				if ( $selector && ! $this->is($selector, $newNode) )
+//			foreach($node->getElementsByTagName('*') as $newNode) {
+			foreach($node->childNodes as $newNode) {
+				if ($newNode->nodeType != 1)
+					continue;
+				if ($selector && ! $this->is($selector, $newNode))
 					continue;
 				if ($this->elementsContainsNode($newNode, $stack))
 					continue;

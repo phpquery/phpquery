@@ -1,16 +1,14 @@
 <?php
 /**
- * phpQuery is a server-side, chainable, CSS selector driven
+ * phpQuery is a server-side, chainable, CSS3 selector driven
  * Document Object Model (DOM) API based on jQuery JavaScript Library.
  *
- * It's almost a full port of jQuery 1.2 to PHP5.
- *
- * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ * @version 0.9.5 beta2
  * @link http://code.google.com/p/phpquery/
  * @link http://phpquery-library.blogspot.com/
- * @link http://jquery.com
+ * @link http://jquery.com/
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.9.5 beta1
  * @package phpQuery
  */
 
@@ -102,26 +100,28 @@ abstract class phpQuery {
 	 * Multi-purpose function.
 	 * Use pq() as shortcut.
 	 *
+	 * In below examples, $pq is any result of pq(); function.
 	 * *************
-	 * 1. Import HTML into existing DOM (without any attaching):
-	 * - Import into last used DOM:
+	 * 1. Import markup into existing document (without any attaching):
+	 * - Import into selected document:
 	 *   pq('<div/>')				// DOESNT accept text nodes at beginning of input string !
-	 * - Import into DOM with ID from $pq->getDocumentID():
-	 *   pq('<div/>', 'domId')
-	 * - Import into same DOM as DOMNode belongs to:
+	 * - Import into document with ID from $pq->getDocumentID():
+	 *   pq('<div/>', $pq->getDocumentID())
+	 * - Import into same document as DOMNode belongs to:
 	 *   pq('<div/>', DOMNode)
-	 * - Import into DOM from phpQuery object:
-	 *   pq('<div/>', phpQuery)
+	 * - Import into document from phpQuery object:
+	 *   pq('<div/>', $pq)
 	 * *************
 	 * 2. Run query:
-	 * - Run query on last used DOM:
+	 * - Run query on last selected document:
 	 *   pq('div.myClass')
-	 * - Run query on DOM with ID from $pq->getDocumentID():
-	 *   pq('div.myClass', 'domId')
-	 * - Run query on same DOM as DOMNode belongs to and use node(s)as root for query:
+	 * - Run query on document with ID from $pq->getDocumentID():
+	 *   pq('div.myClass', $pq->getDocumentID())
+	 * - Run query on same document as DOMNode belongs to and use node(s)as root for query:
 	 *   pq('div.myClass', DOMNode)
-	 * - Run query on DOM from $phpQueryObject and use object's stack as root nodes for query:
-	 *   pq('div.myClass', phpQuery)
+	 * - Run query on document from phpQuery object
+	 *   and use object's stack as root node(s) for query:
+	 *   pq('div.myClass', $pq)
 	 *
 	 * @param string|DOMNode|DOMNodeList|array	$arg1	HTML markup, CSS Selector, DOMNode or array of DOMNodes
 	 * @param string|phpQuery|DOMNode	$context	DOM ID from $pq->getDocumentID(), phpQuery object (determines also query root) or DOMNode (determines also query root)

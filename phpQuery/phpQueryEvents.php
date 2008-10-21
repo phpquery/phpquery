@@ -132,20 +132,20 @@ class phpQueryEvents {
 		}
 	}
 	protected static function getNode($documentID, $node) {
-		foreach(phpQuery::$documents[$documentID]['eventNodes'] as $eventNode) {
+		foreach(phpQuery::$documents[$documentID]->eventsNodes as $eventNode) {
 			if ($node->isSameNode($eventNode))
 				return $eventNode;
 		}
 	}
 	protected static function setNode($documentID, $node) {
-		phpQuery::$documents[$documentID]['eventNodes'][] = $node;
-		return phpQuery::$documents[$documentID]['eventNodes'][
-			count(phpQuery::$documents[$documentID]['eventNodes'])-1
+		phpQuery::$documents[$documentID]->eventsNodes[] = $node;
+		return phpQuery::$documents[$documentID]->eventsNodes[
+			count(phpQuery::$documents[$documentID]->eventsNodes)-1
 		];
 	}
 	protected static function issetGlobal($documentID, $type) {
 		return isset(phpQuery::$documents[$documentID])
-			? in_array($type, phpQuery::$documents[$documentID]['eventGlobals'])
+			? in_array($type, phpQuery::$documents[$documentID]->eventsGlobal)
 			: false;
 	}
 }

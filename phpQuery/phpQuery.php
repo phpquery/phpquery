@@ -477,9 +477,9 @@ abstract class phpQuery {
 	 * @param mixed $documentID @see phpQuery::getDocumentID() for supported types.
 	 */
 	public static function unloadDocuments($id = null) {
-		if ($documentID) {
-			if ($documentID = self::getDocumentID($documentID))
-				unset(phpQuery::$documents[$documentID]);
+		if (isset($id)) {
+			if ($id = self::getDocumentID($id))
+				unset(phpQuery::$documents[$id]);
 		} else
 			unset(phpQuery::$documents);
 	}

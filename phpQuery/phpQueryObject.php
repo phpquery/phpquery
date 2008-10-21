@@ -635,17 +635,17 @@ class phpQueryObject
 						$XQuery .= '*';
 					$XQuery .= "[@id='".substr($s, 1)."']";
 				// ATTRIBUTES
-				} else if ( $s[0] == '[' ) {
+				} else if ($s[0] == '[') {
 					if ( $spaceBefore )
 						$XQuery .= '*';
 					// strip side brackets
 					$attr = trim($s, '][');
 					$execute = false;
 					// attr with specifed value
-					if ( strpos( $s, '=' ) ) {
-						list( $attr, $value ) = explode('=', $attr);
-						$value = trim($value, "'\"'");
-						if ( $this->isRegexp($attr) ) {
+					if (strpos( $s, '=' )) {
+						list($attr, $value) = explode('=', $attr);
+						$value = trim($value, "'\"");
+						if ($this->isRegexp($attr)) {
 							// cut regexp character
 							$attr = substr($attr, 0, -1);
 							$execute = true;
@@ -657,7 +657,7 @@ class phpQueryObject
 					} else {
 						$XQuery .= "[@{$attr}]";
 					}
-					if ( $execute ) {
+					if ($execute) {
 						$this->runQuery($XQuery, $s, 'is');
 						$XQuery = '';
 						if (! $this->length() )
@@ -1116,6 +1116,7 @@ class phpQueryObject
 									if ($val != $node->nodeType)
 										$break = true;
 								} else if ( $this->isRegexp($attr)) {
+									$val = trim($val, '"\'');
 									// switch last character
 									switch( substr($attr, -1) ) {
 										case '^':
@@ -1589,6 +1590,30 @@ class phpQueryObject
 		return $this;
 	}
 
+	/**
+	 * jQuey difference
+	 *
+	 * @param $markup
+	 * @return unknown_type
+	 */
+	public function markup($markup = null) {
+		if ($this->documentWrapper->isXML)
+			return $this->xml($markup);
+		else
+			return $this->html($markup);
+	}
+	/**
+	 * jQuey difference
+	 *
+	 * @param $markup
+	 * @return unknown_type
+	 */
+	public function markupOuter() {
+		if ($this->documentWrapper->isXML)
+			return $this->xmlOuter();
+		else
+			return $this->htmlOuter();
+	}
 	/**
 	 * Enter description here...
 	 *

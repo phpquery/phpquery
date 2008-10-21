@@ -42,3 +42,7 @@ print $doc1->plugin('Scripts')->script('safe_print');
 //$doc = phpQuery::newDocumentXML('<p>123<span/>123</p>');
 //$doc->dump();
 //$doc->children()->wrapAll('<div/>')->dump();
+
+// http://code.google.com/p/phpquery/issues/detail?id=69
+//$doc = phpQuery::newDocumentXML('<p class="test">123<span/>123</p>');
+//$doc['[class^="test"]']->dump();

@@ -33,7 +33,7 @@ phpQuery::selectDocument($doc);
 // query all unordered lists in last selected document
 pq('ul')->insertAfter('div');
 
-// INTERATE
+// INTERATE IT
 // all LIs from last selected DOM
 foreach(pq('li') as $li) {
 	// iteration returns PLAIN dom nodes, NOT phpQuery objects

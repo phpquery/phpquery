@@ -3,7 +3,8 @@
 if (!isset($argv[1]) || $argv[1] == 'help' || $argv[1] == '--help' || $argv[1] == '-h')
 	die("Usage: phpquery URL --method1 arg1 arg2 argN --method2 arg1 arg2 argN ...
 Example: phpquery 'http://localhost' --find 'div > p' --contents
-Docs: http://code.google.com/p/phpquery/wiki/LibrarySections\n");
+Pipe: cat index.html | phpquery --find 'div > p' --contents
+Docs: http://code.google.com/p/phpquery/wiki/\n");
 set_include_path(get_include_path()
 	.':'.'/usr/lib/phpquery'
 	.':'.realpath(dirname(__FILE__).'/../phpQuery')
@@ -11,19 +12,25 @@ set_include_path(get_include_path()
 require_once('phpQuery.php');
 //phpQuery::$debug = true;
 //var_dump($argv);
-if (parse_url($argv[1], PHP_URL_HOST)) {
+if (isset($argv[1]) && parse_url($argv[1], PHP_URL_HOST)) {
 	phpQuery::ajaxAllowURL($argv[1]);
 	// TODO support contentType passing (from response headers)
-	phpQuery::get($argv[1], 'czx023gcs9sg83');
+	phpQuery::get($argv[1],
+		new Callback('phpQueryCli', new CallbackParam, array_slice($argv, 2))
+	);
+} else if (feof(STDIN) === false) {
+	$markup = '';
+	while(!feof(STDIN))
+		$markup .= fgets(STDIN, 4096);
+	phpQueryCli($markup, array_slice($argv, 1));
 } else {
-	czx023gcs9sg83($argv[1]);
+	phpQueryCli($argv[1], array_slice($argv, 2));
 }
-function czx023gcs9sg83($html) {
-	global $argv;
-	$pq = phpQuery::newDocument($html);
+function phpQueryCli($markup, $callQueue) {
+	$pq = phpQuery::newDocument($markup);
 	$method = null;
 	$params = array();
-	foreach(array_slice($argv, 2) as $param) {
+	foreach($callQueue as $param) {
 		if (strpos($param, '--') === 0) {
 			if ($method) {
 				$pq = call_user_func_array(array($pq, $method), $params);

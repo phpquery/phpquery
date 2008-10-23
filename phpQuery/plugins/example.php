@@ -3,10 +3,10 @@
  * Example of phpQuery plugin.
  *
  * Load it like this:
- * phpQuery::extend('example')
- * phpQuery::extend('example', 'plugins/example.php')
- * pq('ul')->extend('example')
- * pq('ul')->extend('example', 'plugins/example.php')
+ * phpQuery::plugin('example')
+ * phpQuery::plugin('example', 'example.php')
+ * pq('ul')->plugin('example')
+ * pq('ul')->plugin('example', 'example.php')
  *
  * Plugin classes are never intialized, just method calls are forwarded
  * in static way from phpQuery.
@@ -33,7 +33,7 @@ abstract class phpQueryObjectPlugin_example {
 	/**
 	 * Enter description here...
 	 *
-	 * @param phpQuery $self
+	 * @param phpQueryObject $self
 	 */
 	public static function example($self, $arg1) {
 		// this method can be called on any phpQuery object, like this:

@@ -8,6 +8,9 @@ set_include_path(
 require_once('../phpQuery/phpQuery.php');
 phpQuery::$debug = true;
 phpQuery::$ajaxAllowedHosts[] = 'wikipedia.org';
+phpQuery::$ajaxAllowedHosts[] = 'google.com';
+phpQuery::$ajaxAllowedHosts[] = 'code.google.com';
+phpQuery::$ajaxAllowedHosts[] = 'www.google.com';
 
 //$pq = phpQuery::ajax(array(
 //	'url' => 'http://wikipedia.org/',
@@ -40,4 +43,22 @@ else {
 	print "</pre>\n";
 }
 print "\n";
-?>
+
+
+//$testName = 'gdata plugin';
+//phpQuery::extend('gdata');
+//$xhr = phpQuery::$plugins->gdata('tobiasz.cudnik@gmail.com', 'XXX');
+//$url = 'http://code.google.com/p/phpquery/w/edit/Callbacks';
+//phpQuery::ajax(array('url' => $url, 'success' => 'ksjsdgh892jh23'), $xhr);
+//function ksjsdgh892jh23($html) {
+//	print $html;
+//	print pq($html)->find('script')->remove()->end();
+//	if (pq('div[lang]')->size())
+//		print "Test '$testName' PASSED :)";
+//	else {
+//		print "Test '$testName' <strong>FAILED</strong> !!! ";
+//		print "<pre>";
+//		print "</pre>\n";
+//	}
+//	print "\n";
+//}

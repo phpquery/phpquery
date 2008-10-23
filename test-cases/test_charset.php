@@ -32,7 +32,7 @@ $testName = 'DOMElement node HTML entite append';
 $result = phpQuery::newDocumentFile('test.html')
 	->find('li:first')
 		->find('p:first')
-			->_empty()
+			->empty()
 			->append('<span>&eacute;</span>');
 if (trim($result->html()) == '<span>é</span>')
 	print "Test '{$testName}' passed :)";
@@ -62,23 +62,34 @@ else {
 }
 print "\n";
 
-
-$testName = 'Loading document without meta charset';
+$testName = 'Attr charset';
 $result = phpQuery::newDocumentFile('test.html')
-	->_empty();
-//var_dump((string)$result->htmlOuter());
-$result = phpQuery::newDocument($result->htmlOuter());
-$validResult = <<<EOF
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8" /></head></html>
-EOF;
-$similarity = 0;
-similar_text($result->htmlOuter(), $validResult, $similarity);
-if ( $similarity > 90 )
-	print "Test '{$testName}' PASSED :)";
-else
-	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
-print "<pre>";
-print $result;
-print "</pre>\n";
-?>
+	->find('li:first')
+		->attr('test', 'foo &eacute; żźć bar');
+if (trim($result->attr('test')) == 'foo &eacute; żźć bar')
+	print "Test '{$testName}' passed :)";
+else {
+	print "Test '{$testName}' <strong>FAILED</strong> !!!";
+	print $result->attr('test');
+}
+print "\n";
+
+
+//$testName = 'Loading document without meta charset';
+//$result = phpQuery::newDocumentFile('test.html')
+//	->_empty();
+////var_dump((string)$result->htmlOuter());
+//$result = phpQuery::newDocument($result->htmlOuter());
+//$validResult = <<<EOF
+//<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+//<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8" /></head></html>
+//EOF;
+//$similarity = 0;
+//similar_text($result->htmlOuter(), $validResult, $similarity);
+//if ( $similarity > 90 )
+//	print "Test '{$testName}' PASSED :)";
+//else
+//	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
+//print "<pre>";
+//print $result;
+//print "</pre>\n";

@@ -1,6 +1,6 @@
 <?php
 // here you can directly run xpath queries to debug your tests
-$Query = "/html[1]//*";
+$Query = "/*[namespace-uri() = 'http://my.name/space'][local-name() eq 'p']";
 
 $DOM = new DOMDocument();
 $DOM->loadHTMLFile('test.html');

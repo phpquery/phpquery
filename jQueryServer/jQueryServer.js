@@ -1,7 +1,7 @@
 /**
  * jQuery Server Plugin
  *
- * Server-side AJAX requests supporting jQuery manipulations
+ * Server-side Ajax requests supporting jQuery manipulations
  * before sending content to the browser.
  * 
  * Example:
@@ -9,8 +9,9 @@
  * 	.find('.my-class')
  * 	.client(${CALLBACK});
  *
- * @version 0.5
- * @author Tobiasz Cudnik tobiasz.cudnik/gmail.com
+ * @version 0.5.1
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ * @link http://code.google.com/p/phpquery/wiki/jQueryServer
  * @link http://code.google.com/p/phpquery/
  */
 jQuery.extend({

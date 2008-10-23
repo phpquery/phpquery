@@ -1,0 +1,5884 @@
+<html>
+<head>
+<title>Docs For Class phpQueryObject</title>
+<link rel="stylesheet" type="text/css" href="../media/style.css">
+</head>
+<body>
+
+<table border="0" cellspacing="0" cellpadding="0" height="48" width="100%">
+  <tr>
+    <td class="header_top">phpQuery</td>
+  </tr>
+  <tr><td class="header_line"><img src="../media/empty.png" width="1" height="1" border="0" alt=""  /></td></tr>
+  <tr>
+    <td class="header_menu">
+        
+                                    
+                              		  [ <a href="../classtrees_phpQuery.html" class="menu">class tree: phpQuery</a> ]
+		  [ <a href="../elementindex_phpQuery.html" class="menu">index: phpQuery</a> ]
+		  	    [ <a href="../elementindex.html" class="menu">all elements</a> ]
+    </td>
+  </tr>
+  <tr><td class="header_line"><img src="../media/empty.png" width="1" height="1" border="0" alt=""  /></td></tr>
+</table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="200" class="menu">
+	<div id="todolist">
+			<p><a href="../todolist.html">Todo List</a></p>
+	</div>
+      <b>Packages:</b><br />
+              <a href="../li_phpQuery.html">phpQuery</a><br />
+            <br /><br />
+                        <b>Files:</b><br />
+      	  <div class="package">
+			<a href="../phpQuery/_Callback.php.html">		Callback.php
+		</a><br>
+			<a href="../phpQuery/_DOMDocumentWrapper.php.html">		DOMDocumentWrapper.php
+		</a><br>
+			<a href="../phpQuery/_DOMEvent.php.html">		DOMEvent.php
+		</a><br>
+			<a href="../phpQuery/_phpQuery.php.html">		phpQuery.php
+		</a><br>
+			<a href="../phpQuery/_phpQueryEvents.php.html">		phpQueryEvents.php
+		</a><br>
+			<a href="../phpQuery/_phpQueryObject.php.html">		phpQueryObject.php
+		</a><br>
+	  </div><br />
+      
+      
+            <b>Classes:</b><br />
+        <div class="package">
+		    		<a href="../phpQuery/Callback.html">Callback</a><br />
+	    		<a href="../phpQuery/CallbackParam.html">CallbackParam</a><br />
+	    		<a href="../phpQuery/CallbackReference.html">CallbackReference</a><br />
+	    		<a href="../phpQuery/DOMDocumentWrapper.html">DOMDocumentWrapper</a><br />
+	    		<a href="../phpQuery/DOMEvent.html">DOMEvent</a><br />
+	    		<a href="../phpQuery/phpQuery.html">phpQuery</a><br />
+	    		<a href="../phpQuery/phpQueryEvents.html">phpQueryEvents</a><br />
+	    		<a href="../phpQuery/phpQueryObject.html">phpQueryObject</a><br />
+	    		<a href="../phpQuery/phpQueryPlugins.html">phpQueryPlugins</a><br />
+	  </div>
+                </td>
+    <td>
+      <table cellpadding="10" cellspacing="0" width="100%" border="0"><tr><td valign="top">
+
+<h1>Class: phpQueryObject</h1>
+Source Location: /phpQueryObject.php<br /><br />
+
+
+<table width="100%" border="0">
+<tr><td valign="top">
+
+<h3><a href="#class_details">Class Overview</a></h3>
+<pre></pre><br />
+<div class="description">Class representing phpQuery objects.</div><br /><br />
+<h4>Author(s):</h4>
+<ul>
+          <li>Tobiasz Cudnik &lt;<a href="mailto:tobiasz.cudnik/gmail.com">tobiasz.cudnik/gmail.com</a>&gt;</li>
+      </ul>
+
+
+
+
+    
+
+                <p class="implements">
+            Implements interfaces:
+            <ul>
+                <li>Iterator (internal interface)</li><li>Countable (internal interface)</li><li>ArrayAccess (internal interface)</li>            </ul>
+        </p>
+        
+</td>
+
+<td valign="top">
+<h3><a href="#class_vars">Variables</a></h3>
+<ul>
+    <li><a href="../phpQuery/phpQueryObject.html#var$charset">$charset</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$current">$current</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$document">$document</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$documentFragment">$documentFragment</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$documentID">$documentID</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$documentWrapper">$documentWrapper</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$elements">$elements</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$elementsBackup">$elementsBackup</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$elementsInterator">$elementsInterator</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$previous">$previous</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$regexpChars">$regexpChars</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$root">$root</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$valid">$valid</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#var$xpath">$xpath</a></li>
+  </ul>
+</td>
+
+
+<td valign="top">
+<h3><a href="#class_methods">Methods</a></h3>
+<ul>
+    <li><a href="../phpQuery/phpQueryObject.html#method__construct">__construct</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodadd">add</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodaddClass">addClass</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodaddClassPHP">addClassPHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodafter">after</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodafterPHP">afterPHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodancestors">ancestors</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodandSelf">andSelf</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodappend">append</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodappendPHP">appendPHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodappendTo">appendTo</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodattr">attr</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodattrAppend">attrAppend</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodattrPHP">attrPHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodattrPrepend">attrPrepend</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodbefore">before</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodbeforePHP">beforePHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodbind">bind</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodchange">change</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodchildren">children</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodclick">click</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodcontents">contents</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodcount">count</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodcss">css</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodcurrent">current</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methoddebug">debug</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methoddocumentFragment">documentFragment</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methoddump">dump</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methoddumpDie">dumpDie</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methoddumpWhois">dumpWhois</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodeach">each</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodelementsContainsNode">elementsContainsNode</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodend">end</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodeq">eq</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodextend">extend</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodfilter">filter</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodfilterCallback">filterCallback</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodfind">find</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodget">get</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodgetDocument">getDocument</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodgetDocumentID">getDocumentID</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodgetDocumentIDRef">getDocumentIDRef</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodgetDOMDocument">getDOMDocument</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodgetElementSiblings">getElementSiblings</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodgetNodeAttrs">getNodeAttrs</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodgetNodeXpath">getNodeXpath</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodgetString">getString</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodhasClass">hasClass</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodhide">hide</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodhtml">html</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodhtmlOuter">htmlOuter</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodimportNodes">importNodes</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodindex">index</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodinsert">insert</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodinsertAfter">insertAfter</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodinsertBefore">insertBefore</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodis">is</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodisChar">isChar</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodisHTML">isHTML</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodisRegexp">isRegexp</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodisRoot">isRoot</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodisXHTML">isXHTML</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodisXML">isXML</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodkey">key</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodlength">length</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodload">load</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodmap">map</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodmarkup">markup</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodmarkupOuter">markupOuter</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodmatchClasses">matchClasses</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodmerge">merge</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodnewInstance">newInstance</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodnext">next</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodnextAll">nextAll</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodnot">not</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodoffsetExists">offsetExists</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodoffsetGet">offsetGet</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodoffsetSet">offsetSet</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodoffsetUnset">offsetUnset</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodparent">parent</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodparents">parents</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodparseSelector">parseSelector</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodphp">php</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodplugin">plugin</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodprepend">prepend</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodprependPHP">prependPHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodprependTo">prependTo</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodprev">prev</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodprevAll">prevAll</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodpseudoClasses">pseudoClasses</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodremove">remove</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodremoveAttr">removeAttr</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodremoveClass">removeClass</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodreplaceAll">replaceAll</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodreplaceWith">replaceWith</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodreplaceWithPHP">replaceWithPHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodreverse">reverse</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodrewind">rewind</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodrunQuery">runQuery</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodselect">select</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodserialize">serialize</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodserializeArray">serializeArray</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodshow">show</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodsiblings">siblings</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodsize">size</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodslice">slice</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodstack">stack</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodstackIsRoot">stackIsRoot</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodsubmit">submit</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodtext">text</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodtoggleClass">toggleClass</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodtoReference">toReference</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodtoRoot">toRoot</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodtrigger">trigger</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodtriggerHandler">triggerHandler</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodunbind">unbind</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodunloadDocument">unloadDocument</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodunwrapContent">unwrapContent</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodval">val</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodvalid">valid</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodwhois">whois</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodwrap">wrap</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodwrapAll">wrapAll</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodwrapAllOld">wrapAllOld</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodwrapAllPHP">wrapAllPHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodwrapInner">wrapInner</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodwrapInnerPHP">wrapInnerPHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodwrapPHP">wrapPHP</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodxml">xml</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#methodxmlOuter">xmlOuter</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method_clone">_clone</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method_empty">_empty</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method_next">_next</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method_prev">_prev</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method__call">__call</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method__get">__get</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method__loadSuccess">__loadSuccess</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method__pseudoClassParam">__pseudoClassParam</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method__toString">__toString</a></li>
+    <li><a href="../phpQuery/phpQueryObject.html#method___wrapAllCallback">___wrapAllCallback</a></li>
+  </ul>
+</td>
+
+</tr></table>
+<hr />
+
+<table width="100%" border="0"><tr>
+
+
+
+
+
+
+</tr></table>
+<hr />
+
+<a name="class_details"></a>
+<h3>Class Details</h3>
+<div class="tags">
+[line 8]<br />
+Class representing phpQuery objects.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>author:</b>&nbsp;&nbsp;</td><td>Tobiasz Cudnik &lt;<a href="mailto:tobiasz.cudnik/gmail.com">tobiasz.cudnik/gmail.com</a>&gt;</td>
+  </tr>
+</table>
+</div>
+</div><br /><br />
+<div class="top">[ <a href="#top">Top</a> ]</div><br />
+
+<hr />
+<a name="class_vars"></a>
+<h3>Class Variables</h3>
+<div class="tags">
+	<a name="var$charset"></a>
+	<p></p>
+	<h4>$charset = <span class="value">&nbsp;null</span></h4>
+	<p>[line 17]</p>
+  <br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>mixed</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$current"></a>
+	<p></p>
+	<h4>$current = <span class="value">&nbsp;null</span></h4>
+	<p>[line 65]</p>
+  Iterator interface helper<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>mixed</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$document"></a>
+	<p></p>
+	<h4>$document = <span class="value">&nbsp;null</span></h4>
+	<p>[line 16]</p>
+  DOMDocument class.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>DOMDocument</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$documentFragment"></a>
+	<p></p>
+	<h4>$documentFragment = <span class="value">&nbsp;true</span></h4>
+	<p>[line 53]</p>
+  Indicated if doument is just a fragment (no &lt;html&gt; tag).<br /><br /><p>Every document is realy a full document, so even documentFragments can  be queried against &lt;html&gt;, but getDocument(id)-&gt;htmlOuter() will return  only contents of &lt;body&gt;.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>bool</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$documentID"></a>
+	<p></p>
+	<h4>$documentID = <span class="value">&nbsp;null</span></h4>
+	<p>[line 10]</p>
+  <br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>mixed</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$documentWrapper"></a>
+	<p></p>
+	<h4>$documentWrapper = <span class="value">&nbsp;null</span></h4>
+	<p>[line 22]</p>
+  <br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td><a href="../phpQuery/DOMDocumentWrapper.html">DOMDocumentWrapper</a></td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$elements"></a>
+	<p></p>
+	<h4>$elements = <span class="value">array()</span></h4>
+	<p>[line 34]</p>
+  Stack of selected elements.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>TODO:</b>&nbsp;&nbsp;</td><td>refactor to -&gt;nodes</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>array</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$elementsBackup"></a>
+	<p></p>
+	<h4>$elementsBackup = <span class="value">array()</span></h4>
+	<p>[line 41]</p>
+  Number of selected elements.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>int</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$elementsInterator"></a>
+	<p></p>
+	<h4>$elementsInterator = <span class="value">array()</span></h4>
+	<p>[line 57]</p>
+  Iterator interface helper<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>mixed</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$previous"></a>
+	<p></p>
+	<h4>$previous = <span class="value">&nbsp;null</span></h4>
+	<p>[line 42]</p>
+  <br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>mixed</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$regexpChars"></a>
+	<p></p>
+	<h4>$regexpChars = <span class="value">array('^','*','$')</span></h4>
+	<p>[line 69]</p>
+  Chars indicating regex comparsion.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>mixed</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$root"></a>
+	<p></p>
+	<h4>$root = <span class="value">array()</span></h4>
+	<p>[line 43]</p>
+  <br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>mixed</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$valid"></a>
+	<p></p>
+	<h4>$valid = <span class="value">&nbsp;false</span></h4>
+	<p>[line 61]</p>
+  Iterator interface helper<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>mixed</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+	<a name="var$xpath"></a>
+	<p></p>
+	<h4>$xpath = <span class="value">&nbsp;null</span></h4>
+	<p>[line 28]</p>
+  XPath interface.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+
+  <br />
+	<div class="tags">
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><b>Type:</b>&nbsp;&nbsp;</td>
+      <td>DOMXPath</td>
+    </tr>
+      </table>
+	</div><br /><br />
+	<div class="top">[ <a href="#top">Top</a> ]</div><br />
+</div><br />
+
+<hr />
+<a name="class_methods"></a>
+<h3>Class Methods</h3>
+<div class="tags">
+  <hr />
+	<a name="methodextend"></a>
+	<h3>static method extend <span class="smalllinenumber">[line 2084]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>static unknown_type extend(
+$class
+$class, [$file
+$file = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Deprecated, use $pq-&gt;plugin() instead.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>deprecated:</b>&nbsp;&nbsp;</td><td></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">$class&nbsp;&nbsp;</td>
+        <td><b>$class</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">$file&nbsp;&nbsp;</td>
+        <td><b>$file</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+
+  <hr />
+	<a name="method__construct"></a>
+	<h3>constructor __construct <span class="smalllinenumber">[line 75]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup __construct(
+
+$documentID)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$documentID</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodadd"></a>
+	<h3>method add <span class="smalllinenumber">[line 2229]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup add(
+[string|<a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">string|<a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodaddClass"></a>
+	<h3>method addClass <span class="smalllinenumber">[line 2532]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup addClass(
+
+$className)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$className</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodaddClassPHP"></a>
+	<h3>method addClassPHP <span class="smalllinenumber">[line 2550]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup addClassPHP(
+
+$className)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$className</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodafter"></a>
+	<h3>method after <span class="smalllinenumber">[line 1815]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup after(
+
+$content)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$content</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodafterPHP"></a>
+	<h3>method afterPHP <span class="smalllinenumber">[line 1823]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup afterPHP(
+
+$content)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$content</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodancestors"></a>
+	<h3>method ancestors <span class="smalllinenumber">[line 1729]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup ancestors(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodandSelf"></a>
+	<h3>method andSelf <span class="smalllinenumber">[line 2521]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup andSelf(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodappend"></a>
+	<h3>method append <span class="smalllinenumber">[line 1738]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup append(
+
+$content)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$content</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodappendPHP"></a>
+	<h3>method appendPHP <span class="smalllinenumber">[line 1746]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup appendPHP(
+
+$content)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$content</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodappendTo"></a>
+	<h3>method appendTo <span class="smalllinenumber">[line 1754]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup appendTo(
+
+$seletor)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$seletor</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodattr"></a>
+	<h3>method attr <span class="smalllinenumber">[line 2331]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void attr(
+[
+$attr = null], [
+$value = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$attr</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$value</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodattrAppend"></a>
+	<h3>method attrAppend <span class="smalllinenumber">[line 2431]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup attrAppend(
+string
+$attr, mixed
+$value)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><p>jQuery difference.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>use attr() function (encoding issues etc).</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">string&nbsp;&nbsp;</td>
+        <td><b>$attr</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">mixed&nbsp;&nbsp;</td>
+        <td><b>$value</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodattrPHP"></a>
+	<h3>method attrPHP <span class="smalllinenumber">[line 2453]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup attrPHP(
+
+$attr, 
+$value)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>check CDATA ???</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$attr</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$value</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodattrPrepend"></a>
+	<h3>method attrPrepend <span class="smalllinenumber">[line 2414]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup attrPrepend(
+string
+$attr, mixed
+$value)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><p>jQuery difference.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>use attr() function (encoding issues etc).</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">string&nbsp;&nbsp;</td>
+        <td><b>$attr</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">mixed&nbsp;&nbsp;</td>
+        <td><b>$value</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodbefore"></a>
+	<h3>method before <span class="smalllinenumber">[line 1789]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup before(
+
+$content)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$content</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodbeforePHP"></a>
+	<h3>method beforePHP <span class="smalllinenumber">[line 1797]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup beforePHP(
+
+$content)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$content</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodbind"></a>
+	<h3>method bind <span class="smalllinenumber">[line 1282]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup bind(
+unknown_type
+$type, unknown_type
+$data, [unknown_type
+$callback = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Binds a handler to one or more events (like click) for each matched element.<br /><br /><p>Can also bind custom events.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>TODO:</b>&nbsp;&nbsp;</td><td>support more than event in $type (space-separated)</td>
+  </tr>
+  <tr>
+    <td><b>TODO:</b>&nbsp;&nbsp;</td><td>support '!' (exclusive) events</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$type</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$data</b>&nbsp;&nbsp;</td>
+        <td>Optional</td>
+      </tr>
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodchange"></a>
+	<h3>method change <span class="smalllinenumber">[line 1310]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup change(
+[
+$callback = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodchildren"></a>
+	<h3>method children <span class="smalllinenumber">[line 1683]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup children(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodclick"></a>
+	<h3>method click <span class="smalllinenumber">[line 1340]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup click(
+[
+$callback = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodcontents"></a>
+	<h3>method contents <span class="smalllinenumber">[line 1457]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup contents(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodcount"></a>
+	<h3>method count <span class="smalllinenumber">[line 1502]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void count(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>Countable::count</dt>
+					</dl>
+		
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodcss"></a>
+	<h3>method css <span class="smalllinenumber">[line 1227]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQuery.html">phpQuery</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup css(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodcurrent"></a>
+	<h3>method current <span class="smalllinenumber">[line 2705]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void current(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>Iterator::current</dt>
+					</dl>
+		
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methoddebug"></a>
+	<h3>method debug <span class="smalllinenumber">[line 248]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void debug(
+
+$in)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$in</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methoddocumentFragment"></a>
+	<h3>method documentFragment <span class="smalllinenumber">[line 114]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void documentFragment(
+[
+$state = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$state</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methoddump"></a>
+	<h3>method dump <span class="smalllinenumber">[line 2824]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup dump(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Dump htmlOuter and preserve chain. Usefull for debugging.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methoddumpDie"></a>
+	<h3>method dumpDie <span class="smalllinenumber">[line 2838]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void dumpDie(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Dump htmlOuter and stop script execution. Usefull for debugging.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methoddumpWhois"></a>
+	<h3>method dumpWhois <span class="smalllinenumber">[line 2829]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void dumpWhois(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodeach"></a>
+	<h3>method each <span class="smalllinenumber">[line 2654]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup each(
+array|string
+$callback, [
+$param1 = null], [
+$param2 = null], [
+$param3 = null], array
+$scope, array
+$arg1, array
+$arg2)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">array|string&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td>Expects $node as first param, $index as second</td>
+      </tr>
+          <tr>
+        <td class="type">array&nbsp;&nbsp;</td>
+        <td><b>$scope</b>&nbsp;&nbsp;</td>
+        <td>External variables passed to callback. Use compact('varName1', 'varName2'...) and extract($scope)</td>
+      </tr>
+          <tr>
+        <td class="type">array&nbsp;&nbsp;</td>
+        <td><b>$arg1</b>&nbsp;&nbsp;</td>
+        <td>Will ba passed as third and futher args to callback.</td>
+      </tr>
+          <tr>
+        <td class="type">array&nbsp;&nbsp;</td>
+        <td><b>$arg2</b>&nbsp;&nbsp;</td>
+        <td>Will ba passed as fourth and futher args to callback, and so on...</td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$param1</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$param2</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$param3</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodelementsContainsNode"></a>
+	<h3>method elementsContainsNode <span class="smalllinenumber">[line 2251]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void elementsContainsNode(
+
+$nodeToCheck, [
+$elementsStack = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$nodeToCheck</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$elementsStack</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodend"></a>
+	<h3>method end <span class="smalllinenumber">[line 1512]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup end(
+[
+$level = 1])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>$level</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$level</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodeq"></a>
+	<h3>method eq <span class="smalllinenumber">[line 1475]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup eq(
+
+$num)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$num</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodfilter"></a>
+	<h3>method filter <span class="smalllinenumber">[line 1069]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup filter(
+
+$selectors, [
+$_skipHistory = false])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>link:</b>&nbsp;&nbsp;</td><td><a href="http://docs.jquery.com/Traversing/filter">http://docs.jquery.com/Traversing/filter</a></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selectors</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$_skipHistory</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodfilterCallback"></a>
+	<h3>method filterCallback <span class="smalllinenumber">[line 1048]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup filterCallback(
+
+$callback, [
+$_skipHistory = false])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><p>jQuery difference.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>link:</b>&nbsp;&nbsp;</td><td><a href="http://docs.jquery.com/Traversing/filter">http://docs.jquery.com/Traversing/filter</a></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$_skipHistory</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodfind"></a>
+	<h3>method find <span class="smalllinenumber">[line 597]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup find(
+
+$selectors, [
+$context = null], [
+$noHistory = false])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selectors</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$context</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$noHistory</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodget"></a>
+	<h3>method get <span class="smalllinenumber">[line 435]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>array|DOMElement get(
+[int
+$index = null], [
+$callback1 = null], [
+$callback2 = null], [
+$callback3 = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Return matched DOM nodes.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>return:</b>&nbsp;&nbsp;</td><td>Single DOMElement or array of DOMElement.</td>
+  </tr>
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>return DOMNodeList insted of array</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">int&nbsp;&nbsp;</td>
+        <td><b>$index</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback1</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback2</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback3</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodgetDocument"></a>
+	<h3>method getDocument <span class="smalllinenumber">[line 165]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup getDocument(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Returns object with stack set to document root.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodgetDocumentID"></a>
+	<h3>method getDocumentID <span class="smalllinenumber">[line 180]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup getDocumentID(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Get object's Document ID.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodgetDocumentIDRef"></a>
+	<h3>method getDocumentIDRef <span class="smalllinenumber">[line 156]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup getDocumentIDRef(
+
+&$documentID, unknown_type
+$domId)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Saves object's DocumentID to $var by reference.<br /><br /><p><ol><li><div class="src-line">&nbsp;<span class="src-var">$myDocumentId</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;<span class="src-id"><a href="../phpQuery/phpQuery.html">phpQuery</a></span><span class="src-sym">::</span><a href="../phpQuery/phpQuery.html#methodnewDocument">newDocument</a><span class="src-sym">(</span><span class="src-str">'&lt;div/&gt;'</span><span class="src-sym">)</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">-&gt;</span><a href="../phpQuery/phpQueryObject.html#methodgetDocumentIDRef">getDocumentIDRef</a><span class="src-sym">(</span><span class="src-var">$myDocumentId</span><span class="src-sym">)</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">-&gt;</span><a href="../phpQuery/phpQueryObject.html#methodfind">find</a><span class="src-sym">(</span><span class="src-str">'div'</span><span class="src-sym">)</span><span class="src-sym">-&gt;</span>...</div></li>
+</ol></p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>see:</b>&nbsp;&nbsp;</td><td>phpQuery::newDocument</td>
+  </tr>
+  <tr>
+    <td><b>see:</b>&nbsp;&nbsp;</td><td>phpQuery::newDocumentFile</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$domId</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>&$documentID</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodgetDOMDocument"></a>
+	<h3>method getDOMDocument <span class="smalllinenumber">[line 172]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>DOMDocument getDOMDocument(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodgetElementSiblings"></a>
+	<h3>method getElementSiblings <span class="smalllinenumber">[line 2163]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void getElementSiblings(
+
+$direction, [
+$selector = null], [
+$limitToOne = false])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$direction</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$limitToOne</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodgetNodeAttrs"></a>
+	<h3>method getNodeAttrs <span class="smalllinenumber">[line 2439]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void getNodeAttrs(
+
+$node)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$node</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodgetNodeXpath"></a>
+	<h3>method getNodeXpath <span class="smalllinenumber">[line 2768]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>string getNodeXpath(
+[unknown_type
+$oneNode = null], [
+$namespace = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Returns node's XPath.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>TODO:</b>&nbsp;&nbsp;</td><td>use native getNodePath is avaible</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$oneNode</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$namespace</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodgetString"></a>
+	<h3>method getString <span class="smalllinenumber">[line 457]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>array|string getString(
+[int
+$index = null], [
+$callback1 = null], [
+$callback2 = null], [
+$callback3 = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Return matched DOM nodes.<br /><br /><p>jQuery difference.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>return:</b>&nbsp;&nbsp;</td><td>Returns string if $index != null</td>
+  </tr>
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>implement callbacks</td>
+  </tr>
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>return only arrays ?</td>
+  </tr>
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>maybe other name...</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">int&nbsp;&nbsp;</td>
+        <td><b>$index</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback1</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback2</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback3</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodhasClass"></a>
+	<h3>method hasClass <span class="smalllinenumber">[line 2579]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>bool hasClass(
+string
+$className)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">string&nbsp;&nbsp;</td>
+        <td><b>$className</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodhide"></a>
+	<h3>method hide <span class="smalllinenumber">[line 1243]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void hide(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodhtml"></a>
+	<h3>method html <span class="smalllinenumber">[line 1623]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>string|<a href="../phpQuery/phpQuery.html">phpQuery</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup html(
+[unknown_type
+$html = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$html</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodhtmlOuter"></a>
+	<h3>method htmlOuter <span class="smalllinenumber">[line 1649]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>String htmlOuter(
+[
+$callback1 = null], [
+$callback2 = null], [
+$callback3 = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback1</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback2</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback3</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodimportNodes"></a>
+	<h3>method importNodes <span class="smalllinenumber">[line 2239]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void importNodes(
+
+$nodes)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$nodes</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodindex"></a>
+	<h3>method index <span class="smalllinenumber">[line 1998]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>Int index(
+
+$subject)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$subject</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodinsert"></a>
+	<h3>method insert <span class="smalllinenumber">[line 1842]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup insert(
+unknown_type
+$target, unknown_type
+$type)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Various insert scenarios.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$target</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$type</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodinsertAfter"></a>
+	<h3>method insertAfter <span class="smalllinenumber">[line 1831]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup insertAfter(
+
+$seletor)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$seletor</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodinsertBefore"></a>
+	<h3>method insertBefore <span class="smalllinenumber">[line 1806]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup insertBefore(
+String|<a href="../phpQuery/phpQuery.html">phpQuery</a>
+$seletor)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String|<a href="../phpQuery/phpQuery.html">phpQuery</a>&nbsp;&nbsp;</td>
+        <td><b>$seletor</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodis"></a>
+	<h3>method is <span class="smalllinenumber">[line 1023]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup is(
+
+$selector, [
+$nodes = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$nodes</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodisChar"></a>
+	<h3>method isChar <span class="smalllinenumber">[line 273]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>bool isChar(
+string
+$char)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Determines if $char is really a char.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>rewrite me to charcode range ! ;)</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">string&nbsp;&nbsp;</td>
+        <td><b>$char</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodisHTML"></a>
+	<h3>method isHTML <span class="smalllinenumber">[line 193]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void isHTML(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodisRegexp"></a>
+	<h3>method isRegexp <span class="smalllinenumber">[line 260]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void isRegexp(
+
+$pattern)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$pattern</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodisRoot"></a>
+	<h3>method isRoot <span class="smalllinenumber">[line 121]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void isRoot(
+
+$node)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$node</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodisXHTML"></a>
+	<h3>method isXHTML <span class="smalllinenumber">[line 196]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void isXHTML(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodisXML"></a>
+	<h3>method isXML <span class="smalllinenumber">[line 199]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void isXML(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodkey"></a>
+	<h3>method key <span class="smalllinenumber">[line 2709]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void key(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>Iterator::key</dt>
+					</dl>
+		
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodlength"></a>
+	<h3>method length <span class="smalllinenumber">[line 1499]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup length(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodload"></a>
+	<h3>method load <span class="smalllinenumber">[line 1184]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQuery.html">phpQuery</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup load(
+
+$url, [
+$data = null], [
+$callback = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>link:</b>&nbsp;&nbsp;</td><td><a href="http://docs.jquery.com/Ajax/load">http://docs.jquery.com/Ajax/load</a></td>
+  </tr>
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>Support $selector</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$url</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$data</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodmap"></a>
+	<h3>method map <span class="smalllinenumber">[line 2671]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup map(
+
+$callback, [
+$param1 = null], [
+$param2 = null], [
+$param3 = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>add $scope and $args as in each() ???</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$param1</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$param2</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$param3</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodmarkup"></a>
+	<h3>method markup <span class="smalllinenumber">[line 1599]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>unknown_type markup(
+[$markup
+$markup = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		jQuey difference<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">$markup&nbsp;&nbsp;</td>
+        <td><b>$markup</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodmarkupOuter"></a>
+	<h3>method markupOuter <span class="smalllinenumber">[line 1611]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>unknown_type markupOuter(
+$markup
+0)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		jQuey difference<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">$markup&nbsp;&nbsp;</td>
+        <td><b>0</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodmatchClasses"></a>
+	<h3>method matchClasses <span class="smalllinenumber">[line 503]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>boolean matchClasses(
+unknown_type
+$class, unknown_type
+$node)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><p>In the future, when PHP will support XLS 2.0, then we would do that this way:  contains(tokenize(@class, '\s'), &quot;something&quot;)</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$class</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$node</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodmerge"></a>
+	<h3>method merge <span class="smalllinenumber">[line 2244]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void merge(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodnewInstance"></a>
+	<h3>method newInstance <span class="smalllinenumber">[line 477]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void newInstance(
+[array
+$newStack = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Returns new instance of actual class.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">array&nbsp;&nbsp;</td>
+        <td><b>$newStack</b>&nbsp;&nbsp;</td>
+        <td>Optional. Will replace old stack with new and move old one to history.c</td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodnext"></a>
+	<h3>method next <span class="smalllinenumber">[line 2723]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup next(
+[
+$cssSelector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Double-function method.<br /><br /><p>First: main iterator interface method.  Second: Returning next sibling, alias for _next().</p><p>Proper functionality is choosed automagicaly.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>see:</b>&nbsp;&nbsp;</td><td><a href="../phpQuery/phpQueryObject.html#method_next">phpQueryObject::_next()</a></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>Iterator::next</dt>
+					</dl>
+		
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$cssSelector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodnextAll"></a>
+	<h3>method nextAll <span class="smalllinenumber">[line 2157]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup nextAll(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>FIXME: returns source elements insted of next siblings</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodnot"></a>
+	<h3>method not <span class="smalllinenumber">[line 2207]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup not(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodoffsetExists"></a>
+	<h3>method offsetExists <span class="smalllinenumber">[line 2745]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void offsetExists(
+
+$offset)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>ArrayAccess::offsetExists</dt>
+					</dl>
+		
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$offset</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodoffsetGet"></a>
+	<h3>method offsetGet <span class="smalllinenumber">[line 2748]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void offsetGet(
+
+$offset)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>ArrayAccess::offsetGet</dt>
+					</dl>
+		
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$offset</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodoffsetSet"></a>
+	<h3>method offsetSet <span class="smalllinenumber">[line 2751]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void offsetSet(
+
+$offset, 
+$value)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>ArrayAccess::offsetSet</dt>
+					</dl>
+		
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$offset</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$value</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodoffsetUnset"></a>
+	<h3>method offsetUnset <span class="smalllinenumber">[line 2755]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void offsetUnset(
+
+$offset)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>ArrayAccess::offsetUnset</dt>
+					</dl>
+		
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$offset</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodparent"></a>
+	<h3>method parent <span class="smalllinenumber">[line 2267]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup parent(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodparents"></a>
+	<h3>method parents <span class="smalllinenumber">[line 2284]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup parents(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodparseSelector"></a>
+	<h3>method parseSelector <span class="smalllinenumber">[line 276]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void parseSelector(
+
+$query)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$query</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodphp"></a>
+	<h3>method php <span class="smalllinenumber">[line 1671]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup php(
+[
+$code = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Just like html(), but returns markup with VALID (dangerous) PHP tags.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>support returning markup with PHP tags when called without param</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$code</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodplugin"></a>
+	<h3>method plugin <span class="smalllinenumber">[line 2072]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup plugin(
+
+$class, [
+$file = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$class</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$file</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodprepend"></a>
+	<h3>method prepend <span class="smalllinenumber">[line 1763]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup prepend(
+
+$content)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$content</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodprependPHP"></a>
+	<h3>method prependPHP <span class="smalllinenumber">[line 1772]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup prependPHP(
+
+$content)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>accept many arguments, which are joined, arrays maybe also</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$content</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodprependTo"></a>
+	<h3>method prependTo <span class="smalllinenumber">[line 1780]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup prependTo(
+
+$seletor)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$seletor</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodprev"></a>
+	<h3>method prev <span class="smalllinenumber">[line 2137]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup prev(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodprevAll"></a>
+	<h3>method prevAll <span class="smalllinenumber">[line 2147]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup prevAll(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodpseudoClasses"></a>
+	<h3>method pseudoClasses <span class="smalllinenumber">[line 746]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void pseudoClasses(
+
+$class)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>create API for classes with pseudoselectors</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$class</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodremove"></a>
+	<h3>method remove <span class="smalllinenumber">[line 1579]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup remove(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodremoveAttr"></a>
+	<h3>method removeAttr <span class="smalllinenumber">[line 2484]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup removeAttr(
+
+$attr)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$attr</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodremoveClass"></a>
+	<h3>method removeClass <span class="smalllinenumber">[line 2592]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup removeClass(
+
+$className)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$className</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodreplaceAll"></a>
+	<h3>method replaceAll <span class="smalllinenumber">[line 1566]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup replaceAll(
+String
+$selector)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>this works ?</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodreplaceWith"></a>
+	<h3>method replaceWith <span class="smalllinenumber">[line 1555]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup replaceWith(
+String|<a href="../phpQuery/phpQuery.html">phpQuery</a>
+$content)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>link:</b>&nbsp;&nbsp;</td><td><a href="http://docs.jquery.com/Manipulation/replaceWith#content">http://docs.jquery.com/Manipulation/replaceWith#content</a></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String|<a href="../phpQuery/phpQuery.html">phpQuery</a>&nbsp;&nbsp;</td>
+        <td><b>$content</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodreplaceWithPHP"></a>
+	<h3>method replaceWithPHP <span class="smalllinenumber">[line 1544]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup replaceWithPHP(
+
+$code)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$code</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodreverse"></a>
+	<h3>method reverse <span class="smalllinenumber">[line 2040]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup reverse(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodrewind"></a>
+	<h3>method rewind <span class="smalllinenumber">[line 2691]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void rewind(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>Iterator::rewind</dt>
+					</dl>
+		
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodrunQuery"></a>
+	<h3>method runQuery <span class="smalllinenumber">[line 530]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void runQuery(
+
+$XQuery, [
+$selector = null], [
+$compare = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$XQuery</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$compare</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodselect"></a>
+	<h3>method select <span class="smalllinenumber">[line 1320]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup select(
+[
+$callback = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodserialize"></a>
+	<h3>method serialize <span class="smalllinenumber">[line 208]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>string serialize(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>link:</b>&nbsp;&nbsp;</td><td><a href="http://docs.jquery.com/Ajax/serialize">http://docs.jquery.com/Ajax/serialize</a></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodserializeArray"></a>
+	<h3>method serializeArray <span class="smalllinenumber">[line 218]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>array serializeArray(
+[
+$submit = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>link:</b>&nbsp;&nbsp;</td><td><a href="http://docs.jquery.com/Ajax/serializeArray">http://docs.jquery.com/Ajax/serializeArray</a></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$submit</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodshow"></a>
+	<h3>method show <span class="smalllinenumber">[line 1235]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void show(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodsiblings"></a>
+	<h3>method siblings <span class="smalllinenumber">[line 2189]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup siblings(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodsize"></a>
+	<h3>method size <span class="smalllinenumber">[line 1489]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup size(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodslice"></a>
+	<h3>method slice <span class="smalllinenumber">[line 2019]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup slice(
+unknown_type
+$start, [unknown_type
+$end = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$start</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$end</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodstack"></a>
+	<h3>method stack <span class="smalllinenumber">[line 2320]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>string|array|<a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup stack(
+[
+$nodeTypes = null], unknown_type
+$attr, unknown_type
+$value)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Attribute method.<br /><br /><p>Accepts * for all attributes (for setting and getting)</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>uncheck other radios in group</td>
+  </tr>
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>* *`val($val)`* Checks, or selects, all the radio buttons, checkboxes, and select options that match the set of values.</td>
+  </tr>
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>select event</td>
+  </tr>
+  <tr>
+    <td><b>todo:</b>&nbsp;&nbsp;</td><td>unselect other selecte's options when !multiply</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$attr</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$value</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$nodeTypes</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodstackIsRoot"></a>
+	<h3>method stackIsRoot <span class="smalllinenumber">[line 127]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void stackIsRoot(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodsubmit"></a>
+	<h3>method submit <span class="smalllinenumber">[line 1330]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup submit(
+[
+$callback = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodtext"></a>
+	<h3>method text <span class="smalllinenumber">[line 2050]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>string text(
+[
+$text = null], [
+$callback1 = null], [
+$callback2 = null], [
+$callback3 = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Return joined text content.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$text</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback1</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback2</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback3</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodtoggleClass"></a>
+	<h3>method toggleClass <span class="smalllinenumber">[line 2611]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup toggleClass(
+
+$className)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$className</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodtoReference"></a>
+	<h3>method toReference <span class="smalllinenumber">[line 111]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup toReference(
+
+&$var, <a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>
+$var)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Saves actual object to $var by reference.<br /><br /><p>Useful when need to break chain.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type"><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>&nbsp;&nbsp;</td>
+        <td><b>$var</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>&$var</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodtoRoot"></a>
+	<h3>method toRoot <span class="smalllinenumber">[line 137]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup toRoot(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><p>NON JQUERY METHOD</p><p>TODO SUPPORT FOR end() !!! Causing problems in queryTemplates...</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodtrigger"></a>
+	<h3>method trigger <span class="smalllinenumber">[line 1255]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup trigger(
+unknown_type
+$type, [unknown_type
+$data = array()])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Trigger a type of event on every matched element.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>TODO:</b>&nbsp;&nbsp;</td><td>support more than event in $type (space-separated)</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$type</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$data</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodtriggerHandler"></a>
+	<h3>method triggerHandler <span class="smalllinenumber">[line 1268]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup triggerHandler(
+unknown_type
+$type, [unknown_type
+$data = array()])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		This particular method triggers all bound event handlers on an element (for a specific event type) WITHOUT executing the browsers default actions.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>TODO:</b>&nbsp;&nbsp;</td><td></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$type</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$data</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodunbind"></a>
+	<h3>method unbind <span class="smalllinenumber">[line 1300]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>unknown unbind(
+[unknown_type
+$type = null], [unknown_type
+$callback = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>TODO:</b>&nbsp;&nbsp;</td><td>support more than event in $type (space-separated)</td>
+  </tr>
+  <tr>
+    <td><b>TODO:</b>&nbsp;&nbsp;</td><td>namespace events</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$type</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">unknown_type&nbsp;&nbsp;</td>
+        <td><b>$callback</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodunloadDocument"></a>
+	<h3>method unloadDocument <span class="smalllinenumber">[line 190]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup unloadDocument(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Unloads whole document from memory.<br /><br /><p>CAUTION! None further operations will be possible on this document.  All objects refering to it will be useless.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodunwrapContent"></a>
+	<h3>method unwrapContent <span class="smalllinenumber">[line 1708]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup unwrapContent(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><p>jQuery difference.</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodval"></a>
+	<h3>method val <span class="smalllinenumber">[line 2501]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>String val(
+[
+$val = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Return form element value.<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>return:</b>&nbsp;&nbsp;</td><td>Fields value.</td>
+  </tr>
+  <tr>
+    <td><b>TODO:</b>&nbsp;&nbsp;</td><td>$val</td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$val</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodvalid"></a>
+	<h3>method valid <span class="smalllinenumber">[line 2739]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void valid(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+			<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt>Iterator::valid</dt>
+					</dl>
+		
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodwhois"></a>
+	<h3>method whois <span class="smalllinenumber">[line 2801]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void whois(
+[
+$oneNode = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$oneNode</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodwrap"></a>
+	<h3>method wrap <span class="smalllinenumber">[line 1410]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup wrap(
+String|<a href="../phpQuery/phpQuery.html">phpQuery</a>
+$wrapper)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String|<a href="../phpQuery/phpQuery.html">phpQuery</a>&nbsp;&nbsp;</td>
+        <td><b>$wrapper</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodwrapAll"></a>
+	<h3>method wrapAll <span class="smalllinenumber">[line 1370]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup wrapAll(
+String|<a href="../phpQuery/phpQuery.html">phpQuery</a>
+$wrapper)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><p>TODO testme...</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String|<a href="../phpQuery/phpQuery.html">phpQuery</a>&nbsp;&nbsp;</td>
+        <td><b>$wrapper</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodwrapAllOld"></a>
+	<h3>method wrapAllOld <span class="smalllinenumber">[line 1351]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup wrapAllOld(
+String|<a href="../phpQuery/phpQuery.html">phpQuery</a>
+$wrapper)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String|<a href="../phpQuery/phpQuery.html">phpQuery</a>&nbsp;&nbsp;</td>
+        <td><b>$wrapper</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodwrapAllPHP"></a>
+	<h3>method wrapAllPHP <span class="smalllinenumber">[line 1394]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup wrapAllPHP(
+String|<a href="../phpQuery/phpQuery.html">phpQuery</a>
+$codeBefore, 
+$codeAfter)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><p>NON JQUERY METHOD</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String|<a href="../phpQuery/phpQuery.html">phpQuery</a>&nbsp;&nbsp;</td>
+        <td><b>$codeBefore</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$codeAfter</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodwrapInner"></a>
+	<h3>method wrapInner <span class="smalllinenumber">[line 1434]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup wrapInner(
+String|<a href="../phpQuery/phpQuery.html">phpQuery</a>
+$wrapper)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String|<a href="../phpQuery/phpQuery.html">phpQuery</a>&nbsp;&nbsp;</td>
+        <td><b>$wrapper</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodwrapInnerPHP"></a>
+	<h3>method wrapInnerPHP <span class="smalllinenumber">[line 1446]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup wrapInnerPHP(
+String|<a href="../phpQuery/phpQuery.html">phpQuery</a>
+$wrapper)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String|<a href="../phpQuery/phpQuery.html">phpQuery</a>&nbsp;&nbsp;</td>
+        <td><b>$wrapper</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodwrapPHP"></a>
+	<h3>method wrapPHP <span class="smalllinenumber">[line 1422]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup wrapPHP(
+String|<a href="../phpQuery/phpQuery.html">phpQuery</a>
+$codeBefore, 
+$codeAfter)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">String|<a href="../phpQuery/phpQuery.html">phpQuery</a>&nbsp;&nbsp;</td>
+        <td><b>$codeBefore</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$codeAfter</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodxml"></a>
+	<h3>method xml <span class="smalllinenumber">[line 1641]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void xml(
+[
+$xml = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$xml</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="methodxmlOuter"></a>
+	<h3>method xmlOuter <span class="smalllinenumber">[line 1658]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void xmlOuter(
+[
+$callback1 = null], [
+$callback2 = null], [
+$callback3 = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback1</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback2</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$callback3</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method_clone"></a>
+	<h3>method _clone <span class="smalllinenumber">[line 1527]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup _clone(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Enter description here...<br /><br /><p>Normal use -&gt;clone() .</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method_empty"></a>
+	<h3>method _empty <span class="smalllinenumber">[line 2637]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup _empty(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Proper name without underscore (just -&gt;empty()) also works.<br /><br /><p>Removes all child nodes from the set of matched elements.</p><p>Example:  pq(&quot;p&quot;)._empty()</p><p>HTML:  &lt;p&gt;Hello, &lt;span&gt;Person&lt;/span&gt; &lt;a href=&quot;#&quot;&gt;and person&lt;/a&gt;&lt;/p&gt;</p><p>Result:  [ &lt;p&gt;&lt;/p&gt; ]</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method_next"></a>
+	<h3>method _next <span class="smalllinenumber">[line 2116]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup _next(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Safe rename of next().<br /><br /><p>Use it ONLY when need to call next() on an iterated object (in same time).  Normaly there is no need to do such thing ;)</p><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method_prev"></a>
+	<h3>method _prev <span class="smalllinenumber">[line 2128]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code><a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup _prev(
+[
+$selector = null])</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		Use prev() and next().<br /><br /><br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>deprecated:</b>&nbsp;&nbsp;</td><td></td>
+  </tr>
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$selector</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method__call"></a>
+	<h3>method __call <span class="smalllinenumber">[line 2087]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void __call(
+
+$method, 
+$args)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$method</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$args</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method__get"></a>
+	<h3>method __get <span class="smalllinenumber">[line 95]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void __get(
+
+$attr)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$attr</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method__loadSuccess"></a>
+	<h3>method __loadSuccess <span class="smalllinenumber">[line 1212]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>unknown_type __loadSuccess(
+$html
+$html)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">$html&nbsp;&nbsp;</td>
+        <td><b>$html</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method__pseudoClassParam"></a>
+	<h3>method __pseudoClassParam <span class="smalllinenumber">[line 1015]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void __pseudoClassParam(
+
+$paramsString)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>protected</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$paramsString</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method__toString"></a>
+	<h3>method __toString <span class="smalllinenumber">[line 1662]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void __toString(
+)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
+	<a name="method___wrapAllCallback"></a>
+	<h3>method ___wrapAllCallback <span class="smalllinenumber">[line 1380]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>void ___wrapAllCallback(
+
+$node)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$node</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+</div><br />
+
+
+        <div class="credit">
+		    <hr />
+		    Documentation generated on Thu, 23 Oct 2008 17:57:02 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.4.2</a>
+	      </div>
+      </td></tr></table>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

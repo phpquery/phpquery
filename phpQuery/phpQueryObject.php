@@ -2554,7 +2554,7 @@ class phpQueryObject
 	 * @TODO $val
 	 */
 	public function val($val = null) {
-		if (isset($val)) {
+		if (! isset($val)) {
 			if ($this->eq(0)->is('select')) {
 					$selected = $this->eq(0)->find('option[selected=selected]');
 					if ($selected->is('[value]'))
@@ -2572,7 +2572,7 @@ class phpQueryObject
 					$checked = in_array($node->attr('value'), $val)
 							|| in_array($node->attr('name'), $val);
 					$node->attr('checked', $checked);
-				} else if ($node->tagName == 'select') {
+				} else if ($node->get(0)->tagName == 'select') {
 					if (! is_array($val))
 						$val = array($val);
 					foreach($node['option'] as $option) {
@@ -2585,11 +2585,12 @@ class phpQueryObject
 							$option->removeAttr('selected', 'selected');
 					}
 				} else if ($node->get(0)->tagName == 'textarea')
+					$node->markup($val);
+				else
 					$node->attr('value', $val);
-					else
-						$node->attr('value', $val);
 			}
 		}
+		return $this;
 	}
 
 	/**

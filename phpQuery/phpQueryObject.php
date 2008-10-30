@@ -1644,6 +1644,7 @@ class phpQueryObject
 	 *
 	 * @param $markup
 	 * @return unknown_type
+	 * @TODO trigger change event for textarea
 	 */
 	public function markup($markup = null) {
 		if ($this->documentWrapper->isXML)
@@ -2305,6 +2306,7 @@ class phpQueryObject
 	}
 	/**
 	 * @access private
+	 * TODO refactor to stackContainsNode
 	 */
 	protected function elementsContainsNode($nodeToCheck, $elementsStack = null) {
 		$loop = ! is_null($elementsStack)
@@ -2347,20 +2349,19 @@ class phpQueryObject
 			$test = $node;
 			while( $test->parentNode ) {
 				$test = $test->parentNode;
-				if ( is_a($test, 'DOMDocument') )
+				if ($this->isRoot($test))
 					break;
-				if ( $selector ) {
-					if ( $this->is( $selector, $test ) && ! $this->elementsContainsNode($test, $stack) ) {
-						$stack[] = $test;
-						continue;
-					}
-				} else if (! $this->elementsContainsNode($test, $stack) ) {
+				if (! $this->elementsContainsNode($test, $stack) ) {
 					$stack[] = $test;
 					continue;
 				}
 			}
 		}
-		return $this->newInstance($stack);
+		$this->elementsBackup = $this->elements;
+		$this->elements = $stack;
+		if ( $selector )
+			$this->filter($selector, true);
+		return $this->newInstance();
 	}
 
 	/**
@@ -2435,10 +2436,7 @@ class phpQueryObject
 							));
 						}
 					}
-					if ($value)
-						$node->setAttribute($a, $value);
-					else
-						$node->removeAttribute($a);
+					$node->setAttribute($a, $value);
 					if ($event) {
 						phpQueryEvents::trigger($this->getDocumentID(),
 							$event->type, array($event)
@@ -2551,7 +2549,6 @@ class phpQueryObject
 	 * Return form element value.
 	 *
 	 * @return String Fields value.
-	 * @TODO $val
 	 */
 	public function val($val = null) {
 		if (! isset($val)) {
@@ -2582,7 +2579,7 @@ class phpQueryObject
 						if ($selected)
 							$option->attr('selected', 'selected');
 						else
-							$option->removeAttr('selected', 'selected');
+							$option->removeAttr('selected');
 					}
 				} else if ($node->get(0)->tagName == 'textarea')
 					$node->markup($val);

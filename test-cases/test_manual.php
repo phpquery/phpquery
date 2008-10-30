@@ -13,6 +13,7 @@ phpQuery::$debug = 2;
 //$doc['p:first']->append($string)->dump();
 
 /*
+ *
 $doc1 = phpQuery::newDocumentFileXHTML('doc1.html');
 $doc2 = phpQuery::newDocumentFileXHTML('doc2.html');
 $doc3 = phpQuery::newDocumentFileXHTML('doc3.html');
@@ -46,3 +47,15 @@ print $doc1->plugin('Scripts')->script('safe_print');
 // http://code.google.com/p/phpquery/issues/detail?id=69
 //$doc = phpQuery::newDocumentXML('<p class="test">123<span/>123</p>');
 //$doc['[class^="test"]']->dump();
+
+// http://code.google.com/p/phpquery/issues/detail?id=71
+// $doc = phpQuery::newDocument('<input value=""/>');
+// print $doc['input']->val('new')->val();
+
+// http://code.google.com/p/phpquery/issues/detail?id=71
+// $doc = phpQuery::newDocument('<select><option value="10">10</option><option value="10">20</option></select>');
+// $doc['select']->val('20')->dump();
+
+// http://code.google.com/p/phpquery/issues/detail?id=73
+$doc = phpQuery::newDocument('<input value=""/>');
+var_dump($doc['input']->val(0)->val());

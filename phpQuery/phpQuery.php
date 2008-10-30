@@ -101,7 +101,7 @@ abstract class phpQuery {
 	 * Use pq() as shortcut.
 	 *
 	 * In below examples, $pq is any result of pq(); function.
-	 * *************
+	 *
 	 * 1. Import markup into existing document (without any attaching):
 	 * - Import into selected document:
 	 *   pq('<div/>')				// DOESNT accept text nodes at beginning of input string !
@@ -111,7 +111,7 @@ abstract class phpQuery {
 	 *   pq('<div/>', DOMNode)
 	 * - Import into document from phpQuery object:
 	 *   pq('<div/>', $pq)
-	 * *************
+	 *
 	 * 2. Run query:
 	 * - Run query on last selected document:
 	 *   pq('div.myClass')
@@ -124,14 +124,10 @@ abstract class phpQuery {
 	 *   pq('div.myClass', $pq)
 	 *
 	 * @param string|DOMNode|DOMNodeList|array	$arg1	HTML markup, CSS Selector, DOMNode or array of DOMNodes
-	 * @param string|phpQuery|DOMNode	$context	DOM ID from $pq->getDocumentID(), phpQuery object (determines also query root) or DOMNode (determines also query root)
+	 * @param string|phpQueryObject|DOMNode	$context	DOM ID from $pq->getDocumentID(), phpQuery object (determines also query root) or DOMNode (determines also query root)
 	 *
-	 * @return	phpQuery|false			phpQuery object or false in case of error.
-	 */
-	/**
-	 * Enter description here...
-	 *
-	 * @return false|phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery|false
+   * phpQuery object or false in case of error.
 	 */
 	public static function pq($arg1, $context = null) {
 		if (! $context) {
@@ -295,7 +291,7 @@ abstract class phpQuery {
 	}
 	public static function markupToPHP($content) {
 		if ($content instanceof phpQueryObject)
-			$content = $content->htmlOuter();
+			$content = $content->markupOuter();
 		/* <php>...</php> to <?php...?> */
 		$content = preg_replace_callback(
 			'@<php>\s*<!--(.*?)-->\s*</php>@s',
@@ -427,7 +423,10 @@ abstract class phpQuery {
 			return;
 		if (! $file)
 			$file = $class.'.php';
-		require_once($file);
+		$objectClassExists = class_exists('phpQueryObjectPlugin_'.$class);
+		$staticClassExists = class_exists('phpQueryPlugin_'.$class);
+		if (! $objectClassExists && ! $staticClassExists)
+			require_once($file);
 		self::$pluginsLoaded[] = $class;
 		// static methods
 		if (class_exists('phpQueryPlugin_'.$class)) {
@@ -855,7 +854,7 @@ abstract class phpQuery {
 	 * @param $paramStructure
 	 * @return unknown_type
 	 */
-	public static function callbackRun($callback, $params, $paramStructure = null) {
+	public static function callbackRun($callback, $params = null, $paramStructure = null) {
 		if (! $callback)
 			return;
 		if ($callback instanceof CallbackReference) {

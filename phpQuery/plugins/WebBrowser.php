@@ -61,7 +61,8 @@ class phpQueryPlugin_WebBrowser {
 	 * @param $param3
 	 * @return Zend_Http_Client
 	 */
-	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
+	public static function browserGet($url, $callback,
+		$param1 = null, $param2 = null, $param3 = null) {
 		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
 			'type' => 'GET',
@@ -95,7 +96,8 @@ class phpQueryPlugin_WebBrowser {
 	 * @param $param3
 	 * @return Zend_Http_Client
 	 */
-	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
+	public static function browserPost($url, $data, $callback,
+		$param1 = null, $param2 = null, $param3 = null) {
 		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
 			'type' => 'POST',
@@ -129,7 +131,8 @@ class phpQueryPlugin_WebBrowser {
 	 * @param $param3
 	 * @return Zend_Http_Client
 	 */
-	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
+	public static function browser($ajaxSettings, $callback,
+		$param1 = null, $param2 = null, $param3 = null) {
 		self::authorizeHost($ajaxSettings['url']);
 		$xhr = phpQuery::ajax(
 			self::ajaxSettingsPrepare($ajaxSettings)
@@ -177,7 +180,8 @@ class phpQueryPlugin_WebBrowser {
 		$pq = phpQuery::newDocument($body);
 		$pq->document->xhr = $xhr;
 		$pq->document->location = $xhr->getUri(true);
-		$refresh = $pq->find('meta[http-equiv=refresh]')->add('meta[http-equiv=Refresh]');
+		$refresh = $pq->find('meta[http-equiv=refresh]')
+			->add('meta[http-equiv=Refresh]');
 		if ($refresh->size()) {
 //			print htmlspecialchars(var_export($xhr->getCookieJar()->getAllCookies(), true));
 //			print htmlspecialchars(var_export($xhr->getLastResponse()->getHeader('Set-Cookie'), true));

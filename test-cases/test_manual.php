@@ -57,5 +57,16 @@ print $doc1->plugin('Scripts')->script('safe_print');
 // $doc['select']->val('20')->dump();
 
 // http://code.google.com/p/phpquery/issues/detail?id=73
-$doc = phpQuery::newDocument('<input value=""/>');
-var_dump($doc['input']->val(0)->val());
+// $doc = phpQuery::newDocument('<input value=""/>');
+// var_dump($doc['input']->val(0)->val());
+
+// $a = null;
+// new CallbackReference($a);
+// phpQuery::callbackRun(new CallbackReference($a), array('new $a value'));
+// var_dump($a);
+
+// check next() inside (also, but separatly)
+// $inputs->dump();
+// foreach($inputs as $node) {
+// }
+// $inputs->dump();

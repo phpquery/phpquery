@@ -67,9 +67,9 @@ class phpQueryEvents {
 								: null;
 							$params = array_merge(array($event), $data);
 							$return = phpQuery::callbackRun($handler['callback'], $params);
-						}
-						if ($return === false) {
-							$event->bubbles = false;
+							if ($return === false) {
+								$event->bubbles = false;
+							}
 						}
 					}
 				}

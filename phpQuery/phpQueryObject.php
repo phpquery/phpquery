@@ -463,7 +463,6 @@ class phpQueryObject
 	/**
 	 * Return matched DOM nodes.
 	 *
-	 * @todo return DOMNodeList insted of array
 	 * @param int $index
 	 * @return array|DOMElement Single DOMElement or array of DOMElement.
 	 */
@@ -475,7 +474,11 @@ class phpQueryObject
 		$args = func_get_args();
 		$args = array_slice($args, 1);
 		foreach($args as $callback) {
-			$return = phpQuery::callbackRun($callback, array($return));
+			if (is_array($return))
+				foreach($return as $k => $v)
+					$return[$k] = phpQuery::callbackRun($callback, array($v));
+			else
+				$return = phpQuery::callbackRun($callback, array($return));
 		}
 		return $return;
 	}
@@ -1268,6 +1271,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @return phpQuery|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @todo
 	 */
 	public function css() {
 		// TODO
@@ -1325,7 +1329,8 @@ class phpQueryObject
 	 * @TODO support more than event in $type (space-separated)
 	 */
 	public function bind($type, $data, $callback = null) {
-		if (is_null($callback) && is_callable($data)) {
+		// TODO check if $data is callable, not using is_callable
+		if (! isset($callback)) {
 			$callback = $data;
 			$data = null;
 		}
@@ -1682,7 +1687,6 @@ class phpQueryObject
 				if (($this->isXHTML() || $this->isHTML()) && $node->tagName == 'textarea')
 					$oldHtml = pq($node, $this->getDocumentID())->markup();
 				foreach($nodes as $newNode) {
-					if ($node->tagName == 'textarea')
 					$node->appendChild($alreadyAdded
 						? $newNode->cloneNode(true)
 						: $newNode
@@ -2292,6 +2296,7 @@ class phpQueryObject
 			}
 		} else {
 			$matched = array();
+			// simulate OR in filter() instead of AND 5y
 			foreach($this->parseSelector($selector) as $s) {
 				$matched = array_merge($matched,
 					$this->filter(array($s))->stack()
@@ -2596,9 +2601,12 @@ class phpQueryObject
 			foreach($this->stack(1) as $node) {
 				$node = pq($node, $this->getDocumentID());
 				if (is_array($val) && in_array($node->attr('type'), array('checkbox', 'radio'))) {
-					$checked = in_array($node->attr('value'), $val)
+					$isChecked = in_array($node->attr('value'), $val)
 							|| in_array($node->attr('name'), $val);
-					$node->attr('checked', $checked);
+					if ($isChecked)
+						$node->attr('checked', 'checked');
+					else
+						$node->removeAttr('checked');
 				} else if ($node->get(0)->tagName == 'select') {
 					if (! is_array($val))
 						$val = array($val);
@@ -2807,16 +2815,16 @@ class phpQueryObject
 		$this->valid = isset( $this->elements[0] )
 			? 1
 			: 0;
-		$this->elements = $this->valid
-			? array($this->elements[0])
-			: array();
+// 		$this->elements = $this->valid
+// 			? array($this->elements[0])
+// 			: array();
 		$this->current = 0;
 	}
 	/**
    * @access private
 	 */
 	public function current(){
-		return $this->elements[0];
+		return $this->elementsInterator[ $this->current ];
 	}
 	/**
    * @access private
@@ -2838,16 +2846,14 @@ class phpQueryObject
 	public function next($cssSelector = null){
 //		if ($cssSelector || $this->valid)
 //			return $this->_next($cssSelector);
-		$this->current++;
-		$this->valid = isset( $this->elementsInterator[ $this->current ] )
+		$this->valid = isset( $this->elementsInterator[ $this->current+1 ] )
 			? true
 			: false;
-		if ( $this->valid )
-			$this->elements = array(
-				$this->elementsInterator[ $this->current ]
-			);
-		else {
-			$this->current--;
+		if (! $this->valid && $this->elementsInterator) {
+			$this->elementsInterator = null;
+		} else if ($this->valid) {
+			$this->current++;
+		} else {
 			return $this->_next($cssSelector);
 		}
 	}

@@ -217,7 +217,7 @@ class phpQueryObject
 		phpQuery::unloadDocuments($this->getDocumentID());
 	}
 	public function isHTML() {
-		return $this->documentWrapper->isXML;
+		return $this->documentWrapper->isHTML;
 	}
 	public function isXHTML() {
 		return $this->documentWrapper->isXHTML;
@@ -898,6 +898,7 @@ class phpQueryObject
 			break;
 			case 'password':
 			case 'checkbox':
+			case 'radio':
 			case 'hidden':
 			case 'image':
 			case 'file':
@@ -1109,16 +1110,17 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 * @link http://docs.jquery.com/Traversing/filter
 	 */
-	public function filter( $selectors, $_skipHistory = false ) {
-		if (! $_skipHistory )
+	public function filter($selectors, $_skipHistory = false) {
+		if (! $_skipHistory)
 			$this->elementsBackup = $this->elements;
 		$notSimpleSelector = array(' ', '>', '~', '+', '/');
-		$selectors = $this->parseSelector( $selectors );
-		if (! $_skipHistory )
+		if (! is_array($selectors))
+			$selectors = $this->parseSelector($selectors);
+		if (! $_skipHistory)
 			$this->debug(array("Filtering:", $selectors));
 		$stack = array();
 		foreach ( $selectors as $selector ) {
-			if (! $selector )
+			if (! $selector)
 				break;
 			// avoid first space or /
 			if (in_array( $selector[0], $notSimpleSelector ) )
@@ -1205,13 +1207,13 @@ class phpQueryObject
 				if (! $break )
 					$stack[] = $node;
 			}
+			$this->elements = $stack;
+			// PER ALL NODES selector chunks
+			foreach($selector as $s)
+				// PSEUDO CLASSES
+				if ( $s[0] == ':' )
+					$this->pseudoClasses($s);
 		}
-		$this->elements = $stack;
-		// PER ALL NODES selector chunks
-		foreach($selector as $s)
-			// PSEUDO CLASSES
-			if ( $s[0] == ':' )
-				$this->pseudoClasses($s);
 		return $_skipHistory
 			? $this
 			: $this->newInstance();
@@ -1360,16 +1362,6 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
-	public function select($callback = null) {
-		if ($callback)
-			return $this->bind('select', $callback);
-		return $this->trigger('select');
-	}
-	/**
-	 * Enter description here...
-	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
-	 */
 	public function submit($callback = null) {
 		if ($callback)
 			return $this->bind('submit', $callback);
@@ -1414,7 +1406,7 @@ class phpQueryObject
 		if (! $this->length())
 			return $this;
 		return phpQuery::pq($wrapper, $this->getDocumentID())
-			->_clone()
+			->clone()
 			->insertBefore($this->get(0))
 			->map(array($this, '___wrapAllCallback'))
 			->append($this);
@@ -1638,7 +1630,17 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
+	protected function markupEvents($newMarkup, $oldMarkup, $node) {
+		if ($node->tagName == 'textarea' && $newMarkup != $oldMarkup) {
+			$event = new DOMEvent(array(
+				'target' => $node,
+				'type' => 'change'
+			));
+			phpQueryEvents::trigger($this->getDocumentID(),
+				$event->type, array($event), $node
+			);
+		}
+	}
 	/**
 	 * jQuey difference
 	 *
@@ -1675,13 +1677,21 @@ class phpQueryObject
 			// INSERT
 			$nodes = $this->documentWrapper->import($html);
 			$this->empty();
-			// i dont like brackets ! python rules ! ;)
-			foreach($nodes as $newNode)
-				foreach($this->elements as $alreadyAdded => $node)
+			foreach($this->stack(1) as $alreadyAdded => $node) {
+				// for now, limit events for textarea
+				if (($this->isXHTML() || $this->isHTML()) && $node->tagName == 'textarea')
+					$oldHtml = pq($node, $this->getDocumentID())->markup();
+				foreach($nodes as $newNode) {
+					if ($node->tagName == 'textarea')
 					$node->appendChild($alreadyAdded
 						? $newNode->cloneNode(true)
 						: $newNode
 					);
+				}
+				// for now, limit events for textarea
+				if (($this->isXHTML() || $this->isHTML()) && $node->tagName == 'textarea')
+					$this->markupEvents($html, $oldHtml, $node);
+			}
 			return $this;
 		} else {
 			// FETCH
@@ -2266,16 +2276,30 @@ class phpQueryObject
 	 */
 	public function not($selector = null) {
 		$stack = array();
-		foreach($this->elements as $node) {
-			if ($selector instanceof self) {
-				// XXX chack all nodes ?
-				if (count($selector->elements) && ! $selector->elements[0]->isSameNode($node))
+		if ($selector instanceof self || $selector instanceof DOMNODE) {
+			foreach($this->elements as $node) {
+				if ($selector instanceof self) {
+					// XXX check all nodes ?
+					if (count($selector->elements) && ! $selector->elements[0]->isSameNode($node))
+						$stack[] = $node;
+				} else if ($selector instanceof DOMNODE) {
+					if (! $selector->isSameNode($node))
+						$stack[] = $node;
+				} else {
+					if (! $this->is($selector))
+						$stack[] = $node;
+				}
+			}
+		} else {
+			$matched = array();
+			foreach($this->parseSelector($selector) as $s) {
+				$matched = array_merge($matched,
+					$this->filter(array($s))->stack()
+				);
+			}
+			foreach($this->stack() as $node)
+				if (! $this->elementsContainsNode($node, $matched))
 					$stack[] = $node;
-			} else if ($selector instanceof DOMNODE) {
-				if (! $selector->isSameNode($node))
-					$stack[] = $node;
-			} else if (! $this->is($selector, $node))
-				$stack[] = $node;
 		}
 		return $this->newInstance($stack);
 	}
@@ -2384,64 +2408,67 @@ class phpQueryObject
 				$return[] = $node;
 		return $return;
 	}
-	public function attr($attr = null, $value = null) {
-		if (! is_null( $value )) {
-//			die(var_dump(mb_detect_encoding($value)));
-			// TODO tempolary solution
-			// http://code.google.com/p/phpquery/issues/detail?id=17
-//			if (function_exists('mb_detect_encoding')
-//				 && mb_detect_encoding($value) == 'ASCII'
-//				 && $this->charset = 'utf-8')
-//				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
+	// TODO phpdoc; $oldAttr is result of hasAttribute, before any changes
+	protected function attrEvents($attr, $oldAttr, $oldValue, $node) {
+		// skip events for XML documents
+		if (! $this->isXHTML() && ! $this->isHTML())
+			return;
+		$event = null;
+		// identify
+		$isInputValue = $node->tagName == 'input'
+			&& (
+				in_array($node->getAttribute('type'),
+					array('text', 'password', 'hidden'))
+				|| !$node->getAttribute('type')
+				 );
+		$isRadio = $node->tagName == 'input'
+			&& $node->getAttribute('type') == 'radio';
+		$isCheckbox = $node->tagName == 'input'
+			&& $node->getAttribute('type') == 'checkbox';
+		$isOption = $node->tagName == 'option';
+		if ($isInputValue && $attr == 'value' && $oldValue != $node->getAttribute($attr)) {
+			$event = new DOMEvent(array(
+				'target' => $node,
+				'type' => 'change'
+			));
+		} else if (($isRadio || $isCheckbox) && $attr == 'checked' && (
+				// check
+				(! $oldAttr && $node->hasAttribute($attr))
+				// un-check
+				|| (! $node->hasAttribute($attr) && $oldAttr)
+			)) {
+			$event = new DOMEvent(array(
+				'target' => $node,
+				'type' => 'change'
+			));
+		} else if ($isOption && $node->parentNode && $attr == 'selected' && (
+				// select
+				(! $oldAttr && $node->hasAttribute($attr))
+				// un-select
+				|| (! $node->hasAttribute($attr) && $oldAttr)
+			)) {
+			$event = new DOMEvent(array(
+				'target' => $node->parentNode,
+				'type' => 'change'
+			));
 		}
+		if ($event) {
+			phpQueryEvents::trigger($this->getDocumentID(),
+				$event->type, array($event), $node
+			);
+		}
+	}
+	public function attr($attr = null, $value = null) {
 		foreach($this->stack(1) as $node) {
 			if (! is_null($value)) {
 				$loop = $attr == '*'
 					? $this->getNodeAttrs($node)
 					: array($attr);
 				foreach($loop as $a) {
-					$event = null;
-					if ($value) {
-						// identify
-						$isInputValue = $node->tagName == 'input'
-							&& (
-								in_array($node->getAttribute('type'),
-									array('text', 'password', 'hidden'))
-								|| !$node->getAttribute('type')
-							);
-						$isRadio = $node->tagName == 'input'
-							&& $node->getAttribute('type') == 'radio';
-						$isCheckbox = $node->tagName == 'input'
-							&& $node->getAttribute('type') == 'checkbox';
-						$isOption = $node->tagName == 'option'
-							&& $node->getAttribute('type') == 'radio';
-						// detect 'change' event
-						if ($isInputValue && $a == 'value'
-							&& $value != $node->getAttribute($a)) {
-							$event = new DOMEvent(array(
-								'target' => $node,
-								'type' => 'change'
-							));
-						} else if (($isRadio || $isCheckbox)
-							&& $a == 'checked' && !$node->getAttribute($a)) {
-							$event = new DOMEvent(array(
-								'target' => $node,
-								'type' => 'change'
-							));
-						} else if ($isOption && $node->parentNode
-							&& $a == 'selected' && !$node->getAttribute($a)) {
-							$event = new DOMEvent(array(
-								'target' => $node->parentNode,
-								'type' => 'change'
-							));
-						}
-					}
+					$oldValue = $node->getAttribute($a);
+					$oldAttr = $node->hasAttribute($a);
 					$node->setAttribute($a, $value);
-					if ($event) {
-						phpQueryEvents::trigger($this->getDocumentID(),
-							$event->type, array($event)
-						);
-					}
+					$this->attrEvents($a, $oldAttr, $oldValue, $node);
 				}
 			} else if ($attr == '*') {
 				// jQuery difference
@@ -2534,13 +2561,16 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
-	public function removeAttr( $attr ) {
-		foreach( $this->elements as $node ) {
+	public function removeAttr($attr) {
+		foreach($this->elements as $node) {
 			$loop = $attr == '*'
 				? $this->getNodeAttrs($node)
 				: array($attr);
-			foreach( $loop as $a )
+			foreach($loop as $a) {
+				$oldValue = $node->getAttribute($a);
 				$node->removeAttribute($a);
+				$this->attrEvents($a, $oldValue, null, $node);
+			}
 		}
 		return $this;
 	}
@@ -2572,7 +2602,7 @@ class phpQueryObject
 				} else if ($node->get(0)->tagName == 'select') {
 					if (! is_array($val))
 						$val = array($val);
-					foreach($node['option'] as $option) {
+					foreach($node['option']->stack() as $option) {
 						$option = pq($option, $this->getDocumentID());
 						$selected = in_array($option->attr('value'), $val)
 								|| in_array($option->text(), $val);
@@ -2909,6 +2939,8 @@ class phpQueryObject
 						? '#'.$node->getAttribute('id'):'')
 					.($node->getAttribute('class')
 						? '.'.join('.', split(' ', $node->getAttribute('class'))):'')
+					.($node->getAttribute('name')
+						? '[name="'.$node->getAttribute('name').'"]':'')
 				: get_class($node);
 		}
 		return $oneNode

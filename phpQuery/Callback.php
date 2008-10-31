@@ -35,9 +35,4 @@ class CallbackReference extends Callback{
 		$this->callback = $reference;
 	}
 }
-class CallbackParam {
-	public $index = null;
-	public function __construct($name = null) {
-		$this->index = $index;
-	}
-}
+class CallbackParam {}

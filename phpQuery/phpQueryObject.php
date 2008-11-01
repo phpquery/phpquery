@@ -1121,6 +1121,7 @@ class phpQueryObject
 			$selectors = $this->parseSelector($selectors);
 		if (! $_skipHistory)
 			$this->debug(array("Filtering:", $selectors));
+		$finalStack = array();
 		foreach($selectors as $selector) {
 			$stack = array();
 			if (! $selector)
@@ -1130,9 +1131,6 @@ class phpQueryObject
 				$selector = array_slice($selector, 1);
 			// PER NODE selector chunks
 			foreach($this->stack() as $node) {
-				// TODO support other nodeTypes
-//				if (! ($node instanceof DOMELEMENT))
-//					continue;
 				$break = false;
 				foreach($selector as $s) {
 					if (!($node instanceof DOMELEMENT)) {
@@ -1212,13 +1210,20 @@ class phpQueryObject
 				if (! $break )
 					$stack[] = $node;
 			}
+			$tmpStack = $this->elements;
 			$this->elements = $stack;
 			// PER ALL NODES selector chunks
 			foreach($selector as $s)
 				// PSEUDO CLASSES
 				if ($s[0] == ':')
 					$this->pseudoClasses($s);
+			foreach($this->elements as $node)
+				// XXX it should be merged without duplicates
+				// but jQuery doesnt do that
+				$finalStack[] = $node;
+			$this->elements = $tmpStack;
 		}
+		$this->elements = $finalStack;
 		return $_skipHistory
 			? $this
 			: $this->newInstance();
@@ -2297,13 +2302,14 @@ class phpQueryObject
 				}
 			}
 		} else {
-			$matched = array();
-			// simulate OR in filter() instead of AND 5y
-			foreach($this->parseSelector($selector) as $s) {
-				$matched = array_merge($matched,
-					$this->filter(array($s))->stack()
-				);
-			}
+			$matched = $this->filter($selector)->stack();
+//			$matched = array();
+//			// simulate OR in filter() instead of AND 5y
+//			foreach($this->parseSelector($selector) as $s) {
+//				$matched = array_merge($matched,
+//					$this->filter(array($s))->stack()
+//				);
+//			}
 			foreach($this->stack() as $node)
 				if (! $this->elementsContainsNode($node, $matched))
 					$stack[] = $node;

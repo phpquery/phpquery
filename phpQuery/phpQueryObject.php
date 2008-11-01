@@ -1121,21 +1121,22 @@ class phpQueryObject
 			$selectors = $this->parseSelector($selectors);
 		if (! $_skipHistory)
 			$this->debug(array("Filtering:", $selectors));
-		$stack = array();
-		foreach ( $selectors as $selector ) {
+		foreach($selectors as $selector) {
+			$stack = array();
 			if (! $selector)
 				break;
 			// avoid first space or /
-			if (in_array( $selector[0], $notSimpleSelector ) )
+			if (in_array($selector[0], $notSimpleSelector))
 				$selector = array_slice($selector, 1);
 			// PER NODE selector chunks
-			foreach( $this->elements as $node ) {
+			foreach($this->stack() as $node) {
 				// TODO support other nodeTypes
 //				if (! ($node instanceof DOMELEMENT))
 //					continue;
 				$break = false;
-				foreach( $selector as $s ) {
+				foreach($selector as $s) {
 					if (!($node instanceof DOMELEMENT)) {
+						// all besides DOMElement
 						if ( $s[0] == '[' ) {
 							$attr = trim($s, '[]');
 							if ( strpos($attr, '=') ) {
@@ -1146,6 +1147,7 @@ class phpQueryObject
 						} else
 							$break = true;
 					} else {
+						// DOMElement only
 						// ID
 						if ( $s[0] == '#' ) {
 							if ( $node->getAttribute('id') != substr($s, 1) )
@@ -1189,21 +1191,21 @@ class phpQueryObject
 						} else if ( $s[0] == ':' ) {
 							// skip
 						// TAG
-						} else if ( trim($s) ) {
-							if ( $s != '*' ) {
-								if ( isset($node->tagName) ) {
-									if ( $node->tagName != $s )
+						} else if (trim($s)) {
+							if ($s != '*') {
+								if (isset($node->tagName)) {
+									if ($node->tagName != $s)
 										$break = true;
-								} else if ( $s == 'html' && ! $this->isRoot($node) )
+								} else if ($s == 'html' && ! $this->isRoot($node))
 									$break = true;
 							}
 						// AVOID NON-SIMPLE SELECTORS
-						} else if ( in_array($s, $notSimpleSelector)) {
+						} else if (in_array($s, $notSimpleSelector)) {
 							$break = true;
 							$this->debug(array('Skipping non simple selector', $selector));
 						}
 					}
-					if ( $break )
+					if ($break)
 						break;
 				}
 				// if element passed all chunks of selector - add it to new stack
@@ -1214,7 +1216,7 @@ class phpQueryObject
 			// PER ALL NODES selector chunks
 			foreach($selector as $s)
 				// PSEUDO CLASSES
-				if ( $s[0] == ':' )
+				if ($s[0] == ':')
 					$this->pseudoClasses($s);
 		}
 		return $_skipHistory

@@ -63,6 +63,7 @@ class phpQueryPlugin_WebBrowser {
 	 */
 	public static function browserGet($url, $callback,
 		$param1 = null, $param2 = null, $param3 = null) {
+		phpQuery::debug("[WebBrowser] GET: $url");
 		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
 			'type' => 'GET',
@@ -83,8 +84,10 @@ class phpQueryPlugin_WebBrowser {
 //				self::browserReceive($xhr)//->WebBrowser($callback)
 //			));
 			return $xhr;
-		} else
+		} else {
+			throw new Exception("[WebBrowser] GET request failed; url: $url");
 			return false;
+		}
 	}
 	/**
 	 *
@@ -168,6 +171,7 @@ class phpQueryPlugin_WebBrowser {
 	 * @param Zend_Http_Client $xhr
 	 */
 	public static function browserReceive($xhr) {
+		phpQuery::debug("[WebBrowser] Received from ".$xhr->getUri(true));
 		// TODO handle meta redirects
 		$body = $xhr->getLastResponse()->getBody();
 

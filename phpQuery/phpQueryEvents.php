@@ -6,7 +6,7 @@
  * @package phpQuery
  * @static
  */
-class phpQueryEvents {
+abstract class phpQueryEvents {
 	/**
 	 * Trigger a type of event on every matched element.
 	 *

@@ -328,14 +328,16 @@ class phpQueryObject
 		$strlen = strlen($query);
 		$classChars = array('.', '-');
 		$pseudoChars = array('-');
+		$tagChars = array('*', '|', '-');
 		// it works, but i dont like it...
 		$i = 0;
 		while( $i < $strlen) {
 			$c = $query[$i];
 			$tmp = '';
 			// TAG
-			if ( $this->isChar($c) || $c == '*' || $c == '|' ) {
-				while( isset($query[$i]) && ($this->isChar($query[$i]) || $query[$i] == '*' || $query[$i] == '|')) {
+			if ( $this->isChar($c) || in_array($c, $tagChars)) {
+				while(isset($query[$i])
+					&& ($this->isChar($query[$i]) || in_array($query[$i], $tagChars))) {
 					$tmp .= $query[$i];
 					$i++;
 				}
@@ -665,12 +667,22 @@ class phpQueryObject
 			$this->elements = $oldStack;
 			foreach( $selector as $s ) {
 				// TAG
-				if ( preg_match('@^[\w|\|]+$@', $s) || $s == '*' ) {
+				if ( preg_match('@^[\w|\||-]+$@', $s) || $s == '*' ) {
 					// TODO support namespaces
-					if ($this->documentWrapper->isXHTML) {
-						$XQuery .= "html:{$s}";
-					} else
-						$XQuery .= $s;
+//					if ($this->documentWrapper->isXHTML) {
+//						$XQuery .= "html:{$s}";
+//					} else
+//						$XQuery .= $s;
+						if ($this->isXML()) {
+							if (strpos($s, '|') !== false) {
+								list($ns, $tag) = explode('|', $s);
+								$XQuery .= "$ns:$tag";
+							} else {
+								$XQuery .= "*[local-name()='$s']";
+							}
+						} else {
+							$XQuery .= $s;
+						}
 				// ID
 				} else if ( $s[0] == '#' ) {
 					if ( $spaceBefore )
@@ -856,7 +868,7 @@ class phpQueryObject
 				$this->elements = $newStack;
 				break;
 			case 'slice':
-				// jQuery difference ?
+				// TODO jQuery difference ?
 				$args = exlode(',',
 					str_replace(', ', ',', trim($args, "\"'"))
 				);
@@ -1191,6 +1203,7 @@ class phpQueryObject
 						// TAG
 						} else if (trim($s)) {
 							if ($s != '*') {
+								// TODO namespaces
 								if (isset($node->tagName)) {
 									if ($node->tagName != $s)
 										$break = true;
@@ -1518,6 +1531,38 @@ class phpQueryObject
 		}
 		return $this->newInstance($stack);
 	}
+	/**
+	 * Enter description here...
+	 *
+	 * jQuery difference.
+	 *
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 */
+	public function contentsUnwrap() {
+		foreach($this->stack(1) as $node) {
+			if (! $node->parentNode )
+				continue;
+			$childNodes = array();
+			// any modification in DOM tree breaks childNodes iteration, so cache them first
+			foreach( $node->childNodes as $chNode )
+				$childNodes[] = $chNode;
+			foreach( $childNodes as $chNode )
+//				$node->parentNode->appendChild($chNode);
+				$node->parentNode->insertBefore($chNode, $node);
+			$node->parentNode->removeChild($node);
+		}
+		return $this;
+	}
+	public function switchWith($markup) {
+		$markup = pq($markup, $this->getDocumentID());
+		$content = null;
+		foreach($this->stack(1) as $node) {
+			pq($node)
+				->contents()->toReference($content)->end()
+				->replaceWith($markup->clone()->append($content));
+		}
+		return $this;
+	}
 
 	/**
 	 * Enter description here...
@@ -1539,7 +1584,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
 	public function size() {
-		return count( $this->elements );
+		return count($this->elements);
 	}
 
 	/**
@@ -1552,7 +1597,7 @@ class phpQueryObject
 		return $this->size();
 	}
 	public function count() {
-		return $this->length();
+		return $this->size();
 	}
 
 	/**
@@ -1767,28 +1812,6 @@ class phpQueryObject
 		}
 		$this->elementsBackup = $this->elements;
 		$this->elements = $stack;
-		return $this->newInstance();
-	}
-	/**
-	 * Enter description here...
-	 *
-	 * jQuery difference.
-	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
-	 */
-	public function unwrapContent() {
-		foreach($this->stack(1) as $node) {
-			if (! $node->parentNode )
-				continue;
-			$childNodes = array();
-			// any modification in DOM tree breaks childNodes iteration, so cache them first
-			foreach( $node->childNodes as $chNode )
-				$childNodes[] = $chNode;
-			foreach( $childNodes as $chNode )
-//				$node->parentNode->appendChild($chNode);
-				$node->parentNode->insertBefore($chNode, $node);
-			$node->parentNode->removeChild($node);
-		}
 		return $this->newInstance();
 	}
 
@@ -2117,7 +2140,7 @@ class phpQueryObject
 
 	/**
 	 * Return joined text content.
-	 * @return string
+	 * @return String
 	 */
 	public function text($text = null, $callback1 = null, $callback2 = null, $callback3 = null) {
 		if ($text)
@@ -2671,7 +2694,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
 	public function addClassPHP( $className ) {
-		foreach( $this->elements as $node ) {
+		foreach($this->stack(1) as $node) {
 //			if (! $this->is(".$className", $node)) {
 //				$attr = $this->DOM->createAttribute('class');
 				$classes = $node->getAttribute('class');
@@ -2699,7 +2722,7 @@ class phpQueryObject
 	 * @param	string	$className
 	 * @return	bool
 	 */
-	public function hasClass( $className ) {
+	public function hasClass($className) {
 		foreach( $this->elements as $node ) {
 			if ( $this->is(".$className", $node))
 				return true;
@@ -2712,8 +2735,8 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
-	public function removeClass( $className ) {
-		foreach( $this->elements as $node ) {
+	public function removeClass($className) {
+		foreach($this->elements as $node) {
 			$classes = explode( ' ', $node->getAttribute('class'));
 			if ( in_array($className, $classes) ) {
 				$classes = array_diff($classes, array($className));
@@ -2731,8 +2754,8 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
-	public function toggleClass( $className ) {
-		foreach( $this->elements as $node ) {
+	public function toggleClass($className) {
+		foreach($this->elements as $node) {
 			if ( $this->is( $node, '.'.$className ))
 				$this->removeClass($className);
 			else
@@ -2913,8 +2936,8 @@ class phpQueryObject
 		$loop = $oneNode
 			? array($oneNode)
 			: $this->elements;
-		if ($namespace)
-			$namespace .= ':';
+//		if ($namespace)
+//			$namespace .= ':';
 		foreach( $loop as $node ) {
 			if ($node instanceof DOMDOCUMENT) {
 				$return[] = '';
@@ -2924,13 +2947,15 @@ class phpQueryObject
 			while(! ($node instanceof DOMDOCUMENT) ) {
 				$i = 1;
 				$sibling = $node;
-				while( $sibling->previousSibling ) {
+				while($sibling->previousSibling ) {
 					$sibling = $sibling->previousSibling;
 					$isElement = $sibling instanceof DOMELEMENT;
 					if ( $isElement && $sibling->tagName == $node->tagName )
 						$i++;
 				}
-				$xpath[] = "{$namespace}{$node->tagName}[{$i}]";
+				$xpath[] = $this->isXML()
+					? "*[local-name()='{$node->tagName}'][{$i}]"
+					: "{$node->tagName}[{$i}]";
 				$node = $node->parentNode;
 			}
 			$xpath = join('/', array_reverse($xpath));

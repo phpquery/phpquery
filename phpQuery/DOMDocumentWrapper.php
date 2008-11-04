@@ -432,7 +432,7 @@ class DOMDocumentWrapper {
 				$fragment->root = $fragment->document->firstChild;
 			}
 		} else {
-			$markup2 = '<html><head><meta http-equiv="Content-Type" content="text/html;charset='
+			$markup2 = phpQuery::$defaultDoctype.'<html><head><meta http-equiv="Content-Type" content="text/html;charset='
 				.$charset.'"></head>';
 			$noBody = strpos($markup, '<body') === false;
 			if ($noBody)

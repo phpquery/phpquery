@@ -37,13 +37,12 @@ abstract class phpQuery {
 	public static $lastDomId = null;
 //	public static $defaultDoctype = 'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"';
 	/**
-	 * @deprecated
+	 * Applies only to HTML.
 	 *
 	 * @var unknown_type
 	 */
-	public static $defaultDoctype = '';
-	public static $defaultEncoding = 'UTF-8';
-	/** TODO */
+	public static $defaultDoctype = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">';
 	public static $defaultCharset = 'UTF-8';
 	/**
 	 * Static namespace for plugins.
@@ -420,7 +419,7 @@ abstract class phpQuery {
 //		if (strpos($class, 'phpQuery') === 0)
 //			$class = substr($class, 8);
 		if (in_array($class, self::$pluginsLoaded))
-			return;
+			return true;
 		if (! $file)
 			$file = $class.'.php';
 		$objectClassExists = class_exists('phpQueryObjectPlugin_'.$class);
@@ -935,21 +934,27 @@ abstract class phpQuery {
 	}
 	/* PLUGINS NAMESPACE */
 	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
-		if (self::extend('WebBrowser')) {
+		if (self::plugin('WebBrowser')) {
 			$params = func_get_args();
 			return self::callbackRun(array(self::$plugins, 'browserGet'), $params);
+		} else {
+			self::debug('WebBrowser plugin not available...');
 		}
 	}
 	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
-		if (self::extend('WebBrowser')) {
+		if (self::plugin('WebBrowser')) {
 			$params = func_get_args();
 			return self::callbackRun(array(self::$plugins, 'browserPost'), $params);
+		} else {
+			self::debug('WebBrowser plugin not available...');
 		}
 	}
 	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
-		if (self::extend('WebBrowser')) {
+		if (self::plugin('WebBrowser')) {
 			$params = func_get_args();
 			return self::callbackRun(array(self::$plugins, 'browser'), $params);
+		} else {
+			self::debug('WebBrowser plugin not available...');
 		}
 	}
 }

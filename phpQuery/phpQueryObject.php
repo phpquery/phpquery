@@ -2188,11 +2188,7 @@ class phpQueryObject
 	 */
 	public function __call($method, $args) {
 		$aliasMethods = array('clone', 'empty');
-		if (method_exists($this, $method))
-			return call_user_func_array(array($this, $method), $args);
-		else if (in_array($method, $aliasMethods)) {
-			return call_user_func_array(array($this, '_'.$method), $args);
-		} else if (isset(phpQuery::$pluginsMethods[$method])) {
+		if (isset(phpQuery::$pluginsMethods[$method])) {
 			array_unshift($args, $this);
 			$class = phpQuery::$pluginsMethods[$method];
 			$realClass = "phpQueryObjectPlugin_$class";
@@ -2203,7 +2199,9 @@ class phpQueryObject
 			return is_null($return)
 				? $this
 				: $return;
-		} else
+		} else if (in_array($method, $aliasMethods)) {
+			return call_user_func_array(array($this, '_'.$method), $args);
+		} else 
 			throw new Exception("Method '{$method}' doesnt exist");
 	}
 

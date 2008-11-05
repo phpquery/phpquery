@@ -31,6 +31,27 @@ class phpQueryObjectPlugin_WebBrowser {
 			$self->bind('submit', array($location, $callback), array('phpQueryPlugin_WebBrowser', 'handleSubmit'));
 		}
 	}
+	public static function downloadTo($self, $dir = null, $filename = null) {
+		$url = null;
+		if ($self->is('a[href]'))
+			$url = $self->attr('href');
+		else if ($self->find('a')->length)
+			$url = $self->find('a')->attr('href');
+		if ($url) {
+			$url = resolve_url($self->document->location, $url);
+			if (! $dir)
+				$dir = getcwd();
+			if (! $filename) {
+				$matches = null;
+				preg_match('@/([^/]+)$@', $url, $matches);
+				$filename = $matches[1];
+			}
+			$path = rtrim($dir, '/').'/'.$filename;
+			// TODO use AJAX instead of file_get_contents
+			file_put_contents($path, file_get_contents($url));
+		}
+		return $self;
+	}
 	public static function location($self, $url = null) {
 		// TODO if ! $url return actual location ???
 		$xhr = isset($self->document->xhr)
@@ -362,4 +383,3 @@ function glue_url($parsed)
         // Step 7
         return glue_url($base);
 }
-?>

@@ -14,6 +14,7 @@ class DOMDocumentWrapper {
 	 * @var DOMDocument
 	 */
 	public $document;
+	public $id;
 	/**
 	 * @todo Rewrite as method and quess if null.
 	 * @var unknown_type

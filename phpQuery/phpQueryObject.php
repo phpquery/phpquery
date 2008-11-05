@@ -76,11 +76,6 @@ class phpQueryObject
 	 */
 	protected $current = null;
 	/**
-	 * Chars indicating regex comparsion.
-	 * @access private
-	 */
-	protected $regexpChars = array('^','*','$');
-	/**
 	 * Enter description here...
 	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
@@ -291,7 +286,7 @@ class phpQueryObject
 	protected function isRegexp($pattern) {
 		return in_array(
 			$pattern[ strlen($pattern)-1 ],
-			$this->regexpChars
+			array('^','*','$')
 		);
 	}
 	/**
@@ -2838,7 +2833,7 @@ class phpQueryObject
 	 */
 	public function rewind(){
 		$this->debug('iterating foreach');
-		phpQuery::selectDocument($this->getDocumentID());
+//		phpQuery::selectDocument($this->getDocumentID());
 		$this->elementsBackup = $this->elements;
 		$this->elementsInterator = $this->elements;
 		$this->valid = isset( $this->elements[0] )

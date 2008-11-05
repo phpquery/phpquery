@@ -32,9 +32,7 @@ require_once(dirname(__FILE__).'/phpQueryObject.php');
 abstract class phpQuery {
 	public static $debug = false;
 	public static $documents = array();
-	// TODO
 	public static $defaultDocumentID = null;
-	public static $lastDomId = null;
 //	public static $defaultDoctype = 'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"';
 	/**
 	 * Applies only to HTML.
@@ -129,8 +127,15 @@ abstract class phpQuery {
    * phpQuery object or false in case of error.
 	 */
 	public static function pq($arg1, $context = null) {
+		if ($arg1 instanceof DOMNODE && ! isset($context)) {
+			foreach(phpQuery::$documents as $documentWrapper) {
+				if ($documentWrapper->document->isSameNode($arg1->ownerDocument)) {
+					$context = $documentWrapper->id;
+				}
+			}
+		}
 		if (! $context) {
-			$domId = self::$lastDomId;
+			$domId = self::$defaultDocumentID;
 			if (! $domId)
 				throw new Exception("Can't use last created DOM, because there isn't any. Use phpQuery::newDocument() first.");
 //		} else if (is_object($context) && ($context instanceof PHPQUERY || is_subclass_of($context, 'phpQueryObject')))
@@ -144,7 +149,7 @@ abstract class phpQuery {
 			}
 		} else if ($context instanceof DOMNODE) {
 			$domId = self::getDocumentID($context);
-			if (! $domId){
+			if (! $domId) {
 				throw new Exception('Orphaned DOMNode');
 //				$domId = self::newDocument($context->ownerDocument);
 			}
@@ -168,7 +173,7 @@ abstract class phpQuery {
 				$phpQuery->elements[] = $phpQuery->document->importNode($node, true);
 			return $phpQuery;
 		} else if ($arg1 instanceof DOMNODE || (is_array($arg1) && isset($arg1[0]) && $arg[0] instanceof DOMNODE)) {
-			/**
+			/*
 			 * Wrap DOM nodes with phpQuery object, import into document when needed:
 			 * pq(array($domNode1, $domNode2))
 			 */
@@ -218,7 +223,7 @@ abstract class phpQuery {
 	public static function selectDocument($id) {
 		$id = self::getDocumentID($id);
 		self::debug("Selecting document '$id' as default one");
-		self::$lastDomId = self::getDocumentID($id);
+		self::$defaultDocumentID = self::getDocumentID($id);
 	}
 	/**
 	 * Returns document with id $id or last used as phpQueryObject.
@@ -233,7 +238,7 @@ abstract class phpQuery {
 		if ($id)
 			phpQuery::selectDocument($id);
 		else
-			$id = phpQuery::$lastDomId;
+			$id = phpQuery::$defaultDocumentID;
 		return new phpQueryObject($id);
 	}
 	/**
@@ -392,10 +397,11 @@ abstract class phpQuery {
 		} else {
 			$wrapper = new DOMDocumentWrapper($html, $contentType);
 		}
+		$wrapper->id = $id;
 		// create document
-		phpQuery::$documents[ $id ] = $wrapper;
+		phpQuery::$documents[$id] = $wrapper;
 		// remember last loaded document
-		return self::$lastDomId = $id;
+		return self::$defaultDocumentID = $id;
 	}
 	/**
 	 * Deprecated, use phpQuery::plugin() instead.
@@ -643,7 +649,7 @@ abstract class phpQuery {
 			phpQueryEvents::trigger($documentID, 'ajaxStop');
 		return $client;
 //		if (is_null($domId))
-//			$domId = self::$lastDomId ? self::$lastDomId : false;
+//			$domId = self::$defaultDocumentID ? self::$defaultDocumentID : false;
 //		return new phpQueryAjaxResponse($response, $domId);
 	}
 	/**

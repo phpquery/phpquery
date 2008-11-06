@@ -70,3 +70,17 @@ print $doc1->plugin('Scripts')->script('safe_print');
 // foreach($inputs as $node) {
 // }
 // $inputs->dump();
+
+// http://code.google.com/p/phpquery/issues/detail?id=74
+// http://code.google.com/p/phpquery/issues/detail?id=31
+//$doc = phpQuery::newDocument('<div class="class1 class2"/><div class="class1"/><div class="class2"/>');
+//$doc['div']->filter('.class1, .class2')->dump()->dumpWhois();
+
+// http://code.google.com/p/phpquery/issues/detail?id=76
+mb_internal_encoding("UTF-8");
+mb_regex_encoding("UTF-8");
+$xml = phpQuery::newDocumentXML('<документа/>');
+
+$xml['документа']->append('<список></список>');
+$xml['документа список'] = '<эл>1</эл><эл>2</эл><эл>3</эл>';
+print "<xmp>$xml</xmp>";

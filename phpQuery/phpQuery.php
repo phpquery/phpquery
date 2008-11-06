@@ -23,6 +23,7 @@ require_once(dirname(__FILE__).'/DOMDocumentWrapper.php');
 require_once(dirname(__FILE__).'/phpQueryEvents.php');
 require_once(dirname(__FILE__).'/Callback.php');
 require_once(dirname(__FILE__).'/phpQueryObject.php');
+require_once(dirname(__FILE__).'/compat/mbstring.php');
 /**
  * Static namespace for phpQuery functions.
  *

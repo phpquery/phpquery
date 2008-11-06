@@ -285,7 +285,7 @@ class phpQueryObject
 	 */
 	protected function isRegexp($pattern) {
 		return in_array(
-			$pattern[ strlen($pattern)-1 ],
+			$pattern[ mb_strlen($pattern)-1 ],
 			array('^','*','$')
 		);
 	}
@@ -298,14 +298,16 @@ class phpQueryObject
 	 * @access private
 	 */
 	protected function isChar($char) {
-		return preg_match('/\w/', $char);
+		return extension_loaded('mbstring')
+			? mb_eregi('\w', $char)
+			: preg_match('@\w@', $char);
 	}
 	/**
 	 * @access private
 	 */
 	protected function parseSelector( $query ) {
 		// clean spaces
-		// TODO include this inside parsing
+		// TODO include this inside parsing ?
 		$query = trim(
 			preg_replace('@\s+@', ' ',
 				preg_replace('@\s*(>|\\+|~)\s*@', '\\1', $query)
@@ -320,17 +322,23 @@ class phpQueryObject
 		$specialChars = array('>',' ');
 //		$specialCharsMapping = array('/' => '>');
 		$specialCharsMapping = array();
-		$strlen = strlen($query);
+		$strlen = mb_strlen($query);
 		$classChars = array('.', '-');
 		$pseudoChars = array('-');
 		$tagChars = array('*', '|', '-');
+		// split multibyte string
+		// http://code.google.com/p/phpquery/issues/detail?id=76
+		$_query = array();
+		for ($i=0; $i<$strlen; $i++)
+			$_query[] = mb_substr($query, $i, 1);
+		$query = $_query;
 		// it works, but i dont like it...
 		$i = 0;
 		while( $i < $strlen) {
 			$c = $query[$i];
 			$tmp = '';
 			// TAG
-			if ( $this->isChar($c) || in_array($c, $tagChars)) {
+			if ($this->isChar($c) || in_array($c, $tagChars)) {
 				while(isset($query[$i])
 					&& ($this->isChar($query[$i]) || in_array($query[$i], $tagChars))) {
 					$tmp .= $query[$i];
@@ -538,7 +546,7 @@ class phpQueryObject
 	 */
 	protected function matchClasses( $class, $node ) {
 		// multi-class
-		if ( strpos($class, '.', 1) ) {
+		if ( mb_strpos($class, '.', 1) ) {
 			$classes = explode('.', substr($class, 1));
 			$classesCount = count( $classes );
 			$nodeClasses = explode(' ', $node->getAttribute('class') );
@@ -658,26 +666,25 @@ class phpQueryObject
 		$oldStack = $this->elements;
 		// here we will be keeping found elements
 		$stack = array();
-		foreach( $queries as $selector ) {
+		foreach($queries as $selector) {
 			$this->elements = $oldStack;
-			foreach( $selector as $s ) {
+			foreach($selector as $s) {
 				// TAG
-				if ( preg_match('@^[\w|\||-]+$@', $s) || $s == '*' ) {
-					// TODO support namespaces
-//					if ($this->documentWrapper->isXHTML) {
-//						$XQuery .= "html:{$s}";
-//					} else
-//						$XQuery .= $s;
-						if ($this->isXML()) {
-							if (strpos($s, '|') !== false) {
-								list($ns, $tag) = explode('|', $s);
-								$XQuery .= "$ns:$tag";
-							} else {
-								$XQuery .= "*[local-name()='$s']";
-							}
+				$isTag = extension_loaded('mbstring')
+					? mb_ereg_match('^[\w|\||-]+$', $s) || $s == '*'
+					: preg_match('@^[\w|\||-]+$@', $s) || $s == '*';
+				if ($isTag) {
+					if ($this->isXML()) {
+						// namespace support
+						if (mb_strpos($s, '|') !== false) {
+							list($ns, $tag) = explode('|', $s);
+							$XQuery .= "$ns:$tag";
 						} else {
-							$XQuery .= $s;
+							$XQuery .= "*[local-name()='$s']";
 						}
+					} else {
+						$XQuery .= $s;
+					}
 				// ID
 				} else if ( $s[0] == '#' ) {
 					if ( $spaceBefore )
@@ -691,7 +698,7 @@ class phpQueryObject
 					$attr = trim($s, '][');
 					$execute = false;
 					// attr with specifed value
-					if (strpos( $s, '=' )) {
+					if (mb_strpos( $s, '=' )) {
 						list($attr, $value) = explode('=', $attr);
 						$value = trim($value, "'\"");
 						if ($this->isRegexp($attr)) {
@@ -796,7 +803,7 @@ class phpQueryObject
 	protected function pseudoClasses( $class ) {
 		// TODO clean args parsing ?
 		$class = ltrim($class, ':');
-		$haveArgs = strpos($class, '(');
+		$haveArgs = mb_strpos($class, '(');
 		if ( $haveArgs !== false ) {
 			$args = substr($class, $haveArgs+1, -1);
 			$class = substr($class, 0, $haveArgs);
@@ -845,7 +852,7 @@ class phpQueryObject
 				$text = trim($args, "\"'");
 				$stack = array();
 				foreach( $this->elements as $node ) {
-					if ( strpos( $node->textContent, $text ) === false )
+					if ( mb_strpos( $node->textContent, $text ) === false )
 						continue;
 					$stack[] = $node;
 				}
@@ -1004,13 +1011,13 @@ class phpQueryObject
 								return null;'),
 						new CallbackParam(), $param
 					);
-				else if (strlen($param) > 1 && $param{1} == 'n')
+				else if (mb_strlen($param) > 1 && $param{1} == 'n')
 					// an+b
 					$mapped = $this->map(
 						create_function('$node, $param',
 							'$prevs = pq($node)->prevAll()->size();
 							$index = 1+$prevs;
-							$b = strlen($param) > 3
+							$b = mb_strlen($param) > 3
 								? $param{3}
 								: 0;
 							$a = $param{0};
@@ -1144,7 +1151,7 @@ class phpQueryObject
 						// all besides DOMElement
 						if ( $s[0] == '[' ) {
 							$attr = trim($s, '[]');
-							if ( strpos($attr, '=') ) {
+							if ( mb_strpos($attr, '=') ) {
 								list( $attr, $val ) = explode('=', $attr);
 								if ($attr == 'nodeType' && $node->nodeType != $val)
 									$break = true;
@@ -1165,28 +1172,35 @@ class phpQueryObject
 						} else if ( $s[0] == '[' ) {
 							// strip side brackets
 							$attr = trim($s, '[]');
-							if ( strpos($attr, '=') ) {
+							if ( mb_strpos($attr, '=') ) {
 								list( $attr, $val ) = explode('=', $attr);
 								if ($attr == 'nodeType') {
 									if ($val != $node->nodeType)
 										$break = true;
 								} else if ( $this->isRegexp($attr)) {
-									$val = trim($val, '"\'');
+									$val = extension_loaded('mbstring')
+										? quotemeta(trim($val, '"\''))
+										: preg_quote(trim($val, '"\''), '@');
 									// switch last character
 									switch( substr($attr, -1) ) {
+										// quotemeta used insted of preg_quote
+										// http://code.google.com/p/phpquery/issues/detail?id=76
 										case '^':
-											$pattern = '^'.preg_quote($val, '@');
+											$pattern = '^'.$val;
 											break;
 										case '*':
-											$pattern = '.*'.preg_quote($val, '@').'.*';
+											$pattern = '.*'.$val.'.*';
 											break;
 										case '$':
-											$pattern = preg_quote($val, '@').'$';
+											$pattern = $val.'$';
 											break;
 									}
 									// cut last character
 									$attr = substr($attr, 0, -1);
-									if (! preg_match("@{$pattern}@", $node->getAttribute($attr)))
+									$isMatch = extension_loaded('mbstring')
+										? mb_ereg_match($pattern, $node->getAttribute($attr))
+										: preg_match("@{$pattern}@", $node->getAttribute($attr));
+									if (! $isMatch)
 										$break = true;
 								} else if ( $node->getAttribute($attr) != $val )
 									$break = true;
@@ -1249,12 +1263,15 @@ class phpQueryObject
 			$callback = $data;
 			$data = null;
 		}
-		if (strpos($url, ' ') !== false) {
+		if (mb_strpos($url, ' ') !== false) {
 			$matches = null;
-			preg_match('@^(.+?) (.*)$@', $url, $matches);
+			if (extension_loaded('mbstring'))
+				mb_ereg_match('^([^ ]+) (.*)$', $url, $matches);
+			else
+				preg_match('^([^ ]+) (.*)$', $url, $matches);
 			$url = $matches[1];
 			$selector = $matches[2];
-			// this sucks, but what to do ?
+			// XXX this sucks, but what to do ?
 			$this->_loadSelector = $selector;
 		}
 		$ajax = array(
@@ -2196,7 +2213,7 @@ class phpQueryObject
 				: $return;
 		} else if (in_array($method, $aliasMethods)) {
 			return call_user_func_array(array($this, '_'.$method), $args);
-		} else 
+		} else
 			throw new Exception("Method '{$method}' doesnt exist");
 	}
 
@@ -2837,8 +2854,7 @@ class phpQueryObject
 		$this->elementsBackup = $this->elements;
 		$this->elementsInterator = $this->elements;
 		$this->valid = isset( $this->elements[0] )
-			? 1
-			: 0;
+			? 1 : 0;
 // 		$this->elements = $this->valid
 // 			? array($this->elements[0])
 // 			: array();

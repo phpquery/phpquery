@@ -1207,12 +1207,13 @@ class phpQueryObject
 						} else if ( $s[0] == '[' ) {
 							// strip side brackets
 							$attr = trim($s, '[]');
-							if ( mb_strpos($attr, '=') ) {
-								list( $attr, $val ) = explode('=', $attr);
+							if (mb_strpos($attr, '=')) {
+								list($attr, $val) = explode('=', $attr);
+								$val = self::unQuote($val);
 								if ($attr == 'nodeType') {
 									if ($val != $node->nodeType)
 										$break = true;
-								} else if ( $this->isRegexp($attr)) {
+								} else if ($this->isRegexp($attr)) {
 									$val = extension_loaded('mbstring')
 										? quotemeta(trim($val, '"\''))
 										: preg_quote(trim($val, '"\''), '@');
@@ -1237,9 +1238,9 @@ class phpQueryObject
 										: preg_match("@{$pattern}@", $node->getAttribute($attr));
 									if (! $isMatch)
 										$break = true;
-								} else if ( $node->getAttribute($attr) != $val )
+								} else if ($node->getAttribute($attr) != $val)
 									$break = true;
-							} else if (! $node->hasAttribute($attr) )
+							} else if (! $node->hasAttribute($attr))
 								$break = true;
 						// PSEUDO CLASSES
 						} else if ( $s[0] == ':' ) {
@@ -1281,11 +1282,18 @@ class phpQueryObject
 			$this->elements = $tmpStack;
 		}
 		$this->elements = $finalStack;
-		return $_skipHistory
-			? $this
-			: $this->newInstance();
+		if ($_skipHistory) {
+			return $this;
+		} else {
+			$this->debug("Stack length after filter(): ".count($finalStack));
+			return $this->newInstance();
+		}
 	}
-
+	protected static function unQuote($value) {
+		return $value[0] == '\'' || $value[0] == '"'
+			? substr($value, 1, -1)
+			: $value;
+	}
 	/**
 	 * Enter description here...
 	 *

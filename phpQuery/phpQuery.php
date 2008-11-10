@@ -94,6 +94,7 @@ abstract class phpQuery {
 	);
 	public static $lastModified = null;
 	public static $active = 0;
+	public static $dumpCount = 0;
 	/**
 	 * Multi-purpose function.
 	 * Use pq() as shortcut.
@@ -527,7 +528,7 @@ abstract class phpQuery {
 	 * @param array See $options http://docs.jquery.com/Ajax/jQuery.ajax#toptions
 	 * Additional options are:
 	 * 'document' - document for global events, @see phpQuery::getDocumentID()
-	 * 'http_referer' - TODO; not implemented
+	 * 'referer' - implemented
 	 * 'requested_with' - TODO; not implemented (X-Requested-With)
 	 * @return Zend_Http_Client
 	 * @link http://docs.jquery.com/Ajax/jQuery.ajax
@@ -550,7 +551,7 @@ abstract class phpQuery {
 //			$client->setParameterGet(null);
 			$client->setAuth(false);
 			$client->setHeaders("If-Modified-Since", null);
-			$client->setHeaders("Http-Referer", null);
+			$client->setHeaders("Referer", null);
 			$client->resetParameters();
 		} else {
 			// create new XHR object
@@ -572,13 +573,17 @@ abstract class phpQuery {
 			return false;
 		}
 		$client->setUri($options['url']);
-		$client->setMethod($options['type']);
-		if (isset($options['httpReferer']) && $options['httpReferer'])
-			$client->setHeaders('Http-Referer', $options['httpReferer']);
+		$client->setMethod(strtoupper($options['type']));
+		if (isset($options['referer']) && $options['referer'])
+			$client->setHeaders('Referer', $options['referer']);
 		$client->setHeaders(array(
 //			'content-type' => $options['contentType'],
-			'user-agent' => 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9a8) Gecko/2007100619 GranParadiso/3.0a8',
-			'accept-charset' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+			'User-Agent' => 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9a8) Gecko/2007100619 GranParadiso/3.0a8',
+	 		// TODO custom charset
+			'Accept-Charset' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+// 	 		'Connection' => 'keep-alive',
+// 			'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+	 		'Accept-Language' => 'en-us,en;q=0.5',
 		));
 		if ($options['username'])
 			$client->setAuth($options['username'], $options['password']);
@@ -963,6 +968,9 @@ abstract class phpQuery {
 		} else {
 			self::debug('WebBrowser plugin not available...');
 		}
+	}
+	public static function php($code) {
+		return "<php><!-- ".trim($code)." --></php>";
 	}
 }
 /**

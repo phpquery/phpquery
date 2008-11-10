@@ -243,7 +243,7 @@ class phpQueryPlugin_WebBrowser {
 				: null;
 			$xhr = phpQuery::ajax(array(
 				'url' => resolve_url($e->data[0], $node->attr('href')),
-				'httpReferer' => $node->document->location,
+				'referer' => $node->document->location,
 			), $xhr);
 			// TODO support extended callbacks
 			if ($xhr->getLastResponse()->isSuccessful() && $e->data[1])
@@ -283,7 +283,7 @@ class phpQueryPlugin_WebBrowser {
 				: 'GET',
 			'url' => resolve_url($e->data[0], $node->attr('action')),
 			'data' => $data,
-			'httpReferer' => $node->document->location,
+			'referer' => $node->document->location,
 //			'success' => $e->data[1],
 		);
 		if ($node->attr('enctype'))

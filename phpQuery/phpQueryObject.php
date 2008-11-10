@@ -316,8 +316,6 @@ class phpQueryObject
 		$queries = array(array());
 		if (! $query)
 			return $queries;
-		if ($query{0} == ':')
-			$query = '*'.$query;
 		$return =& $queries[0];
 		$specialChars = array('>',' ');
 //		$specialCharsMapping = array('/' => '>');
@@ -458,9 +456,13 @@ class phpQueryObject
 				$i++;
 			}
 		}
-		foreach($queries as $k =>$q ) {
-			if ( isset($q[0]) && $q[0] != '>' )
-				array_unshift($queries[$k], ' ');
+		foreach($queries as $k => $q ) {
+			if (isset($q[0])) {
+				if (isset($q[0][0]) && $q[0][0] == ':')
+					array_unshift($queries[$k], '*');
+				if ($q[0] != '>')
+					array_unshift($queries[$k], ' ');
+			}
 		}
 		return $queries;
 	}
@@ -649,9 +651,12 @@ class phpQueryObject
 					phpQuery::$debug ?
 						$this->debug("Found: ".$this->whois( $node ).", comparing with {$compare}()")
 						: null;
-					// TODO use phpQuery::callbackRun()
+					$phpQueryDebug = phpQuery::$debug;
+					phpQuery::$debug = false;
+					// TODO ??? use phpQuery::callbackRun()
 					if (call_user_func_array(array($this, $compare), array($selector, $node)))
 						$matched = true;
+					phpQuery::$debug = $phpQueryDebug;
 				} else {
 					$matched = true;
 				}
@@ -691,7 +696,6 @@ class phpQueryObject
 			} else if ( $context instanceof self )
 				$this->elements = $context->elements;
 		}
-		$spaceBefore = false;
 		$queries = $this->parseSelector($selectors);
 		$this->debug(array('FIND',$selectors,$queries));
 		$XQuery = '';
@@ -701,6 +705,7 @@ class phpQueryObject
 		$stack = array();
 		foreach($queries as $selector) {
 			$this->elements = $oldStack;
+			$delimiterBefore = false;
 			foreach($selector as $s) {
 				// TAG
 				$isTag = extension_loaded('mbstring')
@@ -722,12 +727,12 @@ class phpQueryObject
 					}
 				// ID
 				} else if ( $s[0] == '#' ) {
-					if ( $spaceBefore )
+					if ( $delimiterBefore )
 						$XQuery .= '*';
 					$XQuery .= "[@id='".substr($s, 1)."']";
 				// ATTRIBUTES
 				} else if ($s[0] == '[') {
-					if ( $spaceBefore )
+					if ( $delimiterBefore )
 						$XQuery .= '*';
 					// strip side brackets
 					$attr = trim($s, '][');
@@ -758,7 +763,7 @@ class phpQueryObject
 				} else if ( $s[0] == '.' ) {
 					// TODO use return $this->find("./self::*[contains(concat(\" \",@class,\" \"), \" $class \")]");
 					// thx wizDom ;)
-					if ( $spaceBefore )
+					if ( $delimiterBefore )
 						$XQuery .= '*';
 					$XQuery .= '[@class]';
 					$this->runQuery($XQuery, $s, 'matchClasses');
@@ -808,13 +813,13 @@ class phpQueryObject
 				// DIRECT DESCENDANDS
 				} else if ( $s == '>' ) {
 					$XQuery .= '/';
+					$delimiterBefore = 2;
 				} else {
 					$XQuery .= '//';
+					$delimiterBefore = 2;
 				}
-				if ( $s == ' ' )
-					$spaceBefore = true;
-				else
-					$spaceBefore = false;
+				$delimiterBefore = $delimiterBefore === 2
+					? true : false;
 			}
 			// run query if any
 			if ( $XQuery && $XQuery != '//' ) {
@@ -835,15 +840,15 @@ class phpQueryObject
 	 * @todo create API for classes with pseudoselectors
 	 * @access private
 	 */
-	protected function pseudoClasses( $class ) {
+	protected function pseudoClasses($class) {
 		// TODO clean args parsing ?
 		$class = ltrim($class, ':');
 		$haveArgs = mb_strpos($class, '(');
-		if ( $haveArgs !== false ) {
+		if ($haveArgs !== false) {
 			$args = substr($class, $haveArgs+1, -1);
 			$class = substr($class, 0, $haveArgs);
 		}
-		switch( $class ) {
+		switch($class) {
 			case 'even':
 			case 'odd':
 				$stack = array();
@@ -868,12 +873,12 @@ class phpQueryObject
 				$this->elements = array_slice($this->elements, 0, $args+1);
 				break;
 			case 'first':
-				if ( isset( $this->elements[0] ) )
-					$this->elements = array( $this->elements[0] );
+				if (isset($this->elements[0]))
+					$this->elements = array($this->elements[0]);
 				break;
 			case 'last':
-				if ( $this->elements )
-					$this->elements = array( $this->elements[ count($this->elements)-1 ] );
+				if ($this->elements)
+					$this->elements = array($this->elements[count($this->elements)-1]);
 				break;
 			/*case 'parent':
 				$stack = array();
@@ -887,22 +892,15 @@ class phpQueryObject
 				$text = trim($args, "\"'");
 				$stack = array();
 				foreach( $this->elements as $node ) {
-					if ( mb_strpos( $node->textContent, $text ) === false )
+					if ( mb_strpos( $node->textContent, $text) === false)
 						continue;
 					$stack[] = $node;
 				}
 				$this->elements = $stack;
 				break;
 			case 'not':
-				$query = trim($args, "\"'");
-				$stack = $this->elements;
-				$newStack = array();
-				foreach( $stack as $node ) {
-					$this->elements = array($node);
-					if (! $this->is($query) )
-						$newStack[] = $node;
-				}
-				$this->elements = $newStack;
+				$selector = self::unQuote($args);
+				$this->elements = $this->not($selector)->stack();
 				break;
 			case 'slice':
 				// TODO jQuery difference ?
@@ -921,7 +919,7 @@ class phpQueryObject
 				$selector = trim($args, "\"'");
 				$stack = array();
 				foreach( $this->elements as $el ) {
-					if ( $this->find($selector, $el, true)->length() )
+					if ($this->find($selector, $el, true)->length)
 						$stack[] = $el;
 				}
 				$this->elements = $stack;
@@ -1289,6 +1287,12 @@ class phpQueryObject
 			return $this->newInstance();
 		}
 	}
+	/**
+	 * 
+	 * @param $value
+	 * @return unknown_type
+	 * @TODO implement in all methods using passed parameters
+	 */
 	protected static function unQuote($value) {
 		return $value[0] == '\'' || $value[0] == '"'
 			? substr($value, 1, -1)
@@ -2380,6 +2384,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
 	public function not($selector = null) {
+		phpQuery::debug(array('not', $selector));
 		$stack = array();
 		if ($selector instanceof self || $selector instanceof DOMNODE) {
 			foreach($this->elements as $node) {
@@ -2396,7 +2401,8 @@ class phpQueryObject
 				}
 			}
 		} else {
-			$matched = $this->filter($selector)->stack();
+			$orgStack = $this->stack();
+			$matched = $this->filter($selector, true)->stack();
 //			$matched = array();
 //			// simulate OR in filter() instead of AND 5y
 //			foreach($this->parseSelector($selector) as $s) {
@@ -2404,7 +2410,7 @@ class phpQueryObject
 //					$this->filter(array($s))->stack()
 //				);
 //			}
-			foreach($this->stack() as $node)
+			foreach($orgStack as $node)
 				if (! $this->elementsContainsNode($node, $matched))
 					$stack[] = $node;
 		}
@@ -3068,23 +3074,38 @@ class phpQueryObject
 	 *
 	 */
 	public function dump() {
-		print __FILE__.':'.__LINE__."\n";
+		print 'DUMP #'.(phpQuery::$dumpCount++).' ';
+		$debug = phpQuery::$debug;
+		phpQuery::$debug = false;
+//		print __FILE__.':'.__LINE__."\n";
 		var_dump($this->htmlOuter());
 		return $this;
 	}
 	public function dumpWhois() {
-		print __FILE__.':'.__LINE__."\n";
+		print 'DUMP #'.(phpQuery::$dumpCount++).' ';
+		$debug = phpQuery::$debug;
+		phpQuery::$debug = false;
+//		print __FILE__.':'.__LINE__."\n";
 		var_dump('whois', $this->whois());
+		phpQuery::$debug = $debug;
 		return $this;
 	}
 	public function dumpLength() {
-		print __FILE__.':'.__LINE__."\n";
+		print 'DUMP #'.(phpQuery::$dumpCount++).' ';
+		$debug = phpQuery::$debug;
+		phpQuery::$debug = false;
+//		print __FILE__.':'.__LINE__."\n";
 		var_dump('length', $this->length());
+		phpQuery::$debug = $debug;
 		return $this;
 	}
 	public function dumpTree() {
+		print 'DUMP #'.(phpQuery::$dumpCount++).' ';
+		$debug = phpQuery::$debug;
+		phpQuery::$debug = false;
 		foreach($this->stack() as $node)
 			print $this->__dumpTree($node);
+		phpQuery::$debug = $debug;
 		return $this;
 	}
 	private function __dumpTree($node, $intend = 0) {

@@ -472,8 +472,8 @@ class phpQueryObject
 	 * @return array|DOMElement Single DOMElement or array of DOMElement.
 	 */
 	public function get($index = null, $callback1 = null, $callback2 = null, $callback3 = null) {
-		$return = ! is_null($index)
-			? $this->elements[$index]
+		$return = isset($index)
+			? (isset($this->elements[$index]) ? $this->elements[$index] : null)
 			: $this->elements;
 		// pass thou callbacks
 		$args = func_get_args();
@@ -499,16 +499,49 @@ class phpQueryObject
 	 */
 	public function getString($index = null, $callback1 = null, $callback2 = null, $callback3 = null) {
 		if ($index)
-			return trim($this->eq($index)->text());
-		$return = array();
-		for($i = 0; $i < $this->size(); $i++) {
-			$return[] = trim($this->eq($i)->text());
+			$return = $this->eq($index)->text();
+		else {
+			$return = array();
+			for($i = 0; $i < $this->size(); $i++) {
+				$return[] = $this->eq($i)->text();
+			}
 		}
 		// pass thou callbacks
 		$args = func_get_args();
 		$args = array_slice($args, 1);
 		foreach($args as $callback) {
 			$return = phpQuery::callbackRun($callback, array($return));
+		}
+		return $return;
+	}
+	/**
+	 * Return matched DOM nodes.
+	 * jQuery difference.
+	 *
+	 * @param int $index
+	 * @return array|string Returns string if $index != null
+	 * @todo implement callbacks
+	 * @todo return only arrays ?
+	 * @todo maybe other name...
+	 */
+	public function getStrings($index = null, $callback1 = null, $callback2 = null, $callback3 = null) {
+		if ($index)
+			$return = $this->eq($index)->text();
+		else {
+			$return = array();
+			for($i = 0; $i < $this->size(); $i++) {
+				$return[] = $this->eq($i)->text();
+			}
+			// pass thou callbacks
+			$args = func_get_args();
+			$args = array_slice($args, 1);
+		}
+		foreach($args as $callback) {
+			if (is_array($return))
+				foreach($return as $k => $v)
+					$return[$k] = phpQuery::callbackRun($callback, array($v));
+			else
+				$return = phpQuery::callbackRun($callback, array($return));
 		}
 		return $return;
 	}
@@ -646,20 +679,20 @@ class phpQueryObject
 			// backup last stack /for end()/
 			$this->elementsBackup = $this->elements;
 		// allow to define context
-		if ( $context ) {
-			if (! is_array($context) && $context instanceof DOMELEMENT )
+		if ($context) {
+			if (! is_array($context) && $context instanceof DOMELEMENT)
 				$this->elements = array($context);
 			else if ( is_array($context) ) {
 				$this->elements = array();
 				foreach ($context as $e)
-					if ( $c instanceof DOMELEMENT )
+					if ($c instanceof DOMELEMENT)
 						$this->elements[] = $c;
 
 			} else if ( $context instanceof self )
 				$this->elements = $context->elements;
 		}
 		$spaceBefore = false;
-		$queries = $this->parseSelector( $selectors );
+		$queries = $this->parseSelector($selectors);
 		$this->debug(array('FIND',$selectors,$queries));
 		$XQuery = '';
 		// remember stack state because of multi-queries
@@ -679,6 +712,8 @@ class phpQueryObject
 						if (mb_strpos($s, '|') !== false) {
 							list($ns, $tag) = explode('|', $s);
 							$XQuery .= "$ns:$tag";
+						} else if ($s == '*') {
+							$XQuery .= "*";
 						} else {
 							$XQuery .= "*[local-name()='$s']";
 						}
@@ -1717,11 +1752,12 @@ class phpQueryObject
 	 * @return unknown_type
 	 * @TODO trigger change event for textarea
 	 */
-	public function markup($markup = null) {
+	public function markup($markup = null, $callback1 = null, $callback2 = null, $callback3 = null) {
+		$args = func_get_args();
 		if ($this->documentWrapper->isXML)
-			return $this->xml($markup);
+			return call_user_func_array(array($this, 'xml'), $args);
 		else
-			return $this->html($markup);
+			return call_user_func_array(array($this, 'html'), $args);
 	}
 	/**
 	 * jQuey difference
@@ -1729,19 +1765,21 @@ class phpQueryObject
 	 * @param $markup
 	 * @return unknown_type
 	 */
-	public function markupOuter() {
+	public function markupOuter($callback1 = null, $callback2 = null, $callback3 = null) {
+		$args = func_get_args();
 		if ($this->documentWrapper->isXML)
-			return $this->xmlOuter();
+			return call_user_func_array(array($this, 'xmlOuter'), $args);
 		else
-			return $this->htmlOuter();
+			return call_user_func_array(array($this, 'htmlOuter'), $args);
 	}
 	/**
 	 * Enter description here...
 	 *
 	 * @param unknown_type $html
 	 * @return string|phpQuery|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @TODO force html result
 	 */
-	public function html($html = null) {
+	public function html($html = null, $callback1 = null, $callback2 = null, $callback3 = null) {
 		if (isset($html)) {
 			// INSERT
 			$nodes = $this->documentWrapper->import($html);
@@ -1763,14 +1801,24 @@ class phpQueryObject
 			return $this;
 		} else {
 			// FETCH
-			return $this->documentWrapper->markup($this->elements, true);
+			$return = $this->documentWrapper->markup($this->elements, true);
+			$args = func_get_args();
+			foreach(array_slice($args, 1) as $callback) {
+				$return = phpQuery::callbackRun($callback, array($return));
+			}
+			return $return;
 		}
 	}
-	public function xml($xml = null) {
-		return $this->html($xml);
+	/**
+	 * @TODO force xml result
+	 */
+	public function xml($xml = null, $callback1 = null, $callback2 = null, $callback3 = null) {
+		$args = func_get_args();
+		return call_user_func_array(array($this, 'html'), $args);
 	}
 	/**
 	 * Enter description here...
+	 * @TODO force html result
 	 *
 	 * @return String
 	 */
@@ -1783,6 +1831,9 @@ class phpQueryObject
 		}
 		return $markup;
 	}
+	/**
+	 * @TODO force xml result
+	 */
 	public function xmlOuter($callback1 = null, $callback2 = null, $callback3 = null) {
 		$args = func_get_args();
 		return call_user_func_array(array($this, 'htmlOuter'), $args);
@@ -2160,7 +2211,7 @@ class phpQueryObject
 		$args = func_get_args();
 		$args = array_slice($args, 1);
 		$return = '';
-		foreach($this->elements as $node ) {
+		foreach($this->elements as $node) {
 			$text = $node->textContent;
 			if (count($this->elements) > 1 && $node->textContent)
 				$text .= "\n";
@@ -2283,14 +2334,16 @@ class phpQueryObject
 				$test = $test->{$direction};
 				if (! $test instanceof DOMELEMENT)
 					continue;
-				if ( $selector ) {
-					if ( $this->is( $selector, $test ) )
-						$stack[] = $test;
-				} else
-					$stack[] = $test;
+				$stack[] = $test;
 				if ($limitToOne && $stack)
 					return $stack;
 			}
+		}
+		if ($selector) {
+			$stackOld = $this->elements;
+			$this->elements = $stack;
+			$stack = $this->filter($selector, true)->stack();
+			$this->elements = $stackOld;
 		}
 		return $stack;
 	}
@@ -2513,7 +2566,9 @@ class phpQueryObject
 				foreach($loop as $a) {
 					$oldValue = $node->getAttribute($a);
 					$oldAttr = $node->hasAttribute($a);
-					$node->setAttribute($a, $value);
+					// TODO raises an error when charset other than UTF-8
+					// while document's charset is also not UTF-8
+					@$node->setAttribute($a, $value);
 					$this->attrEvents($a, $oldAttr, $oldValue, $node);
 				}
 			} else if ($attr == '*') {
@@ -2989,7 +3044,10 @@ class phpQueryObject
 						? '.'.join('.', split(' ', $node->getAttribute('class'))):'')
 					.($node->getAttribute('name')
 						? '[name="'.$node->getAttribute('name').'"]':'')
-				: get_class($node);
+				: ($node instanceof DOMTEXT
+					? "text: '".substr(str_replace("\n", '', $node->textContent), 0, 15)."'"
+					: get_class($node)
+				);
 		}
 		return $oneNode
 			? $return[0]
@@ -3008,8 +3066,26 @@ class phpQueryObject
 	}
 	public function dumpWhois() {
 		print __FILE__.':'.__LINE__."\n";
-		var_dump($this->whois());
+		var_dump('whois', $this->whois());
 		return $this;
+	}
+	public function dumpLength() {
+		print __FILE__.':'.__LINE__."\n";
+		var_dump('length', $this->length());
+		return $this;
+	}
+	public function dumpTree() {
+		foreach($this->stack() as $node)
+			print $this->__dumpTree($node);
+		return $this;
+	}
+	private function __dumpTree($node, $intend = 0) {
+		$return = str_repeat('  ', $intend);
+		$return .= $this->whois($node)."\n";
+		if (isset($node->childNodes))
+			foreach($node->childNodes as $chNode)
+				$return .= $this->__dumpTree($chNode, $intend+1);
+		return $return;
 	}
 	/**
 	 * Dump htmlOuter and stop script execution. Usefull for debugging.

@@ -19,7 +19,7 @@ require_once('phpQuery.php');
 //phpQuery::$debug = true;
 //var_dump($argv);
 if (isset($argv[1]) && parse_url($argv[1], PHP_URL_HOST)) {
-	if (include_once('Zend/Http/Client.php')) {
+	if (@include_once('Zend/Http/Client.php')) {
 		// use Ajax if possible
 		phpQuery::ajaxAllowURL($argv[1]);
 		// TODO support contentType passing (from response headers)

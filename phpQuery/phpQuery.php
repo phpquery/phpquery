@@ -518,7 +518,7 @@ abstract class phpQuery {
 	public static function isMarkup($input) {
 		return substr(trim($input), 0, 1) == '<';
 	}
-	public function debug($text) {
+	public static function debug($text) {
 		if (self::$debug)
 			print var_dump($text);
 	}

@@ -14,6 +14,7 @@ class DOMDocumentWrapper {
 	 * @var DOMDocument
 	 */
 	public $document;
+	public $id;
 	/**
 	 * @todo Rewrite as method and quess if null.
 	 * @var unknown_type
@@ -211,6 +212,7 @@ class DOMDocumentWrapper {
 			phpQuery::debug("Full markup load (XML), DocumentFragment detected, using charset '$charset'");
 			$return = $this->documentFragmentLoadMarkup($this, $charset, $markup);
 		} else {
+			// FIXME ???
 			if ($isContentTypeXHTML && ! $isMarkupXHTML)
 			if (! $documentCharset) {
 				phpQuery::debug("Full markup load (XML), appending charset '$charset'");
@@ -234,6 +236,8 @@ class DOMDocumentWrapper {
 					? LIBXML_DTDLOAD|LIBXML_DTDATTR|LIBXML_NONET
 					: LIBXML_DTDLOAD|LIBXML_DTDATTR|LIBXML_NONET|LIBXML_NOWARNING|LIBXML_NOERROR;
 				$return = $this->document->loadXML($markup, $libxmlStatic);
+// 				if (! $return)
+// 					$return = $this->document->loadHTML($markup);
 			}
 			if ($return)
 				$this->root = $this->document;
@@ -432,7 +436,7 @@ class DOMDocumentWrapper {
 				$fragment->root = $fragment->document->firstChild;
 			}
 		} else {
-			$markup2 = '<html><head><meta http-equiv="Content-Type" content="text/html;charset='
+			$markup2 = phpQuery::$defaultDoctype.'<html><head><meta http-equiv="Content-Type" content="text/html;charset='
 				.$charset.'"></head>';
 			$noBody = strpos($markup, '<body') === false;
 			if ($noBody)

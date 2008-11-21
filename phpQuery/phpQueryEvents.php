@@ -6,7 +6,7 @@
  * @package phpQuery
  * @static
  */
-class phpQueryEvents {
+abstract class phpQueryEvents {
 	/**
 	 * Trigger a type of event on every matched element.
 	 *
@@ -15,7 +15,7 @@ class phpQueryEvents {
 	 * @param unknown_type $data
 	 *
 	 * @TODO exclusive events (with !)
-	 * @TODO global events
+	 * @TODO global events (test)
 	 * @TODO support more than event in $type (space-separated)
 	 */
 	public static function trigger($document, $type, $data = array(), $node = null) {
@@ -65,10 +65,11 @@ class phpQueryEvents {
 							$event->data = $handler['data']
 								? $handler['data']
 								: null;
-							$return = phpQuery::callbackRun($handler['callback'], array_merge(array($event), $data));
-						}
-						if ($return === false) {
-							$event->bubbles = false;
+							$params = array_merge(array($event), $data);
+							$return = phpQuery::callbackRun($handler['callback'], $params);
+							if ($return === false) {
+								$event->bubbles = false;
+							}
 						}
 					}
 				}
@@ -93,6 +94,7 @@ class phpQueryEvents {
 	 * @TODO support binding to global events
 	 */
 	public static function add($document, $node, $type, $data, $callback = null) {
+		phpQuery::debug("Binding '$type' event");
 		$documentID = phpQuery::getDocumentID($document);
 //		if (is_null($callback) && is_callable($data)) {
 //			$callback = $data;

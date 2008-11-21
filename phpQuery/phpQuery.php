@@ -3,7 +3,7 @@
  * phpQuery is a server-side, chainable, CSS3 selector driven
  * Document Object Model (DOM) API based on jQuery JavaScript Library.
  *
- * @version 0.9.5 beta3
+ * @version 0.9.5 beta4
  * @link http://code.google.com/p/phpquery/
  * @link http://phpquery-library.blogspot.com/
  * @link http://jquery.com/
@@ -23,6 +23,7 @@ require_once(dirname(__FILE__).'/DOMDocumentWrapper.php');
 require_once(dirname(__FILE__).'/phpQueryEvents.php');
 require_once(dirname(__FILE__).'/Callback.php');
 require_once(dirname(__FILE__).'/phpQueryObject.php');
+require_once(dirname(__FILE__).'/compat/mbstring.php');
 /**
  * Static namespace for phpQuery functions.
  *
@@ -32,18 +33,15 @@ require_once(dirname(__FILE__).'/phpQueryObject.php');
 abstract class phpQuery {
 	public static $debug = false;
 	public static $documents = array();
-	// TODO
 	public static $defaultDocumentID = null;
-	public static $lastDomId = null;
 //	public static $defaultDoctype = 'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"';
 	/**
-	 * @deprecated
+	 * Applies only to HTML.
 	 *
 	 * @var unknown_type
 	 */
-	public static $defaultDoctype = '';
-	public static $defaultEncoding = 'UTF-8';
-	/** TODO */
+	public static $defaultDoctype = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">';
 	public static $defaultCharset = 'UTF-8';
 	/**
 	 * Static namespace for plugins.
@@ -96,12 +94,13 @@ abstract class phpQuery {
 	);
 	public static $lastModified = null;
 	public static $active = 0;
+	public static $dumpCount = 0;
 	/**
 	 * Multi-purpose function.
 	 * Use pq() as shortcut.
 	 *
 	 * In below examples, $pq is any result of pq(); function.
-	 * *************
+	 *
 	 * 1. Import markup into existing document (without any attaching):
 	 * - Import into selected document:
 	 *   pq('<div/>')				// DOESNT accept text nodes at beginning of input string !
@@ -111,7 +110,7 @@ abstract class phpQuery {
 	 *   pq('<div/>', DOMNode)
 	 * - Import into document from phpQuery object:
 	 *   pq('<div/>', $pq)
-	 * *************
+	 *
 	 * 2. Run query:
 	 * - Run query on last selected document:
 	 *   pq('div.myClass')
@@ -124,18 +123,21 @@ abstract class phpQuery {
 	 *   pq('div.myClass', $pq)
 	 *
 	 * @param string|DOMNode|DOMNodeList|array	$arg1	HTML markup, CSS Selector, DOMNode or array of DOMNodes
-	 * @param string|phpQuery|DOMNode	$context	DOM ID from $pq->getDocumentID(), phpQuery object (determines also query root) or DOMNode (determines also query root)
+	 * @param string|phpQueryObject|DOMNode	$context	DOM ID from $pq->getDocumentID(), phpQuery object (determines also query root) or DOMNode (determines also query root)
 	 *
-	 * @return	phpQuery|false			phpQuery object or false in case of error.
-	 */
-	/**
-	 * Enter description here...
-	 *
-	 * @return false|phpQuery|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery|false
+   * phpQuery object or false in case of error.
 	 */
 	public static function pq($arg1, $context = null) {
+		if ($arg1 instanceof DOMNODE && ! isset($context)) {
+			foreach(phpQuery::$documents as $documentWrapper) {
+				if ($documentWrapper->document->isSameNode($arg1->ownerDocument)) {
+					$context = $documentWrapper->id;
+				}
+			}
+		}
 		if (! $context) {
-			$domId = self::$lastDomId;
+			$domId = self::$defaultDocumentID;
 			if (! $domId)
 				throw new Exception("Can't use last created DOM, because there isn't any. Use phpQuery::newDocument() first.");
 //		} else if (is_object($context) && ($context instanceof PHPQUERY || is_subclass_of($context, 'phpQueryObject')))
@@ -149,7 +151,7 @@ abstract class phpQuery {
 			}
 		} else if ($context instanceof DOMNODE) {
 			$domId = self::getDocumentID($context);
-			if (! $domId){
+			if (! $domId) {
 				throw new Exception('Orphaned DOMNode');
 //				$domId = self::newDocument($context->ownerDocument);
 			}
@@ -173,7 +175,7 @@ abstract class phpQuery {
 				$phpQuery->elements[] = $phpQuery->document->importNode($node, true);
 			return $phpQuery;
 		} else if ($arg1 instanceof DOMNODE || (is_array($arg1) && isset($arg1[0]) && $arg[0] instanceof DOMNODE)) {
-			/**
+			/*
 			 * Wrap DOM nodes with phpQuery object, import into document when needed:
 			 * pq(array($domNode1, $domNode2))
 			 */
@@ -223,7 +225,7 @@ abstract class phpQuery {
 	public static function selectDocument($id) {
 		$id = self::getDocumentID($id);
 		self::debug("Selecting document '$id' as default one");
-		self::$lastDomId = self::getDocumentID($id);
+		self::$defaultDocumentID = self::getDocumentID($id);
 	}
 	/**
 	 * Returns document with id $id or last used as phpQueryObject.
@@ -238,7 +240,7 @@ abstract class phpQuery {
 		if ($id)
 			phpQuery::selectDocument($id);
 		else
-			$id = phpQuery::$lastDomId;
+			$id = phpQuery::$defaultDocumentID;
 		return new phpQueryObject($id);
 	}
 	/**
@@ -295,7 +297,7 @@ abstract class phpQuery {
 	}
 	public static function markupToPHP($content) {
 		if ($content instanceof phpQueryObject)
-			$content = $content->htmlOuter();
+			$content = $content->markupOuter();
 		/* <php>...</php> to <?php...?> */
 		$content = preg_replace_callback(
 			'@<php>\s*<!--(.*?)-->\s*</php>@s',
@@ -397,10 +399,11 @@ abstract class phpQuery {
 		} else {
 			$wrapper = new DOMDocumentWrapper($html, $contentType);
 		}
+		$wrapper->id = $id;
 		// create document
-		phpQuery::$documents[ $id ] = $wrapper;
+		phpQuery::$documents[$id] = $wrapper;
 		// remember last loaded document
-		return self::$lastDomId = $id;
+		return self::$defaultDocumentID = $id;
 	}
 	/**
 	 * Deprecated, use phpQuery::plugin() instead.
@@ -424,10 +427,13 @@ abstract class phpQuery {
 //		if (strpos($class, 'phpQuery') === 0)
 //			$class = substr($class, 8);
 		if (in_array($class, self::$pluginsLoaded))
-			return;
+			return true;
 		if (! $file)
 			$file = $class.'.php';
-		require_once($file);
+		$objectClassExists = class_exists('phpQueryObjectPlugin_'.$class);
+		$staticClassExists = class_exists('phpQueryPlugin_'.$class);
+		if (! $objectClassExists && ! $staticClassExists)
+			require_once($file);
 		self::$pluginsLoaded[] = $class;
 		// static methods
 		if (class_exists('phpQueryPlugin_'.$class)) {
@@ -512,7 +518,7 @@ abstract class phpQuery {
 	public static function isMarkup($input) {
 		return substr(trim($input), 0, 1) == '<';
 	}
-	public function debug($text) {
+	public static function debug($text) {
 		if (self::$debug)
 			print var_dump($text);
 	}
@@ -522,7 +528,7 @@ abstract class phpQuery {
 	 * @param array See $options http://docs.jquery.com/Ajax/jQuery.ajax#toptions
 	 * Additional options are:
 	 * 'document' - document for global events, @see phpQuery::getDocumentID()
-	 * 'http_referer' - TODO; not implemented
+	 * 'referer' - implemented
 	 * 'requested_with' - TODO; not implemented (X-Requested-With)
 	 * @return Zend_Http_Client
 	 * @link http://docs.jquery.com/Ajax/jQuery.ajax
@@ -545,7 +551,7 @@ abstract class phpQuery {
 //			$client->setParameterGet(null);
 			$client->setAuth(false);
 			$client->setHeaders("If-Modified-Since", null);
-			$client->setHeaders("Http-Referer", null);
+			$client->setHeaders("Referer", null);
 			$client->resetParameters();
 		} else {
 			// create new XHR object
@@ -567,13 +573,17 @@ abstract class phpQuery {
 			return false;
 		}
 		$client->setUri($options['url']);
-		$client->setMethod($options['type']);
-		if (isset($options['httpReferer']) && $options['httpReferer'])
-			$client->setHeaders('Http-Referer', $options['httpReferer']);
+		$client->setMethod(strtoupper($options['type']));
+		if (isset($options['referer']) && $options['referer'])
+			$client->setHeaders('Referer', $options['referer']);
 		$client->setHeaders(array(
 //			'content-type' => $options['contentType'],
-			'user-agent' => 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9a8) Gecko/2007100619 GranParadiso/3.0a8',
-			'accept-charset' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+			'User-Agent' => 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9a8) Gecko/2007100619 GranParadiso/3.0a8',
+	 		// TODO custom charset
+			'Accept-Charset' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+// 	 		'Connection' => 'keep-alive',
+// 			'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+	 		'Accept-Language' => 'en-us,en;q=0.5',
 		));
 		if ($options['username'])
 			$client->setAuth($options['username'], $options['password']);
@@ -645,7 +655,7 @@ abstract class phpQuery {
 			phpQueryEvents::trigger($documentID, 'ajaxStop');
 		return $client;
 //		if (is_null($domId))
-//			$domId = self::$lastDomId ? self::$lastDomId : false;
+//			$domId = self::$defaultDocumentID ? self::$defaultDocumentID : false;
 //		return new phpQueryAjaxResponse($response, $domId);
 	}
 	/**
@@ -855,7 +865,7 @@ abstract class phpQuery {
 	 * @param $paramStructure
 	 * @return unknown_type
 	 */
-	public static function callbackRun($callback, $params, $paramStructure = null) {
+	public static function callbackRun($callback, $params = null, $paramStructure = null) {
 		if (! $callback)
 			return;
 		if ($callback instanceof CallbackReference) {
@@ -936,22 +946,31 @@ abstract class phpQuery {
 	}
 	/* PLUGINS NAMESPACE */
 	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
-		if (self::extend('WebBrowser')) {
+		if (self::plugin('WebBrowser')) {
 			$params = func_get_args();
 			return self::callbackRun(array(self::$plugins, 'browserGet'), $params);
+		} else {
+			self::debug('WebBrowser plugin not available...');
 		}
 	}
 	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
-		if (self::extend('WebBrowser')) {
+		if (self::plugin('WebBrowser')) {
 			$params = func_get_args();
 			return self::callbackRun(array(self::$plugins, 'browserPost'), $params);
+		} else {
+			self::debug('WebBrowser plugin not available...');
 		}
 	}
 	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
-		if (self::extend('WebBrowser')) {
+		if (self::plugin('WebBrowser')) {
 			$params = func_get_args();
 			return self::callbackRun(array(self::$plugins, 'browser'), $params);
+		} else {
+			self::debug('WebBrowser plugin not available...');
 		}
+	}
+	public static function php($code) {
+		return "<php><!-- ".trim($code)." --></php>";
 	}
 }
 /**

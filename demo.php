@@ -2,11 +2,11 @@
 require('phpQuery/phpQuery.php');
 
 // INITIALIZE IT
-// $doc = phpQuery::newDocumentHTML($markup);
-// $doc = phpQuery::newDocumentXML();
-// $doc = phpQuery::newDocumentFileXHTML('test.html');
-// $doc = phpQuery::newDocumentFilePHP('test.php');
-// $doc = phpQuery::newDocument('test.xml', 'application/rss+xml');
+// phpQuery::newDocumentHTML($markup);
+// phpQuery::newDocumentXML();
+// phpQuery::newDocumentFileXHTML('test.html');
+// phpQuery::newDocumentFilePHP('test.php');
+// phpQuery::newDocument('test.xml', 'application/rss+xml');
 // this one defaults to text/html in utf8
 $doc = phpQuery::newDocument('<div/>');
 
@@ -14,11 +14,11 @@ $doc = phpQuery::newDocument('<div/>');
 // array syntax works like ->find() here
 $doc['div']->append('<ul></ul>');
 // array set changes inner html
-$doc['div ul'] = '<li>1</li><li>2</li><li>3</li>';
+$doc['div ul'] = '<li>1</li> <li>2</li> <li>3</li>';
 
 // MANIPULATE IT
+$li = null;
 // almost everything can be a chain
-$li;
 $doc['ul > li']
 	->addClass('my-new-class')
 	->filter(':last')
@@ -31,11 +31,11 @@ $doc['ul > li']
 phpQuery::selectDocument($doc);
 // documents are selected when created, iterated or by above method
 // query all unordered lists in last selected document
-pq('ul')->insertAfter('div');
+$ul = pq('ul')->insertAfter('div');
 
 // INTERATE IT
-// all LIs from last selected DOM
-foreach(pq('li') as $li) {
+// all direct LIs from $ul
+foreach($ul['> li'] as $li) {
 	// iteration returns PLAIN dom nodes, NOT phpQuery objects
 	$tagName = $li->tagName;
 	$childNodes = $li->childNodes;

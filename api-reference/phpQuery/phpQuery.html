@@ -97,9 +97,8 @@ Source Location: /phpQuery.php<br /><br />
     <li><a href="../phpQuery/phpQuery.html#var$defaultCharset">$defaultCharset</a></li>
     <li><a href="../phpQuery/phpQuery.html#var$defaultDoctype">$defaultDoctype</a></li>
     <li><a href="../phpQuery/phpQuery.html#var$defaultDocumentID">$defaultDocumentID</a></li>
-    <li><a href="../phpQuery/phpQuery.html#var$defaultEncoding">$defaultEncoding</a></li>
     <li><a href="../phpQuery/phpQuery.html#var$documents">$documents</a></li>
-    <li><a href="../phpQuery/phpQuery.html#var$lastDomId">$lastDomId</a></li>
+    <li><a href="../phpQuery/phpQuery.html#var$dumpCount">$dumpCount</a></li>
     <li><a href="../phpQuery/phpQuery.html#var$lastModified">$lastModified</a></li>
     <li><a href="../phpQuery/phpQuery.html#var$plugins">$plugins</a></li>
     <li><a href="../phpQuery/phpQuery.html#var$pluginsLoaded">$pluginsLoaded</a></li>
@@ -150,6 +149,7 @@ Source Location: /phpQuery.php<br /><br />
     <li><a href="../phpQuery/phpQuery.html#methodnewDocumentXML">newDocumentXML</a></li>
     <li><a href="../phpQuery/phpQuery.html#methodparam">param</a></li>
     <li><a href="../phpQuery/phpQuery.html#methodparseJSON">parseJSON</a></li>
+    <li><a href="../phpQuery/phpQuery.html#methodphp">php</a></li>
     <li><a href="../phpQuery/phpQuery.html#methodphpToMarkup">phpToMarkup</a></li>
     <li><a href="../phpQuery/phpQuery.html#methodplugin">plugin</a></li>
     <li><a href="../phpQuery/phpQuery.html#methodpost">post</a></li>
@@ -179,7 +179,7 @@ Source Location: /phpQuery.php<br /><br />
 <a name="class_details"></a>
 <h3>Class Details</h3>
 <div class="tags">
-[line 32]<br />
+[line 33]<br />
 Static namespace for phpQuery functions.<br /><br /><br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -202,7 +202,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<a name="var$active"></a>
 	<p></p>
 	<h4>static $active = <span class="value">&nbsp;0</span></h4>
-	<p>[line 98]</p>
+	<p>[line 96]</p>
   <br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -228,7 +228,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<h4>static $ajaxAllowedHosts = <span class="value">array(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.'<br>
 &nbsp;&nbsp;&nbsp;)</span></h4>
-	<p>[line 68]</p>
+	<p>[line 66]</p>
   Hosts allowed for AJAX connections.<br /><br /><p>Dot '.' means $_SERVER['HTTP_HOST'] (if any).</p><br /><br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -270,7 +270,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'text'&nbsp;=&gt;&nbsp;&quot;text/plain&quot;,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'_default'&nbsp;=&gt;&nbsp;&quot;*/*&quot;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;))</span></h4>
-	<p>[line 77]</p>
+	<p>[line 75]</p>
   AJAX settings.<br /><br /><br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -297,7 +297,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<a name="var$debug"></a>
 	<p></p>
 	<h4>static $debug = <span class="value">&nbsp;false</span></h4>
-	<p>[line 33]</p>
+	<p>[line 34]</p>
   <br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -321,8 +321,8 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<a name="var$defaultCharset"></a>
 	<p></p>
 	<h4>static $defaultCharset = <span class="value">&nbsp;'UTF-8'</span></h4>
-	<p>[line 47]</p>
-  TODO<br /><br /><br /><br />
+	<p>[line 45]</p>
+  <br /><br />
 <h4>Tags:</h4>
 <div class="tags">
 <table border="0" cellspacing="0" cellpadding="0">
@@ -344,15 +344,13 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<div class="top">[ <a href="#top">Top</a> ]</div><br />
 	<a name="var$defaultDoctype"></a>
 	<p></p>
-	<h4>static $defaultDoctype = <span class="value">&nbsp;''</span></h4>
-	<p>[line 44]</p>
-  <br /><br />
+	<h4>static $defaultDoctype = <span class="value">&nbsp;'&lt;!DOCTYPE&nbsp;HTML&nbsp;PUBLIC&nbsp;&quot;-//W3C//DTD&nbsp;HTML&nbsp;4.01&nbsp;Transitional//EN&quot;<br>
+&quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;'</span></h4>
+	<p>[line 43]</p>
+  Applies only to HTML.<br /><br /><br /><br />
 <h4>Tags:</h4>
 <div class="tags">
 <table border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td><b>deprecated:</b>&nbsp;&nbsp;</td><td></td>
-  </tr>
   <tr>
     <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
   </tr>
@@ -393,34 +391,10 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
       </table>
 	</div><br /><br />
 	<div class="top">[ <a href="#top">Top</a> ]</div><br />
-	<a name="var$defaultEncoding"></a>
-	<p></p>
-	<h4>static $defaultEncoding = <span class="value">&nbsp;'UTF-8'</span></h4>
-	<p>[line 45]</p>
-  <br /><br />
-<h4>Tags:</h4>
-<div class="tags">
-<table border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
-  </tr>
-</table>
-</div>
-
-  <br />
-	<div class="tags">
-  <table border="0" cellspacing="0" cellpadding="0">
-    <tr>
-      <td><b>Type:</b>&nbsp;&nbsp;</td>
-      <td>mixed</td>
-    </tr>
-      </table>
-	</div><br /><br />
-	<div class="top">[ <a href="#top">Top</a> ]</div><br />
 	<a name="var$documents"></a>
 	<p></p>
 	<h4>static $documents = <span class="value">array()</span></h4>
-	<p>[line 34]</p>
+	<p>[line 35]</p>
   <br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -441,10 +415,10 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
       </table>
 	</div><br /><br />
 	<div class="top">[ <a href="#top">Top</a> ]</div><br />
-	<a name="var$lastDomId"></a>
+	<a name="var$dumpCount"></a>
 	<p></p>
-	<h4>static $lastDomId = <span class="value">&nbsp;null</span></h4>
-	<p>[line 37]</p>
+	<h4>static $dumpCount = <span class="value">&nbsp;0</span></h4>
+	<p>[line 97]</p>
   <br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -468,7 +442,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<a name="var$lastModified"></a>
 	<p></p>
 	<h4>static $lastModified = <span class="value">&nbsp;null</span></h4>
-	<p>[line 97]</p>
+	<p>[line 95]</p>
   <br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -492,7 +466,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<a name="var$plugins"></a>
 	<p></p>
 	<h4>static $plugins = <span class="value">array()</span></h4>
-	<p>[line 53]</p>
+	<p>[line 51]</p>
   Static namespace for plugins.<br /><br /><br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -516,7 +490,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<a name="var$pluginsLoaded"></a>
 	<p></p>
 	<h4>static $pluginsLoaded = <span class="value">array()</span></h4>
-	<p>[line 59]</p>
+	<p>[line 57]</p>
   List of loaded plugins.<br /><br /><br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -540,7 +514,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<a name="var$pluginsMethods"></a>
 	<p></p>
 	<h4>static $pluginsMethods = <span class="value">array()</span></h4>
-	<p>[line 60]</p>
+	<p>[line 58]</p>
   <br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -564,7 +538,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 	<a name="var$pluginsStaticMethods"></a>
 	<p></p>
 	<h4>static $pluginsStaticMethods = <span class="value">array()</span></h4>
-	<p>[line 61]</p>
+	<p>[line 59]</p>
   <br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -593,7 +567,7 @@ Static namespace for phpQuery functions.<br /><br /><br /><br />
 <div class="tags">
   <hr />
 	<a name="methodajax"></a>
-	<h3>static method ajax <span class="smalllinenumber">[line 534]</span></h3>
+	<h3>static method ajax <span class="smalllinenumber">[line 540]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -634,7 +608,7 @@ $xhr = null])</code>
           <tr>
         <td class="type">array&nbsp;&nbsp;</td>
         <td><b>$options</b>&nbsp;&nbsp;</td>
-        <td>See $options http://docs.jquery.com/Ajax/jQuery.ajax#toptions  Additional options are:  'document' - document for global events, @see phpQuery::getDocumentID()  'http_referer' - TODO; not implemented  'requested_with' - TODO; not implemented (X-Requested-With)</td>
+        <td>See $options http://docs.jquery.com/Ajax/jQuery.ajax#toptions  Additional options are:  'document' - document for global events, @see phpQuery::getDocumentID()  'referer' - implemented  'requested_with' - TODO; not implemented (X-Requested-With)</td>
       </tr>
           <tr>
         <td class="type">&nbsp;&nbsp;</td>
@@ -647,7 +621,7 @@ $xhr = null])</code>
   </div>
   <hr />
 	<a name="methodajaxAllowHost"></a>
-	<h3>static method ajaxAllowHost <span class="smalllinenumber">[line 695]</span></h3>
+	<h3>static method ajaxAllowHost <span class="smalllinenumber">[line 705]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -695,7 +669,7 @@ $host3 = null])</code>
   </div>
   <hr />
 	<a name="methodajaxAllowURL"></a>
-	<h3>static method ajaxAllowURL <span class="smalllinenumber">[line 705]</span></h3>
+	<h3>static method ajaxAllowURL <span class="smalllinenumber">[line 715]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -743,7 +717,7 @@ $url3 = null])</code>
   </div>
   <hr />
 	<a name="methodajaxSetup"></a>
-	<h3>static method ajaxSetup <span class="smalllinenumber">[line 689]</span></h3>
+	<h3>static method ajaxSetup <span class="smalllinenumber">[line 699]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -779,7 +753,7 @@ $options)</code>
   </div>
   <hr />
 	<a name="methodbrowser"></a>
-	<h3>static method browser <span class="smalllinenumber">[line 950]</span></h3>
+	<h3>static method browser <span class="smalllinenumber">[line 964]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -839,7 +813,7 @@ $param3 = null])</code>
   </div>
   <hr />
 	<a name="methodbrowserGet"></a>
-	<h3>static method browserGet <span class="smalllinenumber">[line 938]</span></h3>
+	<h3>static method browserGet <span class="smalllinenumber">[line 948]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -899,7 +873,7 @@ $param3 = null])</code>
   </div>
   <hr />
 	<a name="methodbrowserPost"></a>
-	<h3>static method browserPost <span class="smalllinenumber">[line 944]</span></h3>
+	<h3>static method browserPost <span class="smalllinenumber">[line 956]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -965,14 +939,14 @@ $param3 = null])</code>
   </div>
   <hr />
 	<a name="methodcallbackRun"></a>
-	<h3>static method callbackRun <span class="smalllinenumber">[line 858]</span></h3>
+	<h3>static method callbackRun <span class="smalllinenumber">[line 868]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
 		<code>static unknown_type callbackRun(
 $callback
-$callback, $params
-$params, [$paramStructure
+$callback, [$params
+$params = null], [$paramStructure
 $paramStructure = null])</code>
     </td></tr></table>
     </td></tr></table><br />
@@ -1013,7 +987,7 @@ $paramStructure = null])</code>
   </div>
   <hr />
 	<a name="methodcreateDocumentWrapper"></a>
-	<h3>static method createDocumentWrapper <span class="smalllinenumber">[line 379]</span></h3>
+	<h3>static method createDocumentWrapper <span class="smalllinenumber">[line 381]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1075,8 +1049,44 @@ $domId)</code>
         <div class="top">[ <a href="#top">Top</a> ]</div>
   </div>
   <hr />
+	<a name="methoddebug"></a>
+	<h3>static method debug <span class="smalllinenumber">[line 521]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>static void debug(
+
+$text)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$text</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
 	<a name="methodDOMNodeListToArray"></a>
-	<h3>static method DOMNodeListToArray <span class="smalllinenumber">[line 496]</span></h3>
+	<h3>static method DOMNodeListToArray <span class="smalllinenumber">[line 502]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1112,7 +1122,7 @@ $DOMNodeList)</code>
   </div>
   <hr />
 	<a name="methodeach"></a>
-	<h3>static method each <span class="smalllinenumber">[line 808]</span></h3>
+	<h3>static method each <span class="smalllinenumber">[line 818]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1175,7 +1185,7 @@ $param3 = null])</code>
   </div>
   <hr />
 	<a name="methodextend"></a>
-	<h3>static method extend <span class="smalllinenumber">[line 413]</span></h3>
+	<h3>static method extend <span class="smalllinenumber">[line 416]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1220,7 +1230,7 @@ $file = null])</code>
   </div>
   <hr />
 	<a name="methodget"></a>
-	<h3>static method get <span class="smalllinenumber">[line 661]</span></h3>
+	<h3>static method get <span class="smalllinenumber">[line 671]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1274,7 +1284,7 @@ $type = null])</code>
   </div>
   <hr />
 	<a name="methodgetDocument"></a>
-	<h3>static method getDocument <span class="smalllinenumber">[line 237]</span></h3>
+	<h3>static method getDocument <span class="smalllinenumber">[line 239]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1313,7 +1323,7 @@ $id = null])</code>
   </div>
   <hr />
 	<a name="methodgetDocumentID"></a>
-	<h3>static method getDocumentID <span class="smalllinenumber">[line 744]</span></h3>
+	<h3>static method getDocumentID <span class="smalllinenumber">[line 754]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1349,7 +1359,7 @@ $source)</code>
   </div>
   <hr />
 	<a name="methodgetDOMDocument"></a>
-	<h3>static method getDOMDocument <span class="smalllinenumber">[line 767]</span></h3>
+	<h3>static method getDOMDocument <span class="smalllinenumber">[line 777]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1385,7 +1395,7 @@ $source)</code>
   </div>
   <hr />
 	<a name="methodgrep"></a>
-	<h3>static method grep <span class="smalllinenumber">[line 912]</span></h3>
+	<h3>static method grep <span class="smalllinenumber">[line 922]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1436,7 +1446,7 @@ $invert = false])</code>
   </div>
   <hr />
 	<a name="methodinArray"></a>
-	<h3>static method inArray <span class="smalllinenumber">[line 798]</span></h3>
+	<h3>static method inArray <span class="smalllinenumber">[line 808]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1478,7 +1488,7 @@ $array)</code>
   </div>
   <hr />
 	<a name="methodisFunction"></a>
-	<h3>static method isFunction <span class="smalllinenumber">[line 931]</span></h3>
+	<h3>static method isFunction <span class="smalllinenumber">[line 941]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1517,7 +1527,7 @@ $function)</code>
   </div>
   <hr />
 	<a name="methodisMarkup"></a>
-	<h3>static method isMarkup <span class="smalllinenumber">[line 512]</span></h3>
+	<h3>static method isMarkup <span class="smalllinenumber">[line 518]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1559,7 +1569,7 @@ $input)</code>
   </div>
   <hr />
 	<a name="methodloadDocument"></a>
-	<h3>static method loadDocument <span class="smalllinenumber">[line 366]</span></h3>
+	<h3>static method loadDocument <span class="smalllinenumber">[line 368]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1598,7 +1608,7 @@ $document)</code>
   </div>
   <hr />
 	<a name="methodmakeArray"></a>
-	<h3>static method makeArray <span class="smalllinenumber">[line 784]</span></h3>
+	<h3>static method makeArray <span class="smalllinenumber">[line 794]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1637,7 +1647,7 @@ $obj)</code>
   </div>
   <hr />
 	<a name="methodmap"></a>
-	<h3>static method map <span class="smalllinenumber">[line 826]</span></h3>
+	<h3>static method map <span class="smalllinenumber">[line 836]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1700,7 +1710,7 @@ $param3 = null])</code>
   </div>
   <hr />
 	<a name="methodmarkupToPHP"></a>
-	<h3>static method markupToPHP <span class="smalllinenumber">[line 296]</span></h3>
+	<h3>static method markupToPHP <span class="smalllinenumber">[line 298]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1736,7 +1746,7 @@ $content)</code>
   </div>
   <hr />
 	<a name="methodmerge"></a>
-	<h3>static method merge <span class="smalllinenumber">[line 888]</span></h3>
+	<h3>static method merge <span class="smalllinenumber">[line 898]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1781,7 +1791,7 @@ $two)</code>
   </div>
   <hr />
 	<a name="methodnewDocument"></a>
-	<h3>static method newDocument <span class="smalllinenumber">[line 252]</span></h3>
+	<h3>static method newDocument <span class="smalllinenumber">[line 254]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1826,7 +1836,7 @@ $contentType = null])</code>
   </div>
   <hr />
 	<a name="methodnewDocumentFile"></a>
-	<h3>static method newDocumentFile <span class="smalllinenumber">[line 340]</span></h3>
+	<h3>static method newDocumentFile <span class="smalllinenumber">[line 342]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1868,7 +1878,7 @@ $contentType = null])</code>
   </div>
   <hr />
 	<a name="methodnewDocumentFileHTML"></a>
-	<h3>static method newDocumentFileHTML <span class="smalllinenumber">[line 346]</span></h3>
+	<h3>static method newDocumentFileHTML <span class="smalllinenumber">[line 348]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1910,7 +1920,7 @@ $charset = 'utf-8'])</code>
   </div>
   <hr />
 	<a name="methodnewDocumentFilePHP"></a>
-	<h3>static method newDocumentFilePHP <span class="smalllinenumber">[line 355]</span></h3>
+	<h3>static method newDocumentFilePHP <span class="smalllinenumber">[line 357]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1952,7 +1962,7 @@ $contentType = null])</code>
   </div>
   <hr />
 	<a name="methodnewDocumentFileXHTML"></a>
-	<h3>static method newDocumentFileXHTML <span class="smalllinenumber">[line 352]</span></h3>
+	<h3>static method newDocumentFileXHTML <span class="smalllinenumber">[line 354]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -1994,7 +2004,7 @@ $charset = 'utf-8'])</code>
   </div>
   <hr />
 	<a name="methodnewDocumentFileXML"></a>
-	<h3>static method newDocumentFileXML <span class="smalllinenumber">[line 349]</span></h3>
+	<h3>static method newDocumentFileXML <span class="smalllinenumber">[line 351]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2036,7 +2046,7 @@ $charset = 'utf-8'])</code>
   </div>
   <hr />
 	<a name="methodnewDocumentHTML"></a>
-	<h3>static method newDocumentHTML <span class="smalllinenumber">[line 258]</span></h3>
+	<h3>static method newDocumentHTML <span class="smalllinenumber">[line 260]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2078,7 +2088,7 @@ $charset = 'utf-8'])</code>
   </div>
   <hr />
 	<a name="methodnewDocumentPHP"></a>
-	<h3>static method newDocumentPHP <span class="smalllinenumber">[line 269]</span></h3>
+	<h3>static method newDocumentPHP <span class="smalllinenumber">[line 271]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2120,7 +2130,7 @@ $contentType = &quot;text/html;charset=utf-8&quot;])</code>
   </div>
   <hr />
 	<a name="methodnewDocumentXHTML"></a>
-	<h3>static method newDocumentXHTML <span class="smalllinenumber">[line 266]</span></h3>
+	<h3>static method newDocumentXHTML <span class="smalllinenumber">[line 268]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2162,7 +2172,7 @@ $charset = 'utf-8'])</code>
   </div>
   <hr />
 	<a name="methodnewDocumentXML"></a>
-	<h3>static method newDocumentXML <span class="smalllinenumber">[line 263]</span></h3>
+	<h3>static method newDocumentXML <span class="smalllinenumber">[line 265]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2204,7 +2214,7 @@ $charset = 'utf-8'])</code>
   </div>
   <hr />
 	<a name="methodparam"></a>
-	<h3>static method param <span class="smalllinenumber">[line 657]</span></h3>
+	<h3>static method param <span class="smalllinenumber">[line 667]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2240,7 +2250,7 @@ $data)</code>
   </div>
   <hr />
 	<a name="methodparseJSON"></a>
-	<h3>static method parseJSON <span class="smalllinenumber">[line 732]</span></h3>
+	<h3>static method parseJSON <span class="smalllinenumber">[line 742]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2275,8 +2285,44 @@ $json)</code>
         <div class="top">[ <a href="#top">Top</a> ]</div>
   </div>
   <hr />
+	<a name="methodphp"></a>
+	<h3>static method php <span class="smalllinenumber">[line 972]</span></h3>
+	<div class="function">
+    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
+    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
+		<code>static void php(
+
+$code)</code>
+    </td></tr></table>
+    </td></tr></table><br />
+	
+		<br /><br />
+<h4>Tags:</h4>
+<div class="tags">
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
+  </tr>
+</table>
+</div>
+<br /><br />
+
+	
+        <h4>Parameters:</h4>
+    <div class="tags">
+    <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+        <td class="type">&nbsp;&nbsp;</td>
+        <td><b>$code</b>&nbsp;&nbsp;</td>
+        <td></td>
+      </tr>
+        </table>
+    </div><br />
+        <div class="top">[ <a href="#top">Top</a> ]</div>
+  </div>
+  <hr />
 	<a name="methodphpToMarkup"></a>
-	<h3>static method phpToMarkup <span class="smalllinenumber">[line 273]</span></h3>
+	<h3>static method phpToMarkup <span class="smalllinenumber">[line 275]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2318,7 +2364,7 @@ $charset = 'utf-8'])</code>
   </div>
   <hr />
 	<a name="methodplugin"></a>
-	<h3>static method plugin <span class="smalllinenumber">[line 422]</span></h3>
+	<h3>static method plugin <span class="smalllinenumber">[line 425]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2360,7 +2406,7 @@ $file = null])</code>
   </div>
   <hr />
 	<a name="methodpost"></a>
-	<h3>static method post <span class="smalllinenumber">[line 676]</span></h3>
+	<h3>static method post <span class="smalllinenumber">[line 686]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2414,21 +2460,33 @@ $type = null])</code>
   </div>
   <hr />
 	<a name="methodpq"></a>
-	<h3>static method pq <span class="smalllinenumber">[line 136]</span></h3>
+	<h3>static method pq <span class="smalllinenumber">[line 131]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
-		<code>static false|<a href="../phpQuery/phpQuery.html">phpQuery</a>|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup pq(
-
-$arg1, [
+		<code>static <a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery|false pq(
+string|DOMNode|DOMNodeList|array
+$arg1, [string|<a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|DOMNode
 $context = null])</code>
     </td></tr></table>
     </td></tr></table><br />
 	
-		Enter description here...<br /><br /><br /><br />
+		Multi-purpose function.<br /><br /><p>Use pq() as shortcut.</p><p>In below examples, $pq is any result of pq(); function.</p><p><ol><li>Import markup into existing document (without any attaching):</li></ol><ul><li>Import into selected document:
+   pq('&lt;div/&gt;')				// DOESNT accept text nodes at beginning of input string !</li><li>Import into document with ID from $pq-&gt;getDocumentID():
+   pq('&lt;div/&gt;', $pq-&gt;getDocumentID())</li><li>Import into same document as DOMNode belongs to:
+   pq('&lt;div/&gt;', DOMNode)</li><li>Import into document from phpQuery object:
+   pq('&lt;div/&gt;', $pq)</li></ul>  2. Run query: <ul><li>Run query on last selected document:
+   pq('div.myClass')</li><li>Run query on document with ID from $pq-&gt;getDocumentID():
+   pq('div.myClass', $pq-&gt;getDocumentID())</li><li>Run query on same document as DOMNode belongs to and use node(s)as root for query:
+   pq('div.myClass', DOMNode)</li><li>Run query on document from phpQuery object
+   and use object's stack as root node(s) for query:
+   pq('div.myClass', $pq)</li></ul></p><br /><br /><br />
 <h4>Tags:</h4>
 <div class="tags">
 <table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><b>return:</b>&nbsp;&nbsp;</td><td>phpQuery object or false in case of error.</td>
+  </tr>
   <tr>
     <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
   </tr>
@@ -2441,14 +2499,14 @@ $context = null])</code>
     <div class="tags">
     <table border="0" cellspacing="0" cellpadding="0">
           <tr>
-        <td class="type">&nbsp;&nbsp;</td>
+        <td class="type">string|DOMNode|DOMNodeList|array&nbsp;&nbsp;</td>
         <td><b>$arg1</b>&nbsp;&nbsp;</td>
-        <td></td>
+        <td>HTML markup, CSS Selector, DOMNode or array of DOMNodes</td>
       </tr>
           <tr>
-        <td class="type">&nbsp;&nbsp;</td>
+        <td class="type">string|<a href="../phpQuery/phpQueryObject.html">phpQueryObject</a>|DOMNode&nbsp;&nbsp;</td>
         <td><b>$context</b>&nbsp;&nbsp;</td>
-        <td></td>
+        <td>DOM ID from $pq-&gt;getDocumentID(), phpQuery object (determines also query root) or DOMNode (determines also query root)</td>
       </tr>
         </table>
     </div><br />
@@ -2456,7 +2514,7 @@ $context = null])</code>
   </div>
   <hr />
 	<a name="methodselectDocument"></a>
-	<h3>static method selectDocument <span class="smalllinenumber">[line 223]</span></h3>
+	<h3>static method selectDocument <span class="smalllinenumber">[line 225]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2492,7 +2550,7 @@ $id)</code>
   </div>
   <hr />
 	<a name="methodtoJSON"></a>
-	<h3>static method toJSON <span class="smalllinenumber">[line 719]</span></h3>
+	<h3>static method toJSON <span class="smalllinenumber">[line 729]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2528,7 +2586,7 @@ $data)</code>
   </div>
   <hr />
 	<a name="methodtrim"></a>
-	<h3>static method trim <span class="smalllinenumber">[line 934]</span></h3>
+	<h3>static method trim <span class="smalllinenumber">[line 944]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2564,7 +2622,7 @@ $str)</code>
   </div>
   <hr />
 	<a name="methodunique"></a>
-	<h3>static method unique <span class="smalllinenumber">[line 921]</span></h3>
+	<h3>static method unique <span class="smalllinenumber">[line 931]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2600,7 +2658,7 @@ $array)</code>
   </div>
   <hr />
 	<a name="methodunloadDocuments"></a>
-	<h3>static method unloadDocuments <span class="smalllinenumber">[line 479]</span></h3>
+	<h3>static method unloadDocuments <span class="smalllinenumber">[line 485]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2642,7 +2700,7 @@ $documentID)</code>
   </div>
   <hr />
 	<a name="methodunsafePHPTags"></a>
-	<h3>static method unsafePHPTags <span class="smalllinenumber">[line 493]</span></h3>
+	<h3>static method unsafePHPTags <span class="smalllinenumber">[line 499]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -2680,48 +2738,12 @@ $content)</code>
         <div class="top">[ <a href="#top">Top</a> ]</div>
   </div>
 
-  <hr />
-	<a name="methoddebug"></a>
-	<h3>method debug <span class="smalllinenumber">[line 515]</span></h3>
-	<div class="function">
-    <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
-    <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
-		<code>void debug(
-
-$text)</code>
-    </td></tr></table>
-    </td></tr></table><br />
-	
-		<br /><br />
-<h4>Tags:</h4>
-<div class="tags">
-<table border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td><b>access:</b>&nbsp;&nbsp;</td><td>public</td>
-  </tr>
-</table>
-</div>
-<br /><br />
-
-	
-        <h4>Parameters:</h4>
-    <div class="tags">
-    <table border="0" cellspacing="0" cellpadding="0">
-          <tr>
-        <td class="type">&nbsp;&nbsp;</td>
-        <td><b>$text</b>&nbsp;&nbsp;</td>
-        <td></td>
-      </tr>
-        </table>
-    </div><br />
-        <div class="top">[ <a href="#top">Top</a> ]</div>
-  </div>
 </div><br />
 
 
         <div class="credit">
 		    <hr />
-		    Documentation generated on Thu, 23 Oct 2008 17:57:01 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.4.2</a>
+		    Documentation generated on Tue, 18 Nov 2008 19:39:25 +0100 by <a href="http://www.phpdoc.org">phpDocumentor 1.4.2</a>
 	      </div>
       </td></tr></table>
     </td>

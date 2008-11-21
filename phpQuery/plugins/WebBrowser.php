@@ -31,6 +31,27 @@ class phpQueryObjectPlugin_WebBrowser {
 			$self->bind('submit', array($location, $callback), array('phpQueryPlugin_WebBrowser', 'handleSubmit'));
 		}
 	}
+	public static function downloadTo($self, $dir = null, $filename = null) {
+		$url = null;
+		if ($self->is('a[href]'))
+			$url = $self->attr('href');
+		else if ($self->find('a')->length)
+			$url = $self->find('a')->attr('href');
+		if ($url) {
+			$url = resolve_url($self->document->location, $url);
+			if (! $dir)
+				$dir = getcwd();
+			if (! $filename) {
+				$matches = null;
+				preg_match('@/([^/]+)$@', $url, $matches);
+				$filename = $matches[1];
+			}
+			$path = rtrim($dir, '/').'/'.$filename;
+			// TODO use AJAX instead of file_get_contents
+			file_put_contents($path, file_get_contents($url));
+		}
+		return $self;
+	}
 	public static function location($self, $url = null) {
 		// TODO if ! $url return actual location ???
 		$xhr = isset($self->document->xhr)
@@ -61,7 +82,9 @@ class phpQueryPlugin_WebBrowser {
 	 * @param $param3
 	 * @return Zend_Http_Client
 	 */
-	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
+	public static function browserGet($url, $callback,
+		$param1 = null, $param2 = null, $param3 = null) {
+		phpQuery::debug("[WebBrowser] GET: $url");
 		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
 			'type' => 'GET',
@@ -82,8 +105,10 @@ class phpQueryPlugin_WebBrowser {
 //				self::browserReceive($xhr)//->WebBrowser($callback)
 //			));
 			return $xhr;
-		} else
+		} else {
+			throw new Exception("[WebBrowser] GET request failed; url: $url");
 			return false;
+		}
 	}
 	/**
 	 *
@@ -95,7 +120,8 @@ class phpQueryPlugin_WebBrowser {
 	 * @param $param3
 	 * @return Zend_Http_Client
 	 */
-	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
+	public static function browserPost($url, $data, $callback,
+		$param1 = null, $param2 = null, $param3 = null) {
 		self::authorizeHost($url);
 		$xhr = phpQuery::ajax(array(
 			'type' => 'POST',
@@ -129,7 +155,8 @@ class phpQueryPlugin_WebBrowser {
 	 * @param $param3
 	 * @return Zend_Http_Client
 	 */
-	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
+	public static function browser($ajaxSettings, $callback,
+		$param1 = null, $param2 = null, $param3 = null) {
 		self::authorizeHost($ajaxSettings['url']);
 		$xhr = phpQuery::ajax(
 			self::ajaxSettingsPrepare($ajaxSettings)
@@ -165,6 +192,7 @@ class phpQueryPlugin_WebBrowser {
 	 * @param Zend_Http_Client $xhr
 	 */
 	public static function browserReceive($xhr) {
+		phpQuery::debug("[WebBrowser] Received from ".$xhr->getUri(true));
 		// TODO handle meta redirects
 		$body = $xhr->getLastResponse()->getBody();
 
@@ -177,7 +205,8 @@ class phpQueryPlugin_WebBrowser {
 		$pq = phpQuery::newDocument($body);
 		$pq->document->xhr = $xhr;
 		$pq->document->location = $xhr->getUri(true);
-		$refresh = $pq->find('meta[http-equiv=refresh]')->add('meta[http-equiv=Refresh]');
+		$refresh = $pq->find('meta[http-equiv=refresh]')
+			->add('meta[http-equiv=Refresh]');
 		if ($refresh->size()) {
 //			print htmlspecialchars(var_export($xhr->getCookieJar()->getAllCookies(), true));
 //			print htmlspecialchars(var_export($xhr->getLastResponse()->getHeader('Set-Cookie'), true));
@@ -214,7 +243,7 @@ class phpQueryPlugin_WebBrowser {
 				: null;
 			$xhr = phpQuery::ajax(array(
 				'url' => resolve_url($e->data[0], $node->attr('href')),
-				'httpReferer' => $node->document->location,
+				'referer' => $node->document->location,
 			), $xhr);
 			// TODO support extended callbacks
 			if ($xhr->getLastResponse()->isSuccessful() && $e->data[1])
@@ -254,7 +283,7 @@ class phpQueryPlugin_WebBrowser {
 				: 'GET',
 			'url' => resolve_url($e->data[0], $node->attr('action')),
 			'data' => $data,
-			'httpReferer' => $node->document->location,
+			'referer' => $node->document->location,
 //			'success' => $e->data[1],
 		);
 		if ($node->attr('enctype'))
@@ -354,4 +383,3 @@ function glue_url($parsed)
         // Step 7
         return glue_url($base);
 }
-?>

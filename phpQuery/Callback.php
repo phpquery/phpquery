@@ -31,13 +31,8 @@ class CallbackReference extends Callback{
 	 * @param $paramIndex
 	 * @todo implement $paramIndex; param index choose which callback param will be passed to reference
 	 */
-	public function __contruct(&$reference, $name = null){
-		$this->callback = $reference;
+	public function __construct(&$reference, $name = null){
+		$this->callback =& $reference;
 	}
 }
-class CallbackParam {
-	public $index = null;
-	public function __construct($name = null) {
-		$this->index = $index;
-	}
-}
+class CallbackParam {}

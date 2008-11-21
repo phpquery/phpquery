@@ -1,7 +1,7 @@
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <?php
 require_once('../phpQuery/phpQuery.php');
-phpQuery::$debug = true;
+// phpQuery::$debug = true;
 
 $testName = 'Text node append';
 $result = phpQuery::newDocumentFile('test.html')
@@ -9,9 +9,9 @@ $result = phpQuery::newDocumentFile('test.html')
 		->find('p:first')
 			->html('żźć');
 if (trim($result->html()) == 'żźć')
-	print "Test '{$testName}' passed :)";
+	print "Test '{$testName}' passed :)<br />\n";
 else
-	print "Test '{$testName}' <strong>FAILED</strong> !!!";
+	print "Test '{$testName}' <strong>FAILED</strong> !!!<br />\n";
 print "\n";
 
 $testName = 'Text node HTML entite append';
@@ -21,9 +21,9 @@ $result = phpQuery::newDocumentFile('test.html')
 			->_empty()
 			->append('&eacute;');
 if (trim($result->html()) == 'é')
-	print "Test '{$testName}' passed :)";
+	print "Test '{$testName}' passed :)<br />\n";
 else {
-	print "Test '{$testName}' <strong>FAILED</strong> !!!";
+	print "Test '{$testName}' <strong>FAILED</strong> !!!<br />\n";
 	print $result->html();
 }
 print "\n";
@@ -35,9 +35,9 @@ $result = phpQuery::newDocumentFile('test.html')
 			->empty()
 			->append('<span>&eacute;</span>');
 if (trim($result->html()) == '<span>é</span>')
-	print "Test '{$testName}' passed :)";
+	print "Test '{$testName}' passed :)<br />\n";
 else {
-	print "Test '{$testName}' <strong>FAILED</strong> !!!";
+	print "Test '{$testName}' <strong>FAILED</strong> !!!<br />\n";
 	print $result->html();
 }
 print "\n";
@@ -52,12 +52,11 @@ $li->html('test1-&eacute;-test1')
 		$result->find('div:first')
 	);
 $result = $result->find('div:first li:first');
-$expected = 'test1-é-test1
-test2-é-test2';
-if (trim($result->html()) == $expected)
-	print "Test '{$testName}' passed :)";
+$expected = 'test1-é-test1test2-é-test2';
+if (trim(str_replace("\n", '', $result->html())) == $expected)
+	print "Test '{$testName}' passed :)<br />\n";
 else {
-	print "Test '{$testName}' <strong>FAILED</strong> !!!";
+	print "Test '{$testName}' <strong>FAILED</strong> !!!<br />\n";
 	print "'".trim($result->html())."'";
 }
 print "\n";
@@ -67,9 +66,9 @@ $result = phpQuery::newDocumentFile('test.html')
 	->find('li:first')
 		->attr('test', 'foo &eacute; żźć bar');
 if (trim($result->attr('test')) == 'foo &eacute; żźć bar')
-	print "Test '{$testName}' passed :)";
+	print "Test '{$testName}' passed :)<br />\n";
 else {
-	print "Test '{$testName}' <strong>FAILED</strong> !!!";
+	print "Test '{$testName}' <strong>FAILED</strong> !!!<br />\n";
 	print $result->attr('test');
 }
 print "\n";
@@ -87,7 +86,7 @@ print "\n";
 //$similarity = 0;
 //similar_text($result->htmlOuter(), $validResult, $similarity);
 //if ( $similarity > 90 )
-//	print "Test '{$testName}' PASSED :)";
+//	print "Test '{$testName}' passed :)<br />\n";
 //else
 //	print "Test '{$testName}' <strong>FAILED</strong> !!! ";
 //print "<pre>";

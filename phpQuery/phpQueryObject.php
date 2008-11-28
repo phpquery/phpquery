@@ -1895,7 +1895,7 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
-	public function ancestors( $selector = null ) {
+	public function ancestors($selector = null) {
 		return $this->children( $selector );
 	}
 
@@ -2289,7 +2289,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 * @access private
 	 */
-	public function _next( $selector = null ) {
+	public function _next($selector = null) {
 		return $this->newInstance(
 			$this->getElementSiblings('nextSibling', $selector, true)
 		);
@@ -2301,7 +2301,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 * @access private
 	 */
-	public function _prev( $selector = null ) {
+	public function _prev($selector = null) {
 		return $this->prev($selector);
 	}
 	/**
@@ -2309,7 +2309,7 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
-	public function prev( $selector = null ) {
+	public function prev($selector = null) {
 		return $this->newInstance(
 			$this->getElementSiblings('previousSibling', $selector, true)
 		);
@@ -2319,7 +2319,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 * @todo
 	 */
-	public function prevAll( $selector = null ) {
+	public function prevAll($selector = null) {
 		return $this->newInstance(
 			$this->getElementSiblings('previousSibling', $selector)
 		);
@@ -2329,7 +2329,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 * @todo FIXME: returns source elements insted of next siblings
 	 */
-	public function nextAll( $selector = null ) {
+	public function nextAll($selector = null) {
 		return $this->newInstance(
 			$this->getElementSiblings('nextSibling', $selector)
 		);
@@ -2347,8 +2347,8 @@ class phpQueryObject
 				if (! $test instanceof DOMELEMENT)
 					continue;
 				$stack[] = $test;
-				if ($limitToOne && $stack)
-					return $stack;
+				if ($limitToOne)
+					break;
 			}
 		}
 		if ($selector) {
@@ -2461,7 +2461,7 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
-	public function parent( $selector = null ) {
+	public function parent($selector = null) {
 		$stack = array();
 		foreach( $this->elements as $node )
 			if ( $node->parentNode && ! $this->elementsContainsNode($node->parentNode, $stack) )
@@ -2478,7 +2478,7 @@ class phpQueryObject
 	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
-	public function parents( $selector = null ) {
+	public function parents($selector = null) {
 		$stack = array();
 		if (! $this->elements )
 			$this->debug('parents() - stack empty');
@@ -2592,7 +2592,9 @@ class phpQueryObject
 					$return[$n] = $v->value;
 				return $return;
 			} else
-				return $node->getAttribute($attr);
+				return $node->hasAttribute($attr)
+					? $node->getAttribute($attr)
+					: null;
 		}
 		return $this;
 	}

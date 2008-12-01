@@ -1288,7 +1288,7 @@ class phpQueryObject
 		}
 	}
 	/**
-	 * 
+	 *
 	 * @param $value
 	 * @return unknown_type
 	 * @TODO implement in all methods using passed parameters
@@ -2710,6 +2710,7 @@ class phpQueryObject
 				else
 					return $this->eq(0)->attr('value');
 		} else {
+			$_val = null;
 			foreach($this->stack(1) as $node) {
 				$node = pq($node, $this->getDocumentID());
 				if (is_array($val) && in_array($node->attr('type'), array('checkbox', 'radio'))) {
@@ -2720,12 +2721,13 @@ class phpQueryObject
 					else
 						$node->removeAttr('checked');
 				} else if ($node->get(0)->tagName == 'select') {
-					if (! is_array($val))
-						$val = array($val);
-					foreach($node['option']->stack() as $option) {
+					if (! isset($_val))
+						$_val = is_array($val)
+							? $val : array($val);
+					foreach($node['option']->stack(1) as $option) {
 						$option = pq($option, $this->getDocumentID());
-						$selected = in_array($option->attr('value'), $val)
-								|| in_array($option->text(), $val);
+						$selected = in_array($option->attr('value'), $_val)
+								|| in_array($option->text(), $_val);
 						if ($selected)
 							$option->attr('selected', 'selected');
 						else

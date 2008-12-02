@@ -2218,7 +2218,7 @@ class phpQueryObject
 	 * @return String
 	 */
 	public function text($text = null, $callback1 = null, $callback2 = null, $callback3 = null) {
-		if ($text)
+		if (isset($text))
 			return $this->html(htmlspecialchars($text));
 		$args = func_get_args();
 		$args = array_slice($args, 1);

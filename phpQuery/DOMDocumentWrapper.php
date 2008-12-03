@@ -342,7 +342,7 @@ class DOMDocumentWrapper {
 		return $declaration.$markup;
 	}
 	public static function isDocumentFragmentHTML($markup) {
-		return stripos($markup, '<html') === false;
+		return stripos($markup, '<html') === false && stripos($markup, '<!doctype') === false;
 	}
 	public static function isDocumentFragmentXML($markup) {
 		return stripos($markup, '<'.'?xml') === false;

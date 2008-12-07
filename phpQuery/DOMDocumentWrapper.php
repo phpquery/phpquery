@@ -25,7 +25,7 @@ class DOMDocumentWrapper {
 	public $eventsNodes = array();
 	public $eventsGlobal = array();
 	/**
-	 * TODO
+	 * @TODO iframes support http://code.google.com/p/phpquery/issues/detail?id=28
 	 * @var unknown_type
 	 */
 	public $frames = array();
@@ -36,7 +36,7 @@ class DOMDocumentWrapper {
 	 * @var DOMNode
 	 */
 	public $root;
-	public $isDocumentFragment = null;
+	public $isDocumentFragment;
 	public $isXML = false;
 	public $isXHTML = false;
 	public $isHTML = false;
@@ -49,16 +49,21 @@ class DOMDocumentWrapper {
 		$id = $newDocumentID
 			? $newDocumentID
 			: md5(microtime());
-		if ($markup instanceof DOMDOCUMENT) {
-			// TODO: integrate passed DOMDocument object into wrapper
-		}
 		phpQuery::$documents[$id] = $this;
 		$this->contentType = strtolower($contentType);
-		if ($this->loadMarkup($markup)) {
+		if ($markup instanceof DOMDOCUMENT) {
+			$this->document = $markup;
+			$this->root = $this->document;
+			$this->charset = $this->document->encoding;
+			// TODO isDocumentFragment
+		} else {
+			$loaded = $this->loadMarkup($markup); 
+		}
+		if ($loaded) {
 			$this->xpath = new DOMXPath($this->document);
 			$this->afterMarkupLoad();
 			// remember last loaded document
-			return phpQuery::$defaultDocumentID = $id;
+			return phpQuery::selectDocument($id);
 		}
 	}
 	protected function afterMarkupLoad() {
@@ -107,9 +112,6 @@ class DOMDocumentWrapper {
 	protected function documentCreate($charset, $version = '1.0') {
 		if (! $version)
 			$version = '1.0';
-		if ($this->document)
-			// TODO unload
-			;
 		$this->document = new DOMDocument($version, $charset);
 		$this->charset = $this->document->encoding;
 //		$this->document->encoding = $charset;
@@ -135,6 +137,7 @@ class DOMDocumentWrapper {
 			$charset = phpQuery::$defaultCharset;
 		if ($requestedCharset && $documentCharset && $requestedCharset != $documentCharset) {
 			// TODO place for charset conversion
+			// http://code.google.com/p/phpquery/issues/detail?id=86
 //			$charset = $requestedCharset;
 		}
 		$return = false;
@@ -149,9 +152,6 @@ class DOMDocumentWrapper {
 				$charset = $documentCharset;
 				phpQuery::debug("Full markup load (HTML), using document's charset '{$charset}'");
 			}
-		// TODO: check if mb_convert_encoding is really needed
-		//			$html = mb_convert_encoding($html, 'HTML-ENTITIES', self::$defaultEncoding);
-		//			$html = '<meta http-equiv="Content-Type" content="text/html;charset='.self::$defaultEncoding.'">'.$html;
 			$this->documentCreate($charset);
 			$return = phpQuery::$debug === 2
 				? $this->document->loadHTML($markup)
@@ -176,7 +176,7 @@ class DOMDocumentWrapper {
 			$this->isXHTML = true;
 		}
 		// determine document fragment
-		if (!isset($this->isDocumentFragment))
+		if (! isset($this->isDocumentFragment))
 			$this->isDocumentFragment = $this->isXHTML
 				? self::isDocumentFragmentXHTML($markup)
 				: self::isDocumentFragmentXML($markup);
@@ -329,7 +329,6 @@ class DOMDocumentWrapper {
 		);
 		if (! isset($matches[0]))
 			return;
-		var_dump($matches);
 		$metaContentType = $matches[0][0];
 		$markup = substr($markup, 0, $matches[0][1])
 			.substr($markup, $matches[0][1]+strlen($metaContentType));

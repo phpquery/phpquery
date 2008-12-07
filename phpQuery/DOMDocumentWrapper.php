@@ -127,6 +127,7 @@ class DOMDocumentWrapper {
 		$documentCharset = $this->charsetFromHTML($markup);
 		if ($documentCharset) {
 			$charset = $documentCharset;
+			$markup = $this->charsetFixHTML($markup);
 		} else if ($requestedCharset) {
 			$charset = $requestedCharset;
 		}
@@ -287,7 +288,7 @@ class DOMDocumentWrapper {
 	 * @return array contentType, charset
 	 */
 	protected function contentTypeFromHTML($markup) {
-		$matches;
+		$matches = array();
 		// find meta tag
 		preg_match('@<meta[^>]+http-equiv\\s*=\\s*(["|\'])Content-Type\\1([^>]+?)>@i',
 			$markup, $matches
@@ -313,6 +314,29 @@ class DOMDocumentWrapper {
 		return isset($matches[2])
 			? strtolower($matches[2])
 			: null;
+	}
+	/**
+	 * Repositions meta[type=charset] at the start of head. Bypasses DOMDocument bug.
+	 * 
+	 * @link http://code.google.com/p/phpquery/issues/detail?id=80
+	 * @param $html
+	 */
+	protected function charsetFixHTML($markup) {
+		$matches = array();
+		// find meta tag
+		preg_match('@\s*<meta[^>]+http-equiv\\s*=\\s*(["|\'])Content-Type\\1([^>]+?)>@i',
+			$markup, $matches, PREG_OFFSET_CAPTURE
+		);
+		if (! isset($matches[0]))
+			return;
+		var_dump($matches);
+		$metaContentType = $matches[0][0];
+		$markup = substr($markup, 0, $matches[0][1])
+			.substr($markup, $matches[0][1]+strlen($metaContentType));
+		$headStart = stripos($markup, '<head>');
+		$markup = substr($markup, 0, $headStart+6).$metaContentType
+			.substr($markup, $headStart+6);
+		return $markup;
 	}
 	protected function charsetAppendToHTML($html, $charset, $xhtml = false) {
 		$meta = '<meta http-equiv="Content-Type" content="text/html;charset='

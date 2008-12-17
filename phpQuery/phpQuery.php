@@ -494,8 +494,11 @@ abstract class phpQuery {
 		if (isset($id)) {
 			if ($id = self::getDocumentID($id))
 				unset(phpQuery::$documents[$id]);
-		} else
-			unset(phpQuery::$documents);
+		} else {
+			foreach(phpQuery::$documents as $k => $v) {
+				unset(phpQuery::$documents[$k]);
+			}
+		}		
 	}
 	/**
 	 * Parses phpQuery object or HTML result against PHP tags and makes them active.

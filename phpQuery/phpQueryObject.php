@@ -1227,7 +1227,7 @@ class phpQueryObject
 											$pattern = '.*'.$val.'.*';
 											break;
 										case '$':
-											$pattern = $val.'$';
+											$pattern = '.*'.$val.'$';
 											break;
 									}
 									// cut last character

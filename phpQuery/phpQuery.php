@@ -305,20 +305,15 @@ abstract class phpQuery {
 	public static function markupToPHP($content) {
 		if ($content instanceof phpQueryObject)
 			$content = $content->markupOuter();
-		/* <php>...</php> to <?php...?> */
+		/* <php>...</php> to <?php...? > */
 		$content = preg_replace_callback(
 			'@<php>\s*<!--(.*?)-->\s*</php>@s',
 			create_function('$m',
-				'return "<'.'?php \n".htmlspecialchars_decode($m[1])."\n ?'.'>";'
+				'return "<'.'?php ".htmlspecialchars_decode($m[1])." ?'.'>";'
 			),
 			$content
 		);
-		/*$content = str_replace(
-			array('<?php<!--', '<?php <!--', '-->?>', '--> ?>'),
-			array('<?php', '<?php', '?>', '?>'),
-			$content
-		);*/
-		/* <node attr='<?php ?>'> */
+		/* <node attr='< ?php ? >'> extra space added to save highlighters */
 		$regexes = array(
 			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(\')([^\']*)(?:&lt;|%3C)\\?(?:php)?(.*?)(?:\\?(?:&gt;|%3E))([^\']*)\'@s',
 			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(")([^"]*)(?:&lt;|%3C)\\?(?:php)?(.*?)(?:\\?(?:&gt;|%3E))([^"]*)"@s',
@@ -328,13 +323,13 @@ abstract class phpQuery {
 				$content = preg_replace_callback(
 					$regex,
 					create_function('$m',
-						'return $m[1].$m[2].$m[3]."<?php \n"
+						'return $m[1].$m[2].$m[3]."<?php "
 							.str_replace(
 								array("%20", "%3E", "%09", "&#10;", "&#9;", "%7B", "%24", "%7D", "%22", "%5B", "%5D"),
 								array(" ", ">", "	", "\n", "	", "{", "$", "}", \'"\', "[", "]"),
 								htmlspecialchars_decode($m[4])
 							)
-							." \n?>".$m[5].$m[2];'
+							." ?>".$m[5].$m[2];'
 					),
 					$content
 				);

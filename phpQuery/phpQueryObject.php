@@ -616,6 +616,7 @@ class phpQueryObject
 		$stack = array();
 		if (! $this->elements )
 			$this->debug('Stack empty, skipping...');
+		// XXX foreach($this->stack(1) ???
 		foreach($this->elements as $k => $stackNode) {
 			$detachAfter = false;
 			// to work on detached nodes we need temporary place them somewhere
@@ -919,7 +920,7 @@ class phpQueryObject
 			case 'has':
 				$selector = trim($args, "\"'");
 				$stack = array();
-				foreach($this->elements as $el) {
+				foreach($this->stack(1) as $el) {
 					if ($this->find($selector, $el, true)->length)
 						$stack[] = $el;
 				}
@@ -2348,7 +2349,7 @@ class phpQueryObject
 	protected function getElementSiblings($direction, $selector = null, $limitToOne = false) {
 		$stack = array();
 		$count = 0;
-		foreach($this->elements as $node) {
+		foreach($this->stack(1) as $node) {
 			$test = $node;
 			while( isset($test->{$direction}) && $test->{$direction}) {
 				$test = $test->{$direction};
@@ -2613,7 +2614,7 @@ class phpQueryObject
 	 * @todo use attr() function (encoding issues etc).
 	 */
 	public function attrPrepend($attr, $value) {
-		foreach($this->elements as $node )
+		foreach($this->stack(1) as $node )
 			$node->setAttribute($attr,
 				$value.$node->getAttribute($attr)
 			);
@@ -2630,7 +2631,7 @@ class phpQueryObject
 	 * @todo use attr() function (encoding issues etc).
 	 */
 	public function attrAppend($attr, $value) {
-		foreach($this->elements as $node )
+		foreach($this->stack(1) as $node )
 			$node->setAttribute($attr,
 				$node->getAttribute($attr).$value
 			);
@@ -2683,7 +2684,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
 	public function removeAttr($attr) {
-		foreach($this->elements as $node) {
+		foreach($this->stack(1) as $node) {
 			$loop = $attr == '*'
 				? $this->getNodeAttrs($node)
 				: array($attr);
@@ -2765,7 +2766,7 @@ class phpQueryObject
 	public function addClass( $className) {
 		if (! $className)
 			return $this;
-		foreach($this->elements as $node) {
+		foreach($this->stack(1) as $node) {
 			if (! $this->is(".$className", $node))
 				$node->setAttribute(
 					'class',
@@ -2798,7 +2799,7 @@ class phpQueryObject
 	 * @return	bool
 	 */
 	public function hasClass($className) {
-		foreach($this->elements as $node) {
+		foreach($this->stack(1) as $node) {
 			if ( $this->is(".$className", $node))
 				return true;
 		}
@@ -2811,7 +2812,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
 	public function removeClass($className) {
-		foreach($this->elements as $node) {
+		foreach($this->stack(1) as $node) {
 			$classes = explode( ' ', $node->getAttribute('class'));
 			if ( in_array($className, $classes)) {
 				$classes = array_diff($classes, array($className));
@@ -2830,7 +2831,7 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
 	public function toggleClass($className) {
-		foreach($this->elements as $node) {
+		foreach($this->stack(1) as $node) {
 			if ( $this->is( $node, '.'.$className ))
 				$this->removeClass($className);
 			else
@@ -2857,8 +2858,8 @@ class phpQueryObject
 	 * @access private
 	 */
 	public function _empty() {
-		foreach($this->elements as $node) {
-			// many thx to 'dave at dgx dot cz' :)
+		foreach($this->stack(1) as $node) {
+			// thx to 'dave at dgx dot cz'
 			$node->nodeValue = '';
 		}
 		return $this;

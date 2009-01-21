@@ -2731,8 +2731,17 @@ class phpQueryObject
 							? $val : array($val);
 					foreach($node['option']->stack(1) as $option) {
 						$option = pq($option, $this->getDocumentID());
-						$selected = in_array($option->attr('value'), $_val)
-								|| in_array($option->text(), $_val);
+						$selected = false;
+						// XXX: workaround for string comparsion, see issue #96
+						// http://code.google.com/p/phpquery/issues/detail?id=96
+						$optionValue = $option->attr('value');
+						$optionText = $option->text();
+						$optionTextLenght = mb_strlen($optionText);
+						foreach($_val as $v)
+							if ($optionValue == $v)
+								$selected = true;
+							else if ($optionText == $v && $optionTextLenght == mb_strlen($v))
+								$selected = true;
 						if ($selected)
 							$option->attr('selected', 'selected');
 						else

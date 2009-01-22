@@ -47,6 +47,18 @@ if (!function_exists('mb_strpos'))
 		return strpos($haystack, $needle, $offset);
 	}
 }
+/**
+ *  mb_stripos()
+ *
+ *  Included for mbstring pseudo-compatability.
+ */
+if (!function_exists('mb_stripos'))
+{
+	function mb_stripos($haystack, $needle, $offset=0)
+	{
+		return stripos($haystack, $needle, $offset);
+	}
+}
 
 /**
  *  mb_substr()

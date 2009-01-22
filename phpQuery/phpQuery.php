@@ -3,7 +3,7 @@
  * phpQuery is a server-side, chainable, CSS3 selector driven
  * Document Object Model (DOM) API based on jQuery JavaScript Library.
  *
- * @version 0.9.5 beta4
+ * @version 0.9.5 RC1
  * @link http://code.google.com/p/phpquery/
  * @link http://phpquery-library.blogspot.com/
  * @link http://jquery.com/
@@ -951,6 +951,15 @@ abstract class phpQuery {
 		return trim($str);
 	}
 	/* PLUGINS NAMESPACE */
+	/**
+	 * 
+	 * @param $url
+	 * @param $callback
+	 * @param $param1
+	 * @param $param2
+	 * @param $param3
+	 * @return phpQueryObject
+	 */
 	public static function browserGet($url, $callback, $param1 = null, $param2 = null, $param3 = null) {
 		if (self::plugin('WebBrowser')) {
 			$params = func_get_args();
@@ -959,6 +968,16 @@ abstract class phpQuery {
 			self::debug('WebBrowser plugin not available...');
 		}
 	}
+	/**
+	 * 
+	 * @param $url
+	 * @param $data
+	 * @param $callback
+	 * @param $param1
+	 * @param $param2
+	 * @param $param3
+	 * @return phpQueryObject
+	 */
 	public static function browserPost($url, $data, $callback, $param1 = null, $param2 = null, $param3 = null) {
 		if (self::plugin('WebBrowser')) {
 			$params = func_get_args();
@@ -967,6 +986,15 @@ abstract class phpQuery {
 			self::debug('WebBrowser plugin not available...');
 		}
 	}
+	/**
+	 * 
+	 * @param $ajaxSettings
+	 * @param $callback
+	 * @param $param1
+	 * @param $param2
+	 * @param $param3
+	 * @return phpQueryObject
+	 */
 	public static function browser($ajaxSettings, $callback, $param1 = null, $param2 = null, $param3 = null) {
 		if (self::plugin('WebBrowser')) {
 			$params = func_get_args();
@@ -975,9 +1003,20 @@ abstract class phpQuery {
 			self::debug('WebBrowser plugin not available...');
 		}
 	}
+	/**
+	 * 
+	 * @param $code
+	 * @return string
+	 */
 	public static function php($code) {
 		return self::code('php', $code);
 	}
+	/**
+	 * 
+	 * @param $type
+	 * @param $code
+	 * @return string
+	 */
 	public static function code($type, $code) {
 		return "<$type><!-- ".trim($code)." --></$type>";
 	}
@@ -1028,6 +1067,7 @@ set_include_path(
 		.PATH_SEPARATOR.dirname(__FILE__).'/plugins/'
 );
 // why ? no __call nor __get for statics in php...
+// XXX __callStatic will be available in PHP 5.3
 phpQuery::$plugins = new phpQueryPlugins();
 // include bootstrap file (personal library config)
 if (file_exists(dirname(__FILE__).'/bootstrap.php'))

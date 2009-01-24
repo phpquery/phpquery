@@ -1049,6 +1049,13 @@ abstract class phpQuery {
 	public static function code($type, $code) {
 		return "<$type><!-- ".trim($code)." --></$type>";
 	}
+	
+	public static function __callStatic($method, $params) {
+		return call_user_func_array(
+			array(phpQuery::$plugins, $method),
+			$params
+		);
+	}
 }
 /**
  * Plugins static namespace class.

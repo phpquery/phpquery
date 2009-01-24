@@ -31,6 +31,9 @@ class phpQueryObjectPlugin_WebBrowser {
 			$self->bind('submit', array($location, $callback), array('phpQueryPlugin_WebBrowser', 'handleSubmit'));
 		}
 	}
+	public static function browser($self, $callback = null, $location = null) {
+		return $self->WebBrowser($callback, $location);
+	}
 	public static function downloadTo($self, $dir = null, $filename = null) {
 		$url = null;
 		if ($self->is('a[href]'))
@@ -52,6 +55,13 @@ class phpQueryObjectPlugin_WebBrowser {
 		}
 		return $self;
 	}
+	/**
+	 * Method changing browser location.
+	 * Fires callback registered with WebBrowser(), if any.
+	 * @param $self
+	 * @param $url
+	 * @return unknown_type
+	 */
 	public static function location($self, $url = null) {
 		// TODO if ! $url return actual location ???
 		$xhr = isset($self->document->xhr)
@@ -98,7 +108,7 @@ class phpQueryPlugin_WebBrowser {
 		}
 		if ($xhr->getLastResponse()->isSuccessful()) {
 			phpQuery::callbackRun($callback,
-				array(self::browserReceive($xhr)),
+				array(self::browserReceive($xhr)->WebBrowser()),
 				$paramStructure
 			);
 //			phpQuery::callbackRun($callback, array(
@@ -136,7 +146,7 @@ class phpQueryPlugin_WebBrowser {
 		}
 		if ($xhr->getLastResponse()->isSuccessful()) {
 			phpQuery::callbackRun($callback,
-				array(self::browserReceive($xhr)),
+				array(self::browserReceive($xhr)->WebBrowser()),
 				$paramStructure
 			);
 //			phpQuery::callbackRun($callback, array(
@@ -168,7 +178,7 @@ class phpQueryPlugin_WebBrowser {
 		}
 		if ($xhr->getLastResponse()->isSuccessful()) {
 			phpQuery::callbackRun($callback,
-				array(self::browserReceive($xhr)),
+				array(self::browserReceive($xhr)->WebBrowser()),
 				$paramStructure
 			);
 //			phpQuery::callbackRun($callback, array(
@@ -233,7 +243,13 @@ class phpQueryPlugin_WebBrowser {
 		} else
 			return $pq;
 	}
-	public static function hadleClick($e) {
+	/**
+	 * 
+	 * @param $e
+	 * @param $callback
+	 * @return unknown_type
+	 */
+	public static function hadleClick($e, Callback $callback = null) {
 		$node = phpQuery::pq($e->target);
 		$type = null;
 		if ($node->is('a[href]')) {
@@ -245,9 +261,10 @@ class phpQueryPlugin_WebBrowser {
 				'url' => resolve_url($e->data[0], $node->attr('href')),
 				'referer' => $node->document->location,
 			), $xhr);
-			// TODO support extended callbacks
-			if ($xhr->getLastResponse()->isSuccessful() && $e->data[1])
-				phpQuery::callbackRun($e->data[1], array(
+			if (! $callback && $e->data[1])
+				$callback = $e->data[1];
+			if ($xhr->getLastResponse()->isSuccessful() && $callback)
+				phpQuery::callbackRun($callback, array(
 					self::browserReceive($xhr)
 				));
 		} else if ($node->is(':submit') && $node->parents('form')->size())
@@ -259,7 +276,7 @@ class phpQueryPlugin_WebBrowser {
 	 * @param unknown_type $e
 	 * @TODO trigger submit for form after form's  submit button has a click event
 	 */
-	public static function handleSubmit($e) {
+	public static function handleSubmit($e, Callback $callback = null) {
 		$node = phpQuery::pq($e->target);
 		if (!$node->is('form') || !$node->is('[action]'))
 			return;
@@ -289,13 +306,13 @@ class phpQueryPlugin_WebBrowser {
 		if ($node->attr('enctype'))
 			$options['contentType'] = $node->attr('enctype');
 		$xhr = phpQuery::ajax($options, $xhr);
-		// TODO support extended callbacks
-		if ($xhr->getLastResponse()->isSuccessful() && $e->data[1])
-			phpQuery::callbackRun($e->data[1], array(
+		if (! $callback && $e->data[1])
+			$callback = $e->data[1];
+		if ($xhr->getLastResponse()->isSuccessful() && $callback)
+			phpQuery::callbackRun($callback, array(
 				self::browserReceive($xhr)
 			));
 	}
-
 }
 /**
  *
@@ -327,7 +344,7 @@ function glue_url($parsed)
  * @return unknown
  * @author adrian-php at sixfingeredman dot net
  */
-    function resolve_url($base, $url) {
+function resolve_url($base, $url) {
         if (!strlen($base)) return $url;
         // Step 2
         if (!strlen($url)) return $base;

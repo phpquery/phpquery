@@ -2,6 +2,7 @@
 <?php
 require_once('../phpQuery/phpQuery.php');
 phpQuery::$debug = 2;
+phpQuery::plugin('Scripts');
 
 
 //$doc = phpQuery::newDocumentXML('<article><someMarkupStuff/><p>p</p></article>');
@@ -91,7 +92,7 @@ print $doc1->plugin('Scripts')->script('safe_print');
 // http://code.google.com/p/phpquery/issues/detail?id=77
 // phpQuery::newDocumentFile('http://google.com/')
 // 	->find('body > *')->dumpWhois();
-$XHTML = <<<EOF
+/*$XHTML = <<<EOF
 		<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
@@ -150,4 +151,82 @@ WAI_element-40-WAI_principal-30 WAI_contenu">
 </html>
 EOF;
 phpQuery::newDocumentXHTML($XHTML)
-	->find('body:first > *')->dumpWhois();
+	->find('body:first > *')->dumpWhois();*/
+
+// http://code.google.com/p/phpquery/issues/detail?id=83
+//$doc = phpQuery::newDocument('<select
+//name="toto"><option></option><option value="1">1</option></select><div><input
+//type="hidden" name="toto"/></div>');
+//print $doc['[name=toto]']->val('1');
+
+//$doc = phpQuery::newDocumentFile('http://www.google.pl/search?hl=en&q=test&btnG=Google+Search');
+//print $doc;
+
+// http://code.google.com/p/phpquery/issues/detail?id=88
+//$doc = phpQuery::newDocumentXML('<foo><bar/></foo>');
+//$doc['foo']->find('bar')->andSelf()->addClass('test');
+//$doc->dump();
+
+// http://code.google.com/p/phpquery/issues/detail?id=90
+//print phpQuery::newDocument('<html><body></body></html>')
+//	->find('body')
+//	->load('http://localhost/phpinfo.php');
+
+// http://code.google.com/p/phpquery/issues/detail?id=91
+// phpQuery::newDocumentXML('<foo bar="abc"/><foo bar="bca"/>');
+// print pq('foo')->filter('[bar$=c]');
+
+// FIXME http://code.google.com/p/phpquery/issues/detail?id=93
+//$doc = '<head><title>SomeTitle</title>
+//</head>
+//<body bgcolor="#ffffff" text="#000000" topmargin="1" leftmargin="0">blah
+//</body>';
+//$pq = phpQuery::newDocument($doc);
+//echo $pq;
+
+# http://code.google.com/p/phpquery/issues/detail?id=94#makechanges
+//$doc = phpQuery::newDocument();
+//$test = pq(
+//'
+//<li>
+//	<label>Fichier : </label>
+//	<input type="file" name="pjModification_fichier[0]"/>
+//	<br/>
+//	<label>Titre : </label>
+//	<input type="text" name="pjModification_titre[0]" class="pieceJointe_titre"/>
+//</li>
+//'
+//);
+
+// FIXME??? http://code.google.com/p/phpquery/issues/detail?id=96
+//$doc = phpQuery::newDocument('<select name="section"><option
+//value="-1">Niveau</option><option value="1">6°</option><option
+//value="2">5°</option><option
+//value="3">4°</option><option value="4">3°</option></select>');
+$doc = phpQuery::newDocument('<select name="section"><option
+value="-1">Niveau</option><option value="1">6°</option><option
+value="2">5°</option><option
+value="3">4°</option><option value="4">3&deg;</option></select>');
+print $doc['select']->val(3)->end()->script('print_source');
+
+// http://groups.google.com/group/phpquery/browse_thread/thread/1c78f7e41fc5808c?hl=en
+//$doc = phpQuery::newDocumentXML("
+//<s:Schema id='RowsetSchema'>
+//        <s:ElementType name='row' content='eltOnly'>
+//                <s:AttributeType name='ComparteElementoComun_ID' rs:number='1'
+//rs:maydefer='true' rs:writeunknown='true'>
+//                        <s:datatype dt:type='int' dt:maxLength='4' rs:precision='10'
+//rs:fixedlength='true'/>
+//                </s:AttributeType>
+//                <s:AttributeType name='ComparteElementoComun' rs:number='2'
+//rs:nullable='true' rs:maydefer='true' rs:writeunknown='true'>
+//                        <s:datatype dt:type='string' dt:maxLength='100'/>
+//                </s:AttributeType>
+//                <s:extends type='rs:rowbase'/>
+//        </s:ElementType>
+//</s:Schema>");
+//foreach($doc['Schema ElementType AttributeType'] as $campo){
+//        if( count(pq($campo)->find('datatype'))==1 ){
+//                var_dump(pq($campo)->find('datatype')->attr('dt:type')); // Should print "string" but prints ""
+//        }
+//}

@@ -2273,9 +2273,9 @@ class phpQueryObject
 	public function __call($method, $args) {
 		$aliasMethods = array('clone', 'empty');
 		if (isset(phpQuery::$extendMethods[$method])) {
-			return call_user_func_array(
-				phpQuery::$extendMethods[$method],
-				array($this)
+			array_unshift($args, $this);
+			return phpQuery::callbackRun(
+				phpQuery::$extendMethods[$method], $args
 			);
 		} else if (isset(phpQuery::$pluginsMethods[$method])) {
 			array_unshift($args, $this);

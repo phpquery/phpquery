@@ -46,8 +46,10 @@ abstract class phpQueryEvents {
 					'timeStamp' => time(),
 				));
 			}
+			$i = 0;
 			while($node) {
-				phpQuery::debug("Triggering event '{$type}' on node ".phpQueryObject::whois($node)."\n");
+				phpQuery::debug("Triggering ".($i?"bubbled ":'')."event '{$type}' on "
+					."node ".phpQueryObject::whois($node)."\n");
 				$event->currentTarget = $node;
 				$eventNode = self::getNode($documentID, $node);
 				if (isset($eventNode->eventHandlers)) {
@@ -62,6 +64,7 @@ abstract class phpQueryEvents {
 						if ($namespace && $eventNamespace && $namespace != $eventNamespace)
 							continue;
 						foreach($handlers as $handler) {
+							phpQuery::debug("Calling event handler\n");
 							$event->data = $handler['data']
 								? $handler['data']
 								: null;
@@ -77,6 +80,7 @@ abstract class phpQueryEvents {
 				if (! $event->bubbles)
 					break;
 				$node = $node->parentNode;
+				$i++;
 			}
 		}
 	}

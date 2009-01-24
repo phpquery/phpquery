@@ -57,6 +57,11 @@ abstract class phpQuery {
 	public static $pluginsLoaded = array();
 	public static $pluginsMethods = array();
 	public static $pluginsStaticMethods = array();
+	public static $extendMethods = array();
+	/**
+	 * @TODO implement
+	 */ 
+	public static $extendStaticMethods = array();
 	/**
 	 * Hosts allowed for AJAX connections.
 	 * Dot '.' means $_SERVER['HTTP_HOST'] (if any).
@@ -409,15 +414,39 @@ abstract class phpQuery {
 		return self::$defaultDocumentID = $id;
 	}
 	/**
-	 * Deprecated, use phpQuery::plugin() instead.
+	 * Extend class namespace.
 	 *
-	 * @deprecated
-	 * @param $class
-	 * @param $file
+	 * @param string|array $target
+	 * @param array $source
+	 * @TODO support string $source
 	 * @return unknown_type
 	 */
-	public static function extend($class, $file = null) {
-		return self::plugin($class, $file);
+	public static function extend($target, $source) {
+		switch($target) {
+			case 'phpQueryObject':
+				$targetRef = &self::$extendMethods;
+				$targetRef2 = &self::$pluginsMethods;
+				break;
+			case 'phpQuery':
+				$targetRef = &self::$extendStaticMethods;
+				$targetRef2 = &self::$pluginsStaticMethods;
+				break;
+			default:
+				throw new Exception("Unsupported \$target type");
+		}
+		foreach($source as $method => $callback) {
+			if (isset($targetRef[$method])) {
+				throw new Exception("Duplicate method '{$method}', can\'t extend '{$target}'");
+				continue;
+			}
+			if (isset($targetRef2[$method])) {
+				throw new Exception("Duplicate method '{$method}' from plugin '{$targetRef2[$method]}',"
+					." can\'t extend '{$target}'");
+				continue;
+			}
+			$targetRef[$method] = $callback;
+		}
+		return true;			
 	}
 	/**
 	 * Extend phpQuery with $class from $file.
@@ -473,7 +502,7 @@ abstract class phpQuery {
 					continue;
 				if (isset(self::$pluginsMethods[$method])) {
 					throw new Exception("Duplicate method '{$method}' from plugin '{$c}' conflicts with same method from plugin '".self::$pluginsMethods[$method]."'");
-					return;
+					continue;
 				}
 				self::$pluginsMethods[$method] = $class;
 			}

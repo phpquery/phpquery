@@ -2272,7 +2272,12 @@ class phpQueryObject
 	 */
 	public function __call($method, $args) {
 		$aliasMethods = array('clone', 'empty');
-		if (isset(phpQuery::$pluginsMethods[$method])) {
+		if (isset(phpQuery::$extendMethods[$method])) {
+			return call_user_func_array(
+				phpQuery::$extendMethods[$method],
+				array($this)
+			);
+		} else if (isset(phpQuery::$pluginsMethods[$method])) {
 			array_unshift($args, $this);
 			$class = phpQuery::$pluginsMethods[$method];
 			$realClass = "phpQueryObjectPlugin_$class";
@@ -2280,6 +2285,7 @@ class phpQueryObject
 				array($realClass, $method),
 				$args
 			);
+			// XXX deprecate ?
 			return is_null($return)
 				? $this
 				: $return;

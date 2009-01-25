@@ -151,9 +151,9 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 * NON JQUERY METHOD
-	 * 
+	 *
 	 * Watch out, it doesn't creates new instance, can be reverted with end().
-	 * 
+	 *
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
 	public function toRoot() {
@@ -1751,7 +1751,15 @@ class phpQueryObject
 				continue;
 			if (isset($node->tagName))
 				$this->debug("Removing '{$node->tagName}'");
-			$node->parentNode->removeChild( $node );
+			$node->parentNode->removeChild($node);
+			// Mutation event
+			$event = new DOMEvent(array(
+				'target' => $node,
+				'type' => 'DOMNodeRemoved'
+			));
+			phpQueryEvents::trigger($this->getDocumentID(),
+				$event->type, array($event), $node
+			);
 		}
 		return $this;
 	}
@@ -2128,7 +2136,7 @@ class phpQueryObject
 				$insert = $insertNumber
 					? $fromNode->cloneNode(true)
 					: $fromNode;
-				switch( $type) {
+				switch($type) {
 					case 'appendTo':
 					case 'append':
 //						$toNode->insertBefore(
@@ -2136,6 +2144,7 @@ class phpQueryObject
 //							$toNode->lastChild->nextSibling
 //						);
 						$toNode->appendChild($insert);
+						$eventTarget = $insert;
 						break;
 					case 'prependTo':
 					case 'prepend':
@@ -2165,6 +2174,14 @@ class phpQueryObject
 							);
 						break;
 				}
+				// Mutation event
+				$event = new DOMEvent(array(
+					'target' => $insert,
+					'type' => 'DOMNodeInserted'
+				));
+				phpQueryEvents::trigger($this->getDocumentID(),
+					$event->type, array($event), $insert
+				);
 			}
 		}
 		return $this;
@@ -2518,7 +2535,7 @@ class phpQueryObject
 
 	/**
 	 * Internal stack iterator.
-	 * 
+	 *
 	 * @access private
 	 */
 	public function stack($nodeTypes = null) {

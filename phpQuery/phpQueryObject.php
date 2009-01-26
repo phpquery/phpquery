@@ -2251,7 +2251,7 @@ class phpQueryObject
 		$return = '';
 		foreach($this->elements as $node) {
 			$text = $node->textContent;
-			if (count($this->elements) > 1 && $node->textContent)
+			if (count($this->elements) > 1 && $text)
 				$text .= "\n";
 			foreach($args as $callback) {
 				$text = phpQuery::callbackRun($callback, array($text));
@@ -2757,14 +2757,16 @@ class phpQueryObject
 						$selected = false;
 						// XXX: workaround for string comparsion, see issue #96
 						// http://code.google.com/p/phpquery/issues/detail?id=96
-						$optionValue = $option->attr('value');
-						$optionText = $option->text();
-						$optionTextLenght = mb_strlen($optionText);
-						foreach($_val as $v)
-							if ($optionValue == $v)
-								$selected = true;
-							else if ($optionText == $v && $optionTextLenght == mb_strlen($v))
-								$selected = true;
+//						$optionValue = $option->attr('value');
+//						$optionText = $option->text();
+//						$optionTextLenght = mb_strlen($optionText);
+//						foreach($_val as $v)
+//							if ($optionValue == $v)
+//								$selected = true;
+//							else if ($optionText == $v && $optionTextLenght == mb_strlen($v))
+//								$selected = true;
+						$selected = in_array($option->attr('value'), $_val)
+							|| in_array($option->markup(), $_val);
 						if ($selected)
 							$option->attr('selected', 'selected');
 						else

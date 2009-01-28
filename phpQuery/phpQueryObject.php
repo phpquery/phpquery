@@ -1570,10 +1570,10 @@ class phpQueryObject
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
 	 */
 	public function wrapInnerPHP($codeBefore, $codeAfter) {
-		// TODO test this
 		foreach($this->stack(1) as $node)
 			phpQuery::pq($node, $this->getDocumentID())->contents()
-				->wrapAllPHP($codeBefore, $codeBefore);
+				->wrapAllPHP($codeBefore, $codeAfter);
+		return $this;
 	}
 
 	/**
@@ -2419,10 +2419,14 @@ class phpQueryObject
 		phpQuery::debug(array('not', $selector));
 		$stack = array();
 		if ($selector instanceof self || $selector instanceof DOMNODE) {
-			foreach($this->elements as $node) {
+			foreach($this->stack() as $node) {
 				if ($selector instanceof self) {
-					// XXX check all nodes ?
-					if (count($selector->elements) && ! $selector->elements[0]->isSameNode($node))
+					$matchFound = false;
+					foreach($selector->stack() as $notNode) {
+						if ($notNode->isSameNode($node))
+							$matchFound = true; 
+					}
+					if (! $matchFound)
 						$stack[] = $node;
 				} else if ($selector instanceof DOMNODE) {
 					if (! $selector->isSameNode($node))
@@ -2757,6 +2761,8 @@ class phpQueryObject
 						$selected = false;
 						// XXX: workaround for string comparsion, see issue #96
 						// http://code.google.com/p/phpquery/issues/detail?id=96
+						$selected = in_array($option->attr('value'), $_val)
+							|| in_array($option->markup(), $_val, true);
 //						$optionValue = $option->attr('value');
 //						$optionText = $option->text();
 //						$optionTextLenght = mb_strlen($optionText);
@@ -2765,8 +2771,6 @@ class phpQueryObject
 //								$selected = true;
 //							else if ($optionText == $v && $optionTextLenght == mb_strlen($v))
 //								$selected = true;
-						$selected = in_array($option->attr('value'), $_val)
-							|| in_array($option->markup(), $_val);
 						if ($selected)
 							$option->attr('selected', 'selected');
 						else

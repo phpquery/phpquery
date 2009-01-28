@@ -2753,16 +2753,21 @@ class phpQueryObject
 					else
 						$node->removeAttr('checked');
 				} else if ($node->get(0)->tagName == 'select') {
-					if (! isset($_val))
-						$_val = is_array($val)
-							? $val : array($val);
+					if (! isset($_val)) {
+						$_val = array();
+						if (! is_array($val))
+							$_val = array((string)$val);
+						else
+							foreach($val as $v)
+								$_val[] = $v;
+					}
 					foreach($node['option']->stack(1) as $option) {
 						$option = pq($option, $this->getDocumentID());
 						$selected = false;
 						// XXX: workaround for string comparsion, see issue #96
 						// http://code.google.com/p/phpquery/issues/detail?id=96
 						$selected = in_array($option->attr('value'), $_val)
-							|| in_array($option->markup(), $_val, true);
+							|| in_array($option->markup(), $_val);
 //						$optionValue = $option->attr('value');
 //						$optionText = $option->text();
 //						$optionTextLenght = mb_strlen($optionText);

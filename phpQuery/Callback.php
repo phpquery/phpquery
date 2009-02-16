@@ -5,7 +5,8 @@
  * @link http://code.google.com/p/phpquery/wiki/Callbacks#Param_Structures
  * @author Tobiasz Cudnik
  */
-class Callback {
+class Callback
+	implements ICallbackNamed {
 	public $callback = null;
 	public $params = null;
 	public function __construct($callback, $param1 = null, $param2 = null, $param3 = null) {
@@ -18,13 +19,24 @@ class Callback {
 			$this->params = $params;
 		}
 	}
-	// TODO test me !!!
-	public function param() {
-		$params = func_get_args();
-		return new Callback($this->callback, $this->params+$params);
+	public function getName() {
+		return 'Callback: '.$this->name;
 	}
+	public function hasName() {
+		return isset($this->name) && $this->name;
+	}
+	public function setName($name) {
+		$this->name = $name;
+		return $this;
+	}
+	// TODO test me !!!
+//	public function addParams() {
+//		$params = func_get_args();
+//		return new Callback($this->callback, $this->params+$params);
+//	}
 }
-class CallbackReturnReference extends Callback {
+class CallbackReturnReference extends Callback
+	implements ICallbackNamed {
 	protected $reference;
 	public function __construct(&$reference, $name = null){
 		$this->reference =& $reference;
@@ -33,16 +45,38 @@ class CallbackReturnReference extends Callback {
 	public function callback() {
 		return $this->reference;
 	}
+	public function getName() {
+		return 'Callback: '.$this->name;
+	}
+	public function hasName() {
+		return isset($this->name) && $this->name;
+	}
 }
-class CallbackReturnValue extends Callback {
+class CallbackReturnValue extends Callback
+	implements ICallbackNamed {
 	protected $value;
+	protected $name;
 	public function __construct($value, $name = null){
 		$this->value =& $value;
+		$this->name = $name;
 		$this->callback = array($this, 'callback');
 	}
 	public function callback() {
 		return $this->value;
 	}
+	public function __toString() {
+		return $this->getName();
+	}
+	public function getName() {
+		return 'Callback: '.$this->name;
+	}
+	public function hasName() {
+		return isset($this->name) && $this->name;
+	}
+}
+interface ICallbackNamed {
+	function hasName();
+	function getName();
 }
 /**
  * CallbackParameterToReference can be used when we don't really want a callback,
@@ -65,15 +99,15 @@ class CallbackParameterToReference extends Callback {
 		$this->callback =& $reference;
 	}
 }
-class CallbackReference extends Callback {
-	/**
-	 *
-	 * @param $reference
-	 * @param $paramIndex
-	 * @todo implement $paramIndex; param index choose which callback param will be passed to reference
-	 */
-	public function __construct(&$reference, $name = null){
-		$this->callback =& $reference;
-	}
-}
+//class CallbackReference extends Callback {
+//	/**
+//	 *
+//	 * @param $reference
+//	 * @param $paramIndex
+//	 * @todo implement $paramIndex; param index choose which callback param will be passed to reference
+//	 */
+//	public function __construct(&$reference, $name = null){
+//		$this->callback =& $reference;
+//	}
+//}
 class CallbackParam {}

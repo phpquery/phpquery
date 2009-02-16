@@ -564,6 +564,8 @@ class phpQueryObject
 			$new->elements = $this->elements;
 			if ($this->elementsBackup)
 				$this->elements = $this->elementsBackup;
+		} else if (is_string($newStack)) {
+			$new->elements = phpQuery::pq($newStack, $this->getDocumentID())->stack();
 		} else {
 			$new->elements = $newStack;
 		}
@@ -2766,8 +2768,9 @@ class phpQueryObject
 						$selected = false;
 						// XXX: workaround for string comparsion, see issue #96
 						// http://code.google.com/p/phpquery/issues/detail?id=96
-						$selected = in_array($option->attr('value'), $_val)
-							|| in_array($option->markup(), $_val);
+						$selected = is_null($option->attr('value'))
+							? in_array($option->markup(), $_val)
+							: in_array($option->attr('value'), $_val);
 //						$optionValue = $option->attr('value');
 //						$optionText = $option->text();
 //						$optionTextLenght = mb_strlen($optionText);

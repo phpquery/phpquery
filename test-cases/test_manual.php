@@ -198,16 +198,29 @@ phpQuery::newDocumentXHTML($XHTML)
 //'
 //);
 
-// FIXME??? http://code.google.com/p/phpquery/issues/detail?id=96
+// http://code.google.com/p/phpquery/issues/detail?id=96
 //$doc = phpQuery::newDocument('<select name="section"><option
 //value="-1">Niveau</option><option value="1">6°</option><option
 //value="2">5°</option><option
 //value="3">4°</option><option value="4">3°</option></select>');
-$doc = phpQuery::newDocument('<select name="section"><option
-value="-1">Niveau</option><option value="1">6°</option><option
-value="2">5°</option><option
-value="3">4°</option><option value="4">3&deg;</option></select>');
-print $doc['select']->val(3)->end()->script('print_source');
+//$doc = phpQuery::newDocument('<select name="section"><option
+//value="-1">Niveau</option><option value="1">6°</option><option
+//value="2">5°</option><option
+//value="3">4°</option><option value="4">3&deg;</option></select>');
+//print $doc['select']->val(3)->end()->script('print_source');
+//(16:27:56) jomofcw:        $option_element =
+//(16:27:56) jomofcw:         pq('<option/>')
+//(16:27:56) jomofcw:          ->attr('value',$section['id'])
+//(16:27:56) jomofcw:          ->html($section['libelle'])
+//(16:27:56) jomofcw:        ;
+//(16:29:27) jomofcw: where $section['libelle'] is from a database UTF-8
+//16:30
+//(16:30:20) jomofcw: the value of $section['libelle'] is exactly "3&deg;" in database...
+
+# http://code.google.com/p/phpquery/issues/detail?id=98
+//$doc = phpQuery::newDocument('<select id="test"><option value="0">a</option><option
+//value="10">b</option><option value="20">c</option></select>');
+//print $doc['select']->val(0)->end()->script('print_source');
 
 // http://groups.google.com/group/phpquery/browse_thread/thread/1c78f7e41fc5808c?hl=en
 //$doc = phpQuery::newDocumentXML("
@@ -230,3 +243,14 @@ print $doc['select']->val(3)->end()->script('print_source');
 //                var_dump(pq($campo)->find('datatype')->attr('dt:type')); // Should print "string" but prints ""
 //        }
 //}
+
+// http://code.google.com/p/phpquery/issues/detail?id=97
+//function jsonSuccess($data) {
+//	var_dump($data);
+//}
+//$url = 'http://api.flickr.com/services/feeds/photos_public.gne?tags=cat&tagmode=any&format=json';
+//phpQuery::ajaxAllowHost('api.flickr.com');
+//phpQuery::getJSON($url, array('jsoncallback' => '?'), 'jsonSuccess');
+//var_dump(json_decode($json));
+//require_once('../phpQuery/Zend/Json/Decoder.php');
+//var_dump(Zend_Json_Decoder::decode($json));

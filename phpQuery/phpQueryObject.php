@@ -1870,7 +1870,7 @@ class phpQueryObject
 		return call_user_func_array(array($this, 'htmlOuter'), $args);
 	}
 	public function __toString() {
-		return $this->htmlOuter();
+		return $this->markupOuter();
 	}
 	/**
 	 * Just like html(), but returns markup with VALID (dangerous) PHP tags.
@@ -1879,11 +1879,25 @@ class phpQueryObject
 	 * @todo support returning markup with PHP tags when called without param
 	 */
 	public function php($code = null) {
-//		TODO
-//		$args = func_get_args();
-		return $code
+		return $this->markupPHP($code);
+	}
+	/**
+	 * TODO doc
+	 * @param $code
+	 * @return unknown_type
+	 */
+	public function markupPHP($code = null) {
+		return isset($code)
 			? $this->markup(phpQuery::php($code))
-			: phpQuery::markupToPHP($this->markupOuter());
+			: phpQuery::markupToPHP($this->markup());
+	}
+	/**
+	 * TODO doc
+	 * @param $code
+	 * @return unknown_type
+	 */
+	public function markupOuterPHP() {
+		return phpQuery::markupToPHP($this->markupOuter());
 	}
 	/**
 	 * Enter description here...
@@ -2630,40 +2644,6 @@ class phpQueryObject
 					? $node->getAttribute($attr)
 					: null;
 		}
-		return $this;
-	}
-
-	/**
-	 * Enter description here...
-	 * jQuery difference.
-	 *
-	 * @param string $attr
-	 * @param mixed $value
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
-	 * @todo use attr() function (encoding issues etc).
-	 */
-	public function attrPrepend($attr, $value) {
-		foreach($this->stack(1) as $node )
-			$node->setAttribute($attr,
-				$value.$node->getAttribute($attr)
-			);
-		return $this;
-	}
-
-	/**
-	 * Enter description here...
-	 * jQuery difference.
-	 *
-	 * @param string $attr
-	 * @param mixed $value
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
-	 * @todo use attr() function (encoding issues etc).
-	 */
-	public function attrAppend($attr, $value) {
-		foreach($this->stack(1) as $node )
-			$node->setAttribute($attr,
-				$node->getAttribute($attr).$value
-			);
 		return $this;
 	}
 	/**

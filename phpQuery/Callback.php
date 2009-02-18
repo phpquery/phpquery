@@ -3,12 +3,13 @@
  * Callback class implementing ParamStructures, pattern similar to Currying.
  *
  * @link http://code.google.com/p/phpquery/wiki/Callbacks#Param_Structures
- * @author Tobiasz Cudnik
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
  */
 class Callback
 	implements ICallbackNamed {
 	public $callback = null;
 	public $params = null;
+	protected $name;
 	public function __construct($callback, $param1 = null, $param2 = null, $param3 = null) {
 		$params = func_get_args();
 		$params = array_slice($params, 1);
@@ -29,12 +30,17 @@ class Callback
 		$this->name = $name;
 		return $this;
 	}
-	// TODO test me !!!
+	// TODO test me
 //	public function addParams() {
 //		$params = func_get_args();
 //		return new Callback($this->callback, $this->params+$params);
 //	}
 }
+/**
+ * Callback type which on execution returns reference passed during creation.
+ * 
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ */
 class CallbackReturnReference extends Callback
 	implements ICallbackNamed {
 	protected $reference;
@@ -52,6 +58,11 @@ class CallbackReturnReference extends Callback
 		return isset($this->name) && $this->name;
 	}
 }
+/**
+ * Callback type which on execution returns value passed during creation.
+ * 
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ */
 class CallbackReturnValue extends Callback
 	implements ICallbackNamed {
 	protected $value;
@@ -80,22 +91,18 @@ interface ICallbackNamed {
 }
 /**
  * CallbackParameterToReference can be used when we don't really want a callback,
- * only parameter passed to it. CallbackReference takes first parameter's value
- * and passes it to reference. Thanks to that, we can use *if statement* instead
- * of *callback function*.
+ * only parameter passed to it. CallbackParameterToReference takes first 
+ * parameter's value and passes it to reference.
  *
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
- *
  */
 class CallbackParameterToReference extends Callback {
 	/**
-	 *
 	 * @param $reference
-	 * @param $paramIndex
 	 * @TODO implement $paramIndex; 
 	 * param index choose which callback param will be passed to reference
 	 */
-	public function __construct(&$reference, $paramIndex = null){
+	public function __construct(&$reference){
 		$this->callback =& $reference;
 	}
 }

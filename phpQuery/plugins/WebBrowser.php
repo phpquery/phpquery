@@ -249,7 +249,7 @@ class phpQueryPlugin_WebBrowser {
 	 * @param $callback
 	 * @return unknown_type
 	 */
-	public static function hadleClick($e, Callback $callback = null) {
+	public static function hadleClick($e, $callback = null) {
 		$node = phpQuery::pq($e->target);
 		$type = null;
 		if ($node->is('a[href]')) {
@@ -261,7 +261,7 @@ class phpQueryPlugin_WebBrowser {
 				'url' => resolve_url($e->data[0], $node->attr('href')),
 				'referer' => $node->document->location,
 			), $xhr);
-			if (! $callback && $e->data[1])
+			if ((! $callback || !($callback instanceof Callback)) && $e->data[1])
 				$callback = $e->data[1];
 			if ($xhr->getLastResponse()->isSuccessful() && $callback)
 				phpQuery::callbackRun($callback, array(
@@ -276,7 +276,7 @@ class phpQueryPlugin_WebBrowser {
 	 * @param unknown_type $e
 	 * @TODO trigger submit for form after form's  submit button has a click event
 	 */
-	public static function handleSubmit($e, Callback $callback = null) {
+	public static function handleSubmit($e, $callback = null) {
 		$node = phpQuery::pq($e->target);
 		if (!$node->is('form') || !$node->is('[action]'))
 			return;
@@ -306,7 +306,7 @@ class phpQueryPlugin_WebBrowser {
 		if ($node->attr('enctype'))
 			$options['contentType'] = $node->attr('enctype');
 		$xhr = phpQuery::ajax($options, $xhr);
-		if (! $callback && $e->data[1])
+		if ((! $callback || !($callback instanceof Callback)) && $e->data[1])
 			$callback = $e->data[1];
 		if ($xhr->getLastResponse()->isSuccessful() && $callback)
 			phpQuery::callbackRun($callback, array(

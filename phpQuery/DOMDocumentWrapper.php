@@ -501,9 +501,9 @@ class DOMDocumentWrapper {
 		return $markup;
 	}
 	/**
-	 * Return document markup, starting with optional $node as root.
+	 * Return document markup, starting with optional $nodes as root.
 	 *
-	 * @param $node	DOMNode|DOMNodeList
+	 * @param $nodes	DOMNode|DOMNodeList
 	 * @return string
 	 */
 	public function markup($nodes = null, $innerMarkup = false) {

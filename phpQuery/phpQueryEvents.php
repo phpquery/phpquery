@@ -48,8 +48,9 @@ abstract class phpQueryEvents {
 			}
 			$i = 0;
 			while($node) {
+				// TODO whois
 				phpQuery::debug("Triggering ".($i?"bubbled ":'')."event '{$type}' on "
-					."node ".phpQueryObject::whois($node)."\n");
+					."node \n");//.phpQueryObject::whois($node)."\n");
 				$event->currentTarget = $node;
 				$eventNode = self::getNode($documentID, $node);
 				if (isset($eventNode->eventHandlers)) {

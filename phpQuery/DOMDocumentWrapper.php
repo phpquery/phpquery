@@ -57,7 +57,7 @@ class DOMDocumentWrapper {
 			$this->charset = $this->document->encoding;
 			// TODO isDocumentFragment
 		} else {
-			$loaded = $this->loadMarkup($markup); 
+			$loaded = $this->loadMarkup($markup);
 		}
 		if ($loaded) {
 			$this->xpath = new DOMXPath($this->document);
@@ -79,28 +79,33 @@ class DOMDocumentWrapper {
 			list($contentType, $charset) = $this->contentTypeToArray($this->contentType);
 			switch($contentType) {
 				case 'text/html':
+					phpQuery::debug("Loading HTML, content type '{$this->contentType}'");
 					$loaded = $this->loadMarkupHTML($markup, $charset);
 				break;
 				case 'text/xml':
 				case 'application/xhtml+xml':
+					phpQuery::debug("Loading XML, content type '{$this->contentType}'");
 					$loaded = $this->loadMarkupXML($markup, $charset);
 				break;
 				default:
 					// for feeds or anything that sometimes doesn't use text/xml
-					if (strpos('xml', $this->contentType) !== false)
+					if (strpos('xml', $this->contentType) !== false) {
+						phpQuery::debug("Loading XML, content type '{$this->contentType}'");
 						$loaded = $this->loadMarkupXML($markup, $charset);
-					else
+					} else
 						phpQuery::debug("Could not determine document type from content type '{$this->contentType}'");
 			}
 		} else {
 			// content type autodetection
 			if ($this->isXML($markup)) {
+				phpQuery::debug("Loading XML, isXML() == true");
 				$loaded = $this->loadMarkupXML($markup);
 				if (! $loaded && $this->isXHTML) {
-					phpQuery::debug('Loading as XML failed, trying to load as HTML');
+					phpQuery::debug('Loading as XML failed, trying to load as HTML, isXHTML == true');
 					$loaded = $this->loadMarkupHTML($markup);
 				}
 			} else {
+				phpQuery::debug("Loading HTML, isXML() == false");
 				$loaded = $this->loadMarkupHTML($markup);
 			}
 		}
@@ -268,7 +273,7 @@ class DOMDocumentWrapper {
 	}
 	protected function isXML($markup) {
 //		return strpos($markup, '<?xml') !== false && stripos($markup, 'xhtml') === false;
-		return strpos($markup, '<'.'?xml') !== false;
+		return strpos(substr($markup, 0, 100), '<'.'?xml') !== false;
 	}
 	protected function contentTypeToArray($contentType) {
 		$matches = explode(';', trim(strtolower($contentType)));
@@ -317,7 +322,7 @@ class DOMDocumentWrapper {
 	}
 	/**
 	 * Repositions meta[type=charset] at the start of head. Bypasses DOMDocument bug.
-	 * 
+	 *
 	 * @link http://code.google.com/p/phpquery/issues/detail?id=80
 	 * @param $html
 	 */
@@ -586,7 +591,7 @@ class DOMDocumentWrapper {
 	 * @param $xml
 	 * @return unknown_type
 	 * @author mjaque at ilkebenson dot com
-	 * @link http://pl2.php.net/manual/en/domdocument.savehtml.php#81256
+	 * @link http://php.net/manual/en/domdocument.savehtml.php#81256
 	 */
 	public static function expandEmptyTag($tag, $xml){
         $indice = 0;

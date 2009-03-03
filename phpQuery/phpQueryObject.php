@@ -78,15 +78,18 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function __construct($documentID) {
+//		if ($documentID instanceof self)
+//			var_dump($documentID->getDocumentID());
 		$id = $documentID instanceof self
 			? $documentID->getDocumentID()
 			: $documentID;
+//		var_dump($id);
 		if (! isset(phpQuery::$documents[$id] )) {
+//			var_dump(phpQuery::$documents);
 			throw new Exception("Document with ID '{$id}' isn't loaded. Use phpQuery::newDocument(\$html) or phpQuery::newDocumentFile(\$file) first.");
-			return;
 		}
 		$this->documentID = $id;
 		$this->documentWrapper =& phpQuery::$documents[$id];
@@ -120,7 +123,7 @@ class phpQueryObject
 	 * Saves actual object to $var by reference.
 	 * Useful when need to break chain.
 	 * @param phpQueryObject $var
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function toReference(&$var) {
 		return $var = $this;
@@ -154,7 +157,7 @@ class phpQueryObject
 	 *
 	 * Watch out, it doesn't creates new instance, can be reverted with end().
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function toRoot() {
 		$this->elements = array($this->root);
@@ -173,7 +176,7 @@ class phpQueryObject
 	 * @param unknown_type $domId
 	 * @see phpQuery::newDocument
 	 * @see phpQuery::newDocumentFile
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function getDocumentIDRef(&$documentID) {
 		$documentID = $this->getDocumentID();
@@ -182,7 +185,7 @@ class phpQueryObject
 	/**
 	 * Returns object with stack set to document root.
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function getDocument() {
 		return phpQuery::getDocument($this->getDocumentID());
@@ -197,7 +200,7 @@ class phpQueryObject
 	/**
 	 * Get object's Document ID.
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function getDocumentID() {
 		return $this->documentID;
@@ -207,7 +210,7 @@ class phpQueryObject
 	 * CAUTION! None further operations will be possible on this document.
 	 * All objects refering to it will be useless.
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function unloadDocument() {
 		phpQuery::unloadDocuments($this->getDocumentID());
@@ -306,7 +309,7 @@ class phpQueryObject
 	/**
 	 * @access private
 	 */
-	protected function parseSelector( $query) {
+	protected function parseSelector($query) {
 		// clean spaces
 		// TODO include this inside parsing ?
 		$query = trim(
@@ -618,8 +621,9 @@ class phpQueryObject
 		$stack = array();
 		if (! $this->elements )
 			$this->debug('Stack empty, skipping...');
-		// XXX foreach($this->stack(1) ???
-		foreach($this->elements as $k => $stackNode) {
+//		var_dump($this->elements[0]->nodeType);
+		// element, document
+		foreach($this->stack(array(1, 13)) as $k => $stackNode) {
 			$detachAfter = false;
 			// to work on detached nodes we need temporary place them somewhere
 			// thats because context xpath queries sucks ;]
@@ -681,9 +685,9 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
-	public function find( $selectors, $context = null, $noHistory = false) {
+	public function find($selectors, $context = null, $noHistory = false) {
 		if (!$noHistory)
 			// backup last stack /for end()/
 			$this->elementsBackup = $this->elements;
@@ -908,7 +912,7 @@ class phpQueryObject
 				break;
 			case 'slice':
 				// TODO jQuery difference ?
-				$args = exlode(',',
+				$args = explode(',',
 					str_replace(', ', ',', trim($args, "\"'"))
 				);
 				$start = $args[0];
@@ -1116,7 +1120,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function is($selector, $nodes = null) {
 		phpQuery::debug(array("Is:", $selector));
@@ -1140,13 +1144,17 @@ class phpQueryObject
 	 * Enter description here...
 	 * jQuery difference.
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * Callback:
+	 * - $index int
+	 * - $node DOMNode
+	 *
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @link http://docs.jquery.com/Traversing/filter
 	 */
 	public function filterCallback($callback, $_skipHistory = false) {
 		if (! $_skipHistory) {
 			$this->elementsBackup = $this->elements;
-			$this->debug(array("Filtering:", $selectors));
+			$this->debug("Filtering by callback");
 		}
 		$newStack = array();
 		foreach($this->elements as $index => $node) {
@@ -1161,10 +1169,12 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @link http://docs.jquery.com/Traversing/filter
 	 */
 	public function filter($selectors, $_skipHistory = false) {
+		if ($selectors instanceof Callback)
+			return $this->filterCallback($selectors, $_skipHistory);
 		if (! $_skipHistory)
 			$this->elementsBackup = $this->elements;
 		$notSimpleSelector = array(' ', '>', '~', '+', '/');
@@ -1306,7 +1316,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @link http://docs.jquery.com/Ajax/load
-	 * @return phpQuery|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQuery|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo Support $selector
 	 */
 	public function load($url, $data = null, $callback = null) {
@@ -1353,7 +1363,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQuery|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQuery|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo
 	 */
 	public function css() {
@@ -1381,7 +1391,7 @@ class phpQueryObject
 	 *
 	 * @param unknown_type $type
 	 * @param unknown_type $data
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @TODO support more than event in $type (space-separated)
 	 */
 	public function trigger($type, $data = array()) {
@@ -1394,7 +1404,7 @@ class phpQueryObject
 	 *
 	 * @param unknown_type $type
 	 * @param unknown_type $data
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @TODO
 	 */
 	public function triggerHandler($type, $data = array()) {
@@ -1407,7 +1417,7 @@ class phpQueryObject
 	 * @param unknown_type $type
 	 * @param unknown_type $data Optional
 	 * @param unknown_type $callback
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @TODO support '!' (exclusive) events
 	 * @TODO support more than event in $type (space-separated)
 	 */
@@ -1438,7 +1448,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function change($callback = null) {
 		if ($callback)
@@ -1448,7 +1458,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function submit($callback = null) {
 		if ($callback)
@@ -1458,7 +1468,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function click($callback = null) {
 		if ($callback)
@@ -1469,7 +1479,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @param String|phpQuery
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function wrapAllOld($wrapper) {
 		$wrapper = pq($wrapper)->_clone();
@@ -1488,7 +1498,7 @@ class phpQueryObject
 	 *
 	 * TODO testme...
 	 * @param String|phpQuery
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function wrapAll($wrapper) {
 		if (! $this->length())
@@ -1517,7 +1527,7 @@ class phpQueryObject
 	 * NON JQUERY METHOD
 	 *
 	 * @param String|phpQuery
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function wrapAllPHP($codeBefore, $codeAfter) {
 		return $this
@@ -1533,7 +1543,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @param String|phpQuery
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function wrap($wrapper) {
 		foreach($this->stack() as $node)
@@ -1545,7 +1555,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @param String|phpQuery
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function wrapPHP($codeBefore, $codeAfter) {
 		foreach($this->stack() as $node)
@@ -1557,7 +1567,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @param String|phpQuery
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function wrapInner($wrapper) {
 		foreach($this->stack() as $node)
@@ -1569,7 +1579,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @param String|phpQuery
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function wrapInnerPHP($codeBefore, $codeAfter) {
 		foreach($this->stack(1) as $node)
@@ -1581,7 +1591,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @testme Support for text nodes
 	 */
 	public function contents() {
@@ -1601,7 +1611,7 @@ class phpQueryObject
 	 *
 	 * jQuery difference.
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function contentsUnwrap() {
 		foreach($this->stack(1) as $node) {
@@ -1637,7 +1647,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function eq($num) {
 		$oldStack = $this->elements;
@@ -1651,7 +1661,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function size() {
 		return count($this->elements);
@@ -1660,7 +1670,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @deprecated Use length as attribute
 	 */
 	public function length() {
@@ -1673,7 +1683,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo $level
 	 */
 	public function end($level = 1) {
@@ -1689,7 +1699,7 @@ class phpQueryObject
 	 * Enter description here...
 	 * Normal use ->clone() .
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @access private
 	 */
 	public function _clone() {
@@ -1707,7 +1717,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function replaceWithPHP($code) {
 		return $this->replaceWith(phpQuery::php($code));
@@ -1718,7 +1728,7 @@ class phpQueryObject
 	 *
 	 * @param String|phpQuery $content
 	 * @link http://docs.jquery.com/Manipulation/replaceWith#content
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function replaceWith($content) {
 		return $this->after($content)->remove();
@@ -1728,7 +1738,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @param String $selector
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo this works ?
 	 */
 	public function replaceAll($selector) {
@@ -1742,7 +1752,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function remove($selector = null) {
 		$loop = $selector
@@ -1807,7 +1817,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @param unknown_type $html
-	 * @return string|phpQuery|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return string|phpQuery|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @TODO force html result
 	 */
 	public function html($html = null, $callback1 = null, $callback2 = null, $callback3 = null) {
@@ -1875,7 +1885,7 @@ class phpQueryObject
 	/**
 	 * Just like html(), but returns markup with VALID (dangerous) PHP tags.
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo support returning markup with PHP tags when called without param
 	 */
 	public function php($code = null) {
@@ -1902,7 +1912,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function children($selector = null) {
 		$stack = array();
@@ -1926,7 +1936,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function ancestors($selector = null) {
 		return $this->children( $selector );
@@ -1935,7 +1945,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function append( $content) {
 		return $this->insert($content, __FUNCTION__);
@@ -1943,7 +1953,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function appendPHP( $content) {
 		return $this->insert("<php><!-- {$content} --></php>", 'append');
@@ -1951,7 +1961,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function appendTo( $seletor) {
 		return $this->insert($seletor, __FUNCTION__);
@@ -1960,7 +1970,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function prepend( $content) {
 		return $this->insert($content, __FUNCTION__);
@@ -1969,7 +1979,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @todo accept many arguments, which are joined, arrays maybe also
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function prependPHP( $content) {
 		return $this->insert("<php><!-- {$content} --></php>", 'prepend');
@@ -1977,7 +1987,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function prependTo( $seletor) {
 		return $this->insert($seletor, __FUNCTION__);
@@ -1986,15 +1996,15 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
-	public function before( $content) {
+	public function before($content) {
 		return $this->insert($content, __FUNCTION__);
 	}
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function beforePHP( $content) {
 		return $this->insert("<php><!-- {$content} --></php>", 'before');
@@ -2003,7 +2013,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @param String|phpQuery
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function insertBefore( $seletor) {
 		return $this->insert($seletor, __FUNCTION__);
@@ -2012,7 +2022,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function after( $content) {
 		return $this->insert($content, __FUNCTION__);
@@ -2020,7 +2030,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function afterPHP( $content) {
 		return $this->insert("<php><!-- {$content} --></php>", 'after');
@@ -2028,7 +2038,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function insertAfter( $seletor) {
 		return $this->insert($seletor, __FUNCTION__);
@@ -2039,7 +2049,7 @@ class phpQueryObject
 	 *
 	 * @param unknown_type $target
 	 * @param unknown_type $type
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @access private
 	 */
 	public function insert($target, $type) {
@@ -2052,13 +2062,13 @@ class phpQueryObject
 			case 'insertAfter':
 				$to = true;
 		}
-		switch(gettype( $target )) {
+		switch(gettype($target)) {
 			case 'string':
 				$insertFrom = $insertTo = array();
 				if ($to) {
 					// INSERT TO
 					$insertFrom = $this->elements;
-					if (phpQuery::isMarkup( $target )) {
+					if (phpQuery::isMarkup($target)) {
 						// $target is new markup, import it
 						$insertTo = $this->documentWrapper->import($target);
 					// insert into selected element
@@ -2225,7 +2235,7 @@ class phpQueryObject
 	 * @param unknown_type $start
 	 * @param unknown_type $end
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @testme
 	 */
 	public function slice($start, $end = null) {
@@ -2247,7 +2257,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function reverse() {
 		$this->elementsBackup = $this->elements;
@@ -2279,7 +2289,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function plugin($class, $file = null) {
 		phpQuery::plugin($class, $file);
@@ -2334,7 +2344,7 @@ class phpQueryObject
 	 * Use it ONLY when need to call next() on an iterated object (in same time).
 	 * Normaly there is no need to do such thing ;)
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @access private
 	 */
 	public function _next($selector = null) {
@@ -2346,7 +2356,7 @@ class phpQueryObject
 	 * Use prev() and next().
 	 *
 	 * @deprecated
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @access private
 	 */
 	public function _prev($selector = null) {
@@ -2355,7 +2365,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function prev($selector = null) {
 		return $this->newInstance(
@@ -2364,7 +2374,7 @@ class phpQueryObject
 	}
 
 	/**
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo
 	 */
 	public function prevAll($selector = null) {
@@ -2374,7 +2384,7 @@ class phpQueryObject
 	}
 
 	/**
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo FIXME: returns source elements insted of next siblings
 	 */
 	public function nextAll($selector = null) {
@@ -2411,7 +2421,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function siblings($selector = null) {
 		$stack = array();
@@ -2429,10 +2439,13 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function not($selector = null) {
-		phpQuery::debug(array('not', $selector));
+		if (is_string($selector))
+			phpQuery::debug(array('not', $selector));
+		else
+			phpQuery::debug('not');
 		$stack = array();
 		if ($selector instanceof self || $selector instanceof DOMNODE) {
 			foreach($this->stack() as $node) {
@@ -2440,7 +2453,7 @@ class phpQueryObject
 					$matchFound = false;
 					foreach($selector->stack() as $notNode) {
 						if ($notNode->isSameNode($node))
-							$matchFound = true; 
+							$matchFound = true;
 					}
 					if (! $matchFound)
 						$stack[] = $node;
@@ -2473,7 +2486,7 @@ class phpQueryObject
 	 * Enter description here...
 	 *
 	 * @param string|phpQueryObject
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function add($selector = null) {
 		if (! $selector)
@@ -2511,7 +2524,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function parent($selector = null) {
 		$stack = array();
@@ -2528,7 +2541,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function parents($selector = null) {
 		$stack = array();
@@ -2658,7 +2671,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo check CDATA ???
 	 */
 	public function attrPHP($attr, $code) {
@@ -2690,7 +2703,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function removeAttr($attr) {
 		foreach($this->stack(1) as $node) {
@@ -2776,7 +2789,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function andSelf() {
 		if ( $this->previous )
@@ -2787,7 +2800,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function addClass( $className) {
 		if (! $className)
@@ -2805,7 +2818,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function addClassPHP( $className) {
 		foreach($this->stack(1) as $node) {
@@ -2835,7 +2848,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function removeClass($className) {
 		foreach($this->stack(1) as $node) {
@@ -2854,7 +2867,7 @@ class phpQueryObject
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function toggleClass($className) {
 		foreach($this->stack(1) as $node) {
@@ -2880,7 +2893,7 @@ class phpQueryObject
 	 * Result:
 	 * [ <p></p> ]
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @access private
 	 */
 	public function _empty() {
@@ -2898,7 +2911,7 @@ class phpQueryObject
 	 * @param array $scope External variables passed to callback. Use compact('varName1', 'varName2'...) and extract($scope)
 	 * @param array $arg1 Will ba passed as third and futher args to callback.
 	 * @param array $arg2 Will ba passed as fourth and futher args to callback, and so on...
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function each($callback, $param1 = null, $param2 = null, $param3 = null) {
 		$paramStructure = null;
@@ -2910,11 +2923,22 @@ class phpQueryObject
 			phpQuery::callbackRun($callback, array($v), $paramStructure);
 		return $this;
 	}
+	/**
+	 * Run callback on actual object.
+	 *
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
+	 */
+	public function callback($callback, $param1 = null, $param2 = null, $param3 = null) {
+		$params = func_get_args();
+		$params[0] = $this;
+		phpQuery::callbackRun($callback, $params);
+		return $this;
+	}
 
 	/**
 	 * Enter description here...
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo add $scope and $args as in each() ???
 	 */
 	public function map($callback, $param1 = null, $param2 = null, $param3 = null) {
@@ -2973,7 +2997,7 @@ class phpQueryObject
 	 * Proper functionality is choosed automagicaly.
 	 *
 	 * @see phpQueryObject::_next()
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public function next($cssSelector = null){
 //		if ($cssSelector || $this->valid)
@@ -3051,7 +3075,7 @@ class phpQueryObject
 				while($sibling->previousSibling) {
 					$sibling = $sibling->previousSibling;
 					$isElement = $sibling instanceof DOMELEMENT;
-					if ( $isElement && $sibling->tagName == $node->tagName )
+					if ($isElement && $sibling->tagName == $node->tagName)
 						$i++;
 				}
 				$xpath[] = $this->isXML()
@@ -3073,27 +3097,41 @@ class phpQueryObject
 			? array( $oneNode )
 			: $this->elements;
 		foreach($loop as $node) {
-			$return[] = isset($node->tagName)
-				? $node->tagName
+			if (isset($node->tagName)) {
+				$tag = in_array($node->tagName, array('php', 'js'))
+					? strtoupper($node->tagName)
+					: $node->tagName;
+				$return[] = $tag
 					.($node->getAttribute('id')
 						? '#'.$node->getAttribute('id'):'')
 					.($node->getAttribute('class')
 						? '.'.join('.', split(' ', $node->getAttribute('class'))):'')
 					.($node->getAttribute('name')
 						? '[name="'.$node->getAttribute('name').'"]':'')
-				: ($node instanceof DOMTEXT
-					? "text: '".substr(str_replace("\n", '', $node->textContent), 0, 15)."'"
-					: get_class($node)
-				);
+					.($node->getAttribute('value') && strpos($node->getAttribute('value'), '<?php') === false
+						? '[value="'.substr(str_replace("\n", '', $node->getAttribute('value')), 0, 15).'"]':'')
+					.($node->getAttribute('value') && strpos($node->getAttribute('value'), '<?php') !== false
+						? '[value=PHP]':'')
+					.($node->getAttribute('selected')
+						? '[selected]':'')
+					.($node->getAttribute('checked')
+						? '[checked]':'')
+				;
+			} else if ($node instanceof DOMTEXT) {
+				if (trim($node->textContent))
+					$return[] = 'Text:'.substr(str_replace("\n", ' ', $node->textContent), 0, 15);
+			} else {
+
+			}
 		}
-		return $oneNode
+		return $oneNode && isset($return[0])
 			? $return[0]
 			: $return;
 	}
 	/**
 	 * Dump htmlOuter and preserve chain. Usefull for debugging.
 	 *
-	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery|QueryTemplatesPhpQuery
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 *
 	 */
 	public function dump() {
@@ -3122,18 +3160,24 @@ class phpQueryObject
 		phpQuery::$debug = $debug;
 		return $this;
 	}
-	public function dumpTree() {
-		print 'DUMP #'.(phpQuery::$dumpCount++).' ';
+	public function dumpTree($html = true, $title = true) {
+		$output = $title
+			? 'DUMP #'.(phpQuery::$dumpCount++)." \n" : '';
 		$debug = phpQuery::$debug;
 		phpQuery::$debug = false;
 		foreach($this->stack() as $node)
-			print $this->__dumpTree($node);
+			$output .= $this->__dumpTree($node);
 		phpQuery::$debug = $debug;
+		print $html
+			? nl2br(str_replace(' ', '&nbsp;', $output))
+			: $output;
 		return $this;
 	}
 	private function __dumpTree($node, $intend = 0) {
-		$return = str_repeat('  ', $intend);
-		$return .= $this->whois($node)."\n";
+		$whois = $this->whois($node);
+		$return = '';
+		if ($whois)
+			$return .= str_repeat(' - ', $intend).$whois."\n";
 		if (isset($node->childNodes))
 			foreach($node->childNodes as $chNode)
 				$return .= $this->__dumpTree($chNode, $intend+1);

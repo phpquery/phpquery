@@ -4,6 +4,9 @@
  *
  * @link http://code.google.com/p/phpquery/wiki/Callbacks#Param_Structures
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ * 
+ * @TODO??? return fake forwarding function created via create_function
+ * honor paramStructure
  */
 class Callback
 	implements ICallbackNamed {
@@ -35,6 +38,19 @@ class Callback
 //		$params = func_get_args();
 //		return new Callback($this->callback, $this->params+$params);
 //	}
+}
+/**
+ * Shorthand for new Callback(create_function(...), ...);
+ * 
+ * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
+ */
+class CallbackBody extends Callback {
+	public function __construct($paramList, $code, $param1 = null, $param2 = null, $param3 = null) {
+		$params = func_get_args();
+		$params = array_slice($params, 2);
+		$this->callback = create_function($paramList, $code);
+		$this->params = $params;
+	}
 }
 /**
  * Callback type which on execution returns reference passed during creation.

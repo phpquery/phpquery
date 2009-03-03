@@ -391,31 +391,29 @@ abstract class phpQuery {
 	 * @todo support passing DOMDocument object from self::loadDocument
 	 */
 	protected static function createDocumentWrapper($html, $contentType = null, $documentID = null) {
-		if (function_exists('domxml_open_mem')) {
+		if (function_exists('domxml_open_mem'))
 			throw new Exception("Old PHP4 DOM XML extension detected. phpQuery won't work until this extension is enabled.");
-			return null;
-		}
-		$id = $documentID
-			? $documentID
-			: md5(microtime());
+//		$id = $documentID
+//			? $documentID
+//			: md5(microtime());
 		$document = null;
 		if ($html instanceof DOMDOCUMENT) {
-			// TODO support cloning of DOMDocumentWrapper
 			if (self::getDocumentID($html)) {
 				// document already exists in phpQuery::$documents, make a copy
 				$document = clone $html;
 			} else {
 				// new document, add it to phpQuery::$documents
-				$wrapper = new DOMDocumentWrapper($html, $contentType);
+				$wrapper = new DOMDocumentWrapper($html, $contentType, $documentID);
 			}
 		} else {
-			$wrapper = new DOMDocumentWrapper($html, $contentType);
+			$wrapper = new DOMDocumentWrapper($html, $contentType, $documentID);
 		}
-		$wrapper->id = $id;
-		// create document
-		phpQuery::$documents[$id] = $wrapper;
+//		$wrapper->id = $id;
+		// bind document
+		phpQuery::$documents[$wrapper->id] = $wrapper;
 		// remember last loaded document
-		return self::$defaultDocumentID = $id;
+		phpQuery::selectDocument($wrapper->id);
+		return $wrapper->id;
 	}
 	/**
 	 * Extend class namespace.
@@ -984,10 +982,10 @@ abstract class phpQuery {
 	 * @param $paramStructure
 	 * @return unknown_type
 	 */
-	public static function callbackRun($callback, $params = null, $paramStructure = null) {
+	public static function callbackRun($callback, $params = array(), $paramStructure = null) {
 		if (! $callback)
 			return;
-		if ($callback instanceof CallbackReference) {
+		if ($callback instanceof CallbackParameterToReference) {
 			// TODO support ParamStructure to select which $param push to reference
 			if (isset($params[0]))
 				$callback->callback = $params[0];

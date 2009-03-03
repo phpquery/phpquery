@@ -44,12 +44,12 @@ class DOMDocumentWrapper {
 	public function __construct($markup = null, $contentType = null, $newDocumentID = null) {
 		if (isset($markup))
 			$this->load($markup, $contentType, $newDocumentID);
-	}
-	public function load($markup, $contentType = null, $newDocumentID = null) {
-		$id = $newDocumentID
+		$this->id = $newDocumentID
 			? $newDocumentID
 			: md5(microtime());
-		phpQuery::$documents[$id] = $this;
+	}
+	public function load($markup, $contentType = null, $newDocumentID = null) {
+//		phpQuery::$documents[$id] = $this;
 		$this->contentType = strtolower($contentType);
 		if ($markup instanceof DOMDOCUMENT) {
 			$this->document = $markup;
@@ -62,9 +62,11 @@ class DOMDocumentWrapper {
 		if ($loaded) {
 			$this->xpath = new DOMXPath($this->document);
 			$this->afterMarkupLoad();
+			return true;
 			// remember last loaded document
-			return phpQuery::selectDocument($id);
+//			return phpQuery::selectDocument($id);
 		}
+		return false;
 	}
 	protected function afterMarkupLoad() {
 		if ($this->isXHTML) {
@@ -535,9 +537,13 @@ class DOMDocumentWrapper {
 			} else {
 				$loop = array();
 				if ($innerMarkup)
-					foreach($nodes as $node)
-						foreach($node->childNodes as $child)
-							$loop[] = $child;
+					foreach($nodes as $node) {
+						if ($node->childNodes)
+							foreach($node->childNodes as $child)
+								$loop[] = $child;
+						else
+							$loop[] = $node;
+					}
 				else
 					$loop = $nodes;
 				self::debug("Getting markup, moving selected nodes (".count($loop).") to new DocumentFragment");

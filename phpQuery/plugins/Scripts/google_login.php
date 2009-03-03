@@ -29,7 +29,7 @@ if (! function_exists('ndfasui8923')) {
 		'config', 'self', 'return', 'params'
 	));
 }
-phpQuery::extend('WebBrowser');
+phpQuery::plugin('WebBrowser');
 $self->document->xhr = phpQuery::$plugins->browserGet(
 	'https://www.google.com/accounts/Login',
 	$ndfasui8923

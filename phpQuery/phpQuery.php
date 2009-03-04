@@ -180,7 +180,7 @@ abstract class phpQuery {
 			foreach($arg1->elements as $node)
 				$phpQuery->elements[] = $phpQuery->document->importNode($node, true);
 			return $phpQuery;
-		} else if ($arg1 instanceof DOMNODE || (is_array($arg1) && isset($arg1[0]) && $arg[0] instanceof DOMNODE)) {
+		} else if ($arg1 instanceof DOMNODE || (is_array($arg1) && isset($arg1[0]) && $arg1[0] instanceof DOMNODE)) {
 			/*
 			 * Wrap DOM nodes with phpQuery object, import into document when needed:
 			 * pq(array($domNode1, $domNode2))
@@ -557,7 +557,7 @@ abstract class phpQuery {
 	 * @todo still used ?
 	 */
 	public static function isMarkup($input) {
-		return substr(trim($input), 0, 1) == '<';
+		return ! is_array($input) && substr(trim($input), 0, 1) == '<';
 	}
 	public static function debug($text) {
 		if (self::$debug)

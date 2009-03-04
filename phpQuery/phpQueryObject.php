@@ -2657,7 +2657,8 @@ class phpQueryObject
 					? $node->getAttribute($attr)
 					: null;
 		}
-		return $this;
+		return is_null($value)
+			? '' : $this;
 	}
 	/**
 	 * @access private
@@ -2683,7 +2684,7 @@ class phpQueryObject
 //				$value	= mb_convert_encoding($value, 'UTF-8', 'HTML-ENTITIES');
 		}
 		foreach($this->stack(1) as $node) {
-			if (! is_null( $value )) {
+			if (! is_null($code)) {
 //				$attrNode = $this->DOM->createAttribute($attr);
 				$node->setAttribute($attr, $value);
 //				$attrNode->value = $value;

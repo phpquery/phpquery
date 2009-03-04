@@ -2398,7 +2398,7 @@ class phpQueryObject
 	protected function getElementSiblings($direction, $selector = null, $limitToOne = false) {
 		$stack = array();
 		$count = 0;
-		foreach($this->stack(1) as $node) {
+		foreach($this->stack() as $node) {
 			$test = $node;
 			while( isset($test->{$direction}) && $test->{$direction}) {
 				$test = $test->{$direction};

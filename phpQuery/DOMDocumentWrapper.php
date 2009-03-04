@@ -60,6 +60,8 @@ class DOMDocumentWrapper {
 			$loaded = $this->loadMarkup($markup);
 		}
 		if ($loaded) {
+//			$this->document->formatOutput = true;
+			$this->document->preserveWhiteSpace = true;
 			$this->xpath = new DOMXPath($this->document);
 			$this->afterMarkupLoad();
 			return true;

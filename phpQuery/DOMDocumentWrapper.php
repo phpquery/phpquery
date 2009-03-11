@@ -136,31 +136,60 @@ class DOMDocumentWrapper {
 			$this->isDocumentFragment = self::isDocumentFragmentHTML($markup);
 		$charset = null;
 		$documentCharset = $this->charsetFromHTML($markup);
+		$addDocumentCharset = false;
 		if ($documentCharset) {
 			$charset = $documentCharset;
 			$markup = $this->charsetFixHTML($markup);
 		} else if ($requestedCharset) {
 			$charset = $requestedCharset;
 		}
-		if (! $charset)
+		if (! $charset )
 			$charset = phpQuery::$defaultCharset;
-		if ($requestedCharset && $documentCharset && $requestedCharset != $documentCharset) {
-			// TODO place for charset conversion
+		// HTTP 1.1 says that the default charset is ISO-8859-1
+		// @see http://www.w3.org/International/O-HTTP-charset
+		if (! $documentCharset) {
+			$documentCharset = 'ISO-8859-1';
+			$addDocumentCharset = true;	
+		}
+		// Should be careful here, still need 'magic encoding detection' since lots of pages have other 'default encoding'
+		// Worse, some pages can have mixed encodings... we'll try not to worry about that
+		$requestedCharset = strtoupper($requestedCharset);
+		$documentCharset = strtoupper($documentCharset);
+		phpQuery::debug("DOC: $documentCharset REQ: $requestedCharset");
+		if ($requestedCharset && $documentCharset && $requestedCharset !== $documentCharset) {
+			phpQuery::debug("CHARSET CONVERT");
+			// Document Encoding Conversion
 			// http://code.google.com/p/phpquery/issues/detail?id=86
-//			$charset = $requestedCharset;
+			if (function_exists('mb_detect_encoding')) {
+				$possibleCharsets = array($documentCharset, $requestedCharset, 'AUTO');
+				$docEncoding = mb_detect_encoding($markup, implode(', ', $possibleCharsets));
+				if (! $docEncoding)
+					$docEncoding = $documentCharset; // ok trust the document
+				phpQuery::debug("DETECTED '$docEncoding'");
+				// Detected does not match what document says...
+				if ($docEncoding !== $documentCharset) {
+					// Tricky..
+				}
+				if ($docEncoding !== $requestedCharset) {
+					phpQuery::debug("CONVERT $docEncoding => $requestedCharset");
+					$markup = mb_convert_encoding($markup, $requestedCharset, $docEncoding);
+					$markup = $this->charsetAppendToHTML($markup, $requestedCharset);
+					$charset = $requestedCharset;
+				}
+			} else {
+				phpQuery::debug("TODO: charset conversion without mbstring...");
+			}
 		}
 		$return = false;
 		if ($this->isDocumentFragment) {
 			phpQuery::debug("Full markup load (HTML), DocumentFragment detected, using charset '$charset'");
 			$return = $this->documentFragmentLoadMarkup($this, $charset, $markup);
 		} else {
-			if (! $documentCharset) {
-				phpQuery::debug("Full markup load (HTML), appending charset '$charset'");
+			if ($addDocumentCharset) {
+				phpQuery::debug("Full markup load (HTML), appending charset: '$charset'");
 				$markup = $this->charsetAppendToHTML($markup, $charset);
-			} else {
-				$charset = $documentCharset;
-				phpQuery::debug("Full markup load (HTML), using document's charset '{$charset}'");
 			}
+			phpQuery::debug("Full markup load (HTML), documentCreate('$charset')");
 			$this->documentCreate($charset);
 			$return = phpQuery::$debug === 2
 				? $this->document->loadHTML($markup)
@@ -347,12 +376,14 @@ class DOMDocumentWrapper {
 		return $markup;
 	}
 	protected function charsetAppendToHTML($html, $charset, $xhtml = false) {
+		// remove existing meta[type=content-type]
+		$html = preg_replace('@\s*<meta[^>]+http-equiv\\s*=\\s*(["|\'])Content-Type\\1([^>]+?)>@i', '', $html);
 		$meta = '<meta http-equiv="Content-Type" content="text/html;charset='
 			.$charset.'" '
 			.($xhtml ? '/' : '')
 			.'>';
 		if (strpos($html, '<head') === false) {
-			if (strpos($html, '<html') === false) {
+			if (strpos($hltml, '<html') === false) {
 				return $meta.$html;
 			} else {
 				return preg_replace(

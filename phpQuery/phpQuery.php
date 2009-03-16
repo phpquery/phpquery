@@ -283,8 +283,8 @@ abstract class phpQuery {
 	}
 	public static function phpToMarkup($php, $charset = 'utf-8') {
 		$regexes = array(
-			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(\')([^\']*)<?php?(.*?)(?:\\?>)([^\']*)\'@s',
-			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(")([^"]*)<?php?(.*?)(?:\\?>)([^"]*)"@s',
+			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(\')([^\']*)<'.'?php?(.*?)(?:\\?>)([^\']*)\'@s',
+			'@(<(?!\\?)(?:[^>]|\\?>)+\\w+\\s*=\\s*)(")([^"]*)<'.'?php?(.*?)(?:\\?>)([^"]*)"@s',
 		);
 		foreach($regexes as $regex)
 			while (preg_match($regex, $php, $matches)) {
@@ -292,7 +292,7 @@ abstract class phpQuery {
 					$regex,
 					create_function('$m, $charset = "'.$charset.'"',
 						'return $m[1].$m[2]
-							.htmlspecialchars("<?php".$m[4]."?>", ENT_QUOTES|ENT_NOQUOTES, $charset)
+							.htmlspecialchars("<"."?php".$m[4]."?>", ENT_QUOTES|ENT_NOQUOTES, $charset)
 							.$m[5].$m[2];'
 					),
 					$php

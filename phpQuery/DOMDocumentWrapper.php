@@ -143,7 +143,7 @@ class DOMDocumentWrapper {
 		} else if ($requestedCharset) {
 			$charset = $requestedCharset;
 		}
-		if (! $charset )
+		if (! $charset)
 			$charset = phpQuery::$defaultCharset;
 		// HTTP 1.1 says that the default charset is ISO-8859-1
 		// @see http://www.w3.org/International/O-HTTP-charset

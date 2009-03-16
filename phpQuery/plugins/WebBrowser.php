@@ -44,12 +44,15 @@ class phpQueryObjectPlugin_WebBrowser {
 			$url = resolve_url($self->document->location, $url);
 			if (! $dir)
 				$dir = getcwd();
+			// TODO resolv name from response headers
 			if (! $filename) {
 				$matches = null;
 				preg_match('@/([^/]+)$@', $url, $matches);
 				$filename = $matches[1];
 			}
+			//print $url;
 			$path = rtrim($dir, '/').'/'.$filename;
+			phpQuery::debug("Requesting download of $url\n");
 			// TODO use AJAX instead of file_get_contents
 			file_put_contents($path, file_get_contents($url));
 		}

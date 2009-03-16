@@ -616,14 +616,14 @@ class phpQueryObject
 	 * @access private
 	 */
 	protected function runQuery( $XQuery, $selector = null, $compare = null) {
-		if ( $compare && ! method_exists($this, $compare) )
+		if ($compare && ! method_exists($this, $compare))
 			return false;
 		$stack = array();
 		if (! $this->elements )
 			$this->debug('Stack empty, skipping...');
 //		var_dump($this->elements[0]->nodeType);
 		// element, document
-		foreach($this->stack(array(1, 13)) as $k => $stackNode) {
+		foreach($this->stack(array(1, 9, 13)) as $k => $stackNode) {
 			$detachAfter = false;
 			// to work on detached nodes we need temporary place them somewhere
 			// thats because context xpath queries sucks ;]
@@ -746,7 +746,7 @@ class phpQueryObject
 					$attr = trim($s, '][');
 					$execute = false;
 					// attr with specifed value
-					if (mb_strpos( $s, '=' )) {
+					if (mb_strpos($s, '=')) {
 						list($attr, $value) = explode('=', $attr);
 						$value = trim($value, "'\"");
 						if ($this->isRegexp($attr)) {
@@ -764,7 +764,7 @@ class phpQueryObject
 					if ($execute) {
 						$this->runQuery($XQuery, $s, 'is');
 						$XQuery = '';
-						if (! $this->length() )
+						if (! $this->length())
 							break;
 					}
 				// CLASSES
@@ -830,7 +830,7 @@ class phpQueryObject
 					? true : false;
 			}
 			// run query if any
-			if ( $XQuery && $XQuery != '//') {
+			if ($XQuery && $XQuery != '//') {
 				$this->runQuery($XQuery);
 				$XQuery = '';
 //				if (! $this->length() )
@@ -1158,7 +1158,8 @@ class phpQueryObject
 		}
 		$newStack = array();
 		foreach($this->elements as $index => $node) {
-			if (false !== phpQuery::callbackRun($callback, array($index, $node)))
+			$result = phpQuery::callbackRun($callback, array($index, $node));
+			if (is_null($result) || (! is_null($result) && $result))
 				$newStack[] = $node;
 		}
 		$this->elements = $newStack;
@@ -1173,7 +1174,7 @@ class phpQueryObject
 	 * @link http://docs.jquery.com/Traversing/filter
 	 */
 	public function filter($selectors, $_skipHistory = false) {
-		if ($selectors instanceof Callback)
+		if ($selectors instanceof Callback OR $selectors instanceof Closure)
 			return $this->filterCallback($selectors, $_skipHistory);
 		if (! $_skipHistory)
 			$this->elementsBackup = $this->elements;
@@ -2577,9 +2578,10 @@ class phpQueryObject
 		if (!is_array($nodeTypes))
 			$nodeTypes = array($nodeTypes);
 		$return = array();
-		foreach($this->elements as $node)
+		foreach($this->elements as $node) {
 			if (in_array($node->nodeType, $nodeTypes))
 				$return[] = $node;
+		}
 		return $return;
 	}
 	// TODO phpdoc; $oldAttr is result of hasAttribute, before any changes
@@ -3109,9 +3111,9 @@ class phpQueryObject
 						? '.'.join('.', split(' ', $node->getAttribute('class'))):'')
 					.($node->getAttribute('name')
 						? '[name="'.$node->getAttribute('name').'"]':'')
-					.($node->getAttribute('value') && strpos($node->getAttribute('value'), '<?php') === false
+					.($node->getAttribute('value') && strpos($node->getAttribute('value'), '<'.'?php') === false
 						? '[value="'.substr(str_replace("\n", '', $node->getAttribute('value')), 0, 15).'"]':'')
-					.($node->getAttribute('value') && strpos($node->getAttribute('value'), '<?php') !== false
+					.($node->getAttribute('value') && strpos($node->getAttribute('value'), '<'.'?php') !== false
 						? '[value=PHP]':'')
 					.($node->getAttribute('selected')
 						? '[selected]':'')

@@ -21,6 +21,9 @@ class DOMDocumentWrapper {
 	 */
 	public $contentType = '';
 	public $xpath;
+	public $uuid = 0;
+	public $data = array();
+	public $dataNodes = array();
 	public $events = array();
 	public $eventsNodes = array();
 	public $eventsGlobal = array();

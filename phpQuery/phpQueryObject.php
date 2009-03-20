@@ -822,7 +822,7 @@ class phpQueryObject
 				} else if ($s == '>') {
 					$XQuery .= '/';
 					$delimiterBefore = 2;
-				// NON-DIRECT DESCENDANDS
+				// ALL DESCENDANDS
 				} else if ($s == ' ') {
 					$XQuery .= '//';
 					$delimiterBefore = 2;
@@ -2921,7 +2921,15 @@ class phpQueryObject
 	 * @param <type> $value
 	 */
 	public function data($key, $value = null) {
-		;
+		if (! isset($value)) {
+			// TODO? implement specific jQuery behavior od returning parent values
+			// is child which we look up doesn't exist
+			return phpQuery::data($this->get(0), $key, $value, $this->getDocumentID());
+		} else {
+			foreach($this as $node)
+				phpQuery::data($node, $key, $value, $this->getDocumentID());
+			return $this;
+		}
 	}
 	/**
 	 * TODO
@@ -2929,7 +2937,9 @@ class phpQueryObject
 	 * @param <type> $key
 	 */
 	public function removeData($key) {
-		
+		foreach($this as $node)
+			phpQuery::removeData($node, $key, $this->getDocumentID());
+		return $this;
 	}
 	// INTERFACE IMPLEMENTATIONS
 

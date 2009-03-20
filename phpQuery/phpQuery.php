@@ -266,17 +266,49 @@ abstract class phpQuery {
 		$documentID = phpQuery::createDocumentWrapper($markup, $contentType);
 		return new phpQueryObject($documentID);
 	}
+	/**
+	 * Creates new document from markup.
+	 * Chainable.
+	 *
+	 * @param unknown_type $markup
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @TODO support DOMDocument
+	 */
 	public static function newDocumentHTML($markup = null, $charset = 'utf-8') {
 		if (!isset($charset))
 			$charset = self::$defaultCharset;
 		return self::newDocument($markup, "text/html;charset=$charset");
 	}
+	/**
+	 * Creates new document from markup.
+	 * Chainable.
+	 *
+	 * @param unknown_type $markup
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @TODO support DOMDocument
+	 */
 	public static function newDocumentXML($markup = null, $charset = 'utf-8') {
 		return self::newDocument($markup, "text/xml;charset=$charset");
 	}
+	/**
+	 * Creates new document from markup.
+	 * Chainable.
+	 *
+	 * @param unknown_type $markup
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @TODO support DOMDocument
+	 */
 	public static function newDocumentXHTML($markup = null, $charset = 'utf-8') {
 		return self::newDocument($markup, "application/xhtml+xml;charset=$charset");
 	}
+	/**
+	 * Creates new document from markup.
+	 * Chainable.
+	 *
+	 * @param unknown_type $markup
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @TODO support DOMDocument
+	 */
 	public static function newDocumentPHP($markup = null, $contentType = "text/html;charset=utf-8") {
 		$markup = phpQuery::phpToMarkup($markup);
 		return self::newDocument($markup, $contentType);
@@ -357,15 +389,47 @@ abstract class phpQuery {
 		);
 		return new phpQueryObject($documentID);
 	}
+	/**
+	 * Creates new document from markup.
+	 * Chainable.
+	 *
+	 * @param unknown_type $markup
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @TODO support DOMDocument
+	 */
 	public static function newDocumentFileHTML($file, $charset = 'utf-8') {
 		return self::newDocumentFile($file, "text/html;charset=$charset");
 	}
+	/**
+	 * Creates new document from markup.
+	 * Chainable.
+	 *
+	 * @param unknown_type $markup
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @TODO support DOMDocument
+	 */
 	public static function newDocumentFileXML($file, $charset = 'utf-8') {
 		return self::newDocumentFile($file, "text/xml;charset=$charset");
 	}
+	/**
+	 * Creates new document from markup.
+	 * Chainable.
+	 *
+	 * @param unknown_type $markup
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @TODO support DOMDocument
+	 */
 	public static function newDocumentFileXHTML($file, $charset = 'utf-8') {
 		return self::newDocumentFile($file, "application/xhtml+xml;charset=$charset");
 	}
+	/**
+	 * Creates new document from markup.
+	 * Chainable.
+	 *
+	 * @param unknown_type $markup
+	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @TODO support DOMDocument
+	 */
 	public static function newDocumentFilePHP($file, $contentType = null) {
 		return self::newDocumentPHP(file_get_contents($file), $contentType);
 	}
@@ -1137,6 +1201,63 @@ abstract class phpQuery {
 			array(phpQuery::$plugins, $method),
 			$params
 		);
+	}
+	protected static function dataSetupNode($node, $documentID) {
+		// search are return if alredy exists
+		foreach(phpQuery::$documents[$documentID]->dataNodes as $dataNode) {
+			if ($node->isSameNode($dataNode))
+				return $dataNode;
+		}
+		// if doesn't, add it
+		phpQuery::$documents[$documentID]->dataNodes[] = $node;
+		return $node;
+	}
+	protected static function dataRemoveNode($node, $documentID) {
+		// search are return if alredy exists
+		foreach(phpQuery::$documents[$documentID]->dataNodes as $k => $dataNode) {
+			if ($node->isSameNode($dataNode)) {
+				unset(self::$documents[$documentID]->dataNodes[$k]);
+				unset(self::$documents[$documentID]->data[ $dataNode->dataID ]);
+			}
+		}
+	}
+	public static function data($node, $name, $data, $documentID = null) {
+		if (! $documentID)
+			// TODO check if this works
+			$documentID = self::getDocumentID($node);
+		$document = phpQuery::$documents[$documentID];
+		$node = self::dataSetupNode($node, $documentID);
+		if (! isset($node->dataID))
+			$node->dataID = ++phpQuery::$documents[$documentID]->uuid;
+		$id = $node->dataID;
+		if (! isset($document->data[$id]))
+			$document->data[$id] = array();
+		if (! is_null($data))
+			$document->data[$id][$name] = $data;
+		if ($name) {
+			if (isset($document->data[$id][$name]))
+				return $document->data[$id][$name];
+		} else
+			return $id;
+	}
+	public static function removeData($node, $name, $documentID) {
+		if (! $documentID)
+			// TODO check if this works
+			$documentID = self::getDocumentID($node);
+		$document = phpQuery::$documents[$documentID];
+		$node = self::dataSetupNode($node, $documentID);
+		$id = $node->dataID;
+		if ($name) {
+			if (isset($document->data[$id][$name]))
+				unset($document->data[$id][$name]);
+			$name = null;
+			foreach($document->data[$id] as $name)
+				break;
+			if (! $name)
+				self::removeData($node, $name, $documentID);
+		} else {
+			self::dataRemoveNode($node, $documentID);
+		}
 	}
 }
 /**

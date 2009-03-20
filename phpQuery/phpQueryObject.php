@@ -233,7 +233,6 @@ class phpQueryObject
 	public function serialize() {
 		return phpQuery::param($this->serializeArray());
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -470,7 +469,6 @@ class phpQueryObject
 		}
 		return $queries;
 	}
-
 	/**
 	 * Return matched DOM nodes.
 	 *
@@ -574,7 +572,6 @@ class phpQueryObject
 		}
 		return $new;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -585,7 +582,7 @@ class phpQueryObject
 	 * @return boolean
 	 * @access private
 	 */
-	protected function matchClasses( $class, $node) {
+	protected function matchClasses($class, $node) {
 		// multi-class
 		if ( mb_strpos($class, '.', 1)) {
 			$classes = explode('.', substr($class, 1));
@@ -615,11 +612,11 @@ class phpQueryObject
 	/**
 	 * @access private
 	 */
-	protected function runQuery( $XQuery, $selector = null, $compare = null) {
+	protected function runQuery($XQuery, $selector = null, $compare = null) {
 		if ($compare && ! method_exists($this, $compare))
 			return false;
 		$stack = array();
-		if (! $this->elements )
+		if (! $this->elements)
 			$this->debug('Stack empty, skipping...');
 //		var_dump($this->elements[0]->nodeType);
 		// element, document
@@ -638,11 +635,11 @@ class phpQueryObject
 					? $testNode->parentNode
 					: null;
 			}
-			// TODO tmp
+			// XXX tmp ?
 			$xpath = $this->documentWrapper->isXHTML
 				? $this->getNodeXpath($stackNode, 'html')
 				: $this->getNodeXpath($stackNode);
-			// FIXME deam...
+			// FIXME pseudoclasses-only query, support XML
 			$query = $XQuery == '//' && $xpath == '/html[1]'
 				? '//*'
 				: $xpath.$XQuery;
@@ -692,20 +689,21 @@ class phpQueryObject
 			// backup last stack /for end()/
 			$this->elementsBackup = $this->elements;
 		// allow to define context
+		// TODO combine code below with phpQuery::pq() context quessing code
+		//   as generic function
 		if ($context) {
 			if (! is_array($context) && $context instanceof DOMELEMENT)
 				$this->elements = array($context);
-			else if ( is_array($context)) {
+			else if (is_array($context)) {
 				$this->elements = array();
-				foreach ($context as $e)
+				foreach ($context as $c)
 					if ($c instanceof DOMELEMENT)
 						$this->elements[] = $c;
-
 			} else if ( $context instanceof self )
 				$this->elements = $context->elements;
 		}
 		$queries = $this->parseSelector($selectors);
-		$this->debug(array('FIND',$selectors,$queries));
+		$this->debug(array('FIND', $selectors, $queries));
 		$XQuery = '';
 		// remember stack state because of multi-queries
 		$oldStack = $this->elements;
@@ -723,6 +721,7 @@ class phpQueryObject
 					if ($this->isXML()) {
 						// namespace support
 						if (mb_strpos($s, '|') !== false) {
+							$ns = $tag = null;
 							list($ns, $tag) = explode('|', $s);
 							$XQuery .= "$ns:$tag";
 						} else if ($s == '*') {
@@ -734,19 +733,20 @@ class phpQueryObject
 						$XQuery .= $s;
 					}
 				// ID
-				} else if ( $s[0] == '#') {
-					if ( $delimiterBefore )
+				} else if ($s[0] == '#') {
+					if ($delimiterBefore)
 						$XQuery .= '*';
 					$XQuery .= "[@id='".substr($s, 1)."']";
 				// ATTRIBUTES
 				} else if ($s[0] == '[') {
-					if ( $delimiterBefore )
+					if ($delimiterBefore)
 						$XQuery .= '*';
 					// strip side brackets
 					$attr = trim($s, '][');
 					$execute = false;
 					// attr with specifed value
 					if (mb_strpos($s, '=')) {
+						$value = null;
 						list($attr, $value) = explode('=', $attr);
 						$value = trim($value, "'\"");
 						if ($this->isRegexp($attr)) {
@@ -768,10 +768,10 @@ class phpQueryObject
 							break;
 					}
 				// CLASSES
-				} else if ( $s[0] == '.') {
+				} else if ($s[0] == '.') {
 					// TODO use return $this->find("./self::*[contains(concat(\" \",@class,\" \"), \" $class \")]");
 					// thx wizDom ;)
-					if ( $delimiterBefore )
+					if ($delimiterBefore)
 						$XQuery .= '*';
 					$XQuery .= '[@class]';
 					$this->runQuery($XQuery, $s, 'matchClasses');
@@ -779,7 +779,7 @@ class phpQueryObject
 					if (! $this->length() )
 						break;
 				// ~ General Sibling Selector
-				} else if ( $s[0] == '~') {
+				} else if ($s[0] == '~') {
 					$this->runQuery($XQuery);
 					$XQuery = '';
 					$this->elements = $this
@@ -789,7 +789,7 @@ class phpQueryObject
 					if (! $this->length() )
 						break;
 				// + Adjacent sibling selectors
-				} else if ( $s[0] == '+') {
+				} else if ($s[0] == '+') {
 					// TODO /following-sibling::
 					$this->runQuery($XQuery);
 					$XQuery = '';
@@ -807,43 +807,43 @@ class phpQueryObject
 					if (! $this->length() )
 						break;
 				// PSEUDO CLASSES
-				} else if ( $s[0] == ':') {
+				} else if ($s[0] == ':') {
 					// TODO optimization for :first :last
-					if ( $XQuery) {
+					if ($XQuery) {
 						$this->runQuery($XQuery);
 						$XQuery = '';
 					}
-					if (! $this->length() )
+					if (! $this->length())
 						break;
 					$this->pseudoClasses($s);
-					if (! $this->length() )
+					if (! $this->length())
 						break;
 				// DIRECT DESCENDANDS
-				} else if ( $s == '>') {
+				} else if ($s == '>') {
 					$XQuery .= '/';
 					$delimiterBefore = 2;
-				} else {
+				// NON-DIRECT DESCENDANDS
+				} else if ($s == ' ') {
 					$XQuery .= '//';
 					$delimiterBefore = 2;
+				// ERRORS
+				} else {
+					phpQuery::debug("Unrecognized token '$s'");
 				}
-				$delimiterBefore = $delimiterBefore === 2
-					? true : false;
+				$delimiterBefore = $delimiterBefore === 2;
 			}
 			// run query if any
 			if ($XQuery && $XQuery != '//') {
 				$this->runQuery($XQuery);
 				$XQuery = '';
-//				if (! $this->length() )
-//					break;
 			}
-			foreach($this->elements as $node )
-				if (! $this->elementsContainsNode($node, $stack) )
+			foreach($this->elements as $node)
+				if (! $this->elementsContainsNode($node, $stack))
 					$stack[] = $node;
 		}
 		$this->elements = $stack;
 		return $this->newInstance();
 	}
-
 	/**
 	 * @todo create API for classes with pseudoselectors
 	 * @access private
@@ -1139,7 +1139,6 @@ class phpQueryObject
 			return $stack ? $stack : null;
 		return (bool)count($stack);
 	}
-
 	/**
 	 * Enter description here...
 	 * jQuery difference.
@@ -1493,7 +1492,6 @@ class phpQueryObject
 		pq($deepest)->append($this);
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1522,7 +1520,6 @@ class phpQueryObject
 			$deepest = $deepest->firstChild;
 		return $deepest;
 	}
-
 	/**
 	 * Enter description here...
 	 * NON JQUERY METHOD
@@ -1539,7 +1536,6 @@ class phpQueryObject
 				->afterPHP($codeAfter)
 			->end();
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1551,7 +1547,6 @@ class phpQueryObject
 			phpQuery::pq($node, $this->getDocumentID())->wrapAll($wrapper);
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1563,7 +1558,6 @@ class phpQueryObject
 			phpQuery::pq($node, $this->getDocumentID())->wrapAllPHP($codeBefore, $codeAfter);
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1575,7 +1569,6 @@ class phpQueryObject
 			phpQuery::pq($node, $this->getDocumentID())->contents()->wrapAll($wrapper);
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1588,7 +1581,6 @@ class phpQueryObject
 				->wrapAllPHP($codeBefore, $codeAfter);
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1644,7 +1636,6 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1658,7 +1649,6 @@ class phpQueryObject
 			$this->elements[] = $oldStack[$num];
 		return $this->newInstance();
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1667,7 +1657,6 @@ class phpQueryObject
 	public function size() {
 		return count($this->elements);
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1680,7 +1669,6 @@ class phpQueryObject
 	public function count() {
 		return $this->size();
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1714,7 +1702,6 @@ class phpQueryObject
 		$this->elements = $newStack;
 		return $this->newInstance();
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1723,7 +1710,6 @@ class phpQueryObject
 	public function replaceWithPHP($code) {
 		return $this->replaceWith(phpQuery::php($code));
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1734,7 +1720,6 @@ class phpQueryObject
 	public function replaceWith($content) {
 		return $this->after($content)->remove();
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1749,7 +1734,6 @@ class phpQueryObject
 				->remove();
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1933,7 +1917,6 @@ class phpQueryObject
 		$this->elements = $stack;
 		return $this->newInstance();
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1942,7 +1925,6 @@ class phpQueryObject
 	public function ancestors($selector = null) {
 		return $this->children( $selector );
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1967,7 +1949,6 @@ class phpQueryObject
 	public function appendTo( $seletor) {
 		return $this->insert($seletor, __FUNCTION__);
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -1993,7 +1974,6 @@ class phpQueryObject
 	public function prependTo( $seletor) {
 		return $this->insert($seletor, __FUNCTION__);
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2019,7 +1999,6 @@ class phpQueryObject
 	public function insertBefore( $seletor) {
 		return $this->insert($seletor, __FUNCTION__);
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2044,7 +2023,6 @@ class phpQueryObject
 	public function insertAfter( $seletor) {
 		return $this->insert($seletor, __FUNCTION__);
 	}
-
 	/**
 	 * Internal insert method. Don't use it.
 	 *
@@ -2229,7 +2207,6 @@ class phpQueryObject
 		}
 		return $index;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2254,7 +2231,6 @@ class phpQueryObject
 			array_slice($this->elements, $start, $end)
 		);
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2265,7 +2241,6 @@ class phpQueryObject
 		$this->elements = array_reverse($this->elements);
 		return $this->newInstance();
 	}
-
 	/**
 	 * Return joined text content.
 	 * @return String
@@ -2338,7 +2313,6 @@ class phpQueryObject
 		} else
 			throw new Exception("Method '{$method}' doesnt exist");
 	}
-
 	/**
 	 * Safe rename of next().
 	 *
@@ -2373,7 +2347,6 @@ class phpQueryObject
 			$this->getElementSiblings('previousSibling', $selector, true)
 		);
 	}
-
 	/**
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo
@@ -2383,7 +2356,6 @@ class phpQueryObject
 			$this->getElementSiblings('previousSibling', $selector)
 		);
 	}
-
 	/**
 	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 * @todo FIXME: returns source elements insted of next siblings
@@ -2418,7 +2390,6 @@ class phpQueryObject
 		}
 		return $stack;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2436,7 +2407,6 @@ class phpQueryObject
 		}
 		return $this->newInstance($stack);
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2482,7 +2452,6 @@ class phpQueryObject
 		}
 		return $this->newInstance($stack);
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2521,7 +2490,6 @@ class phpQueryObject
 		}
 		return false;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2538,7 +2506,6 @@ class phpQueryObject
 			$this->filter($selector, true);
 		return $this->newInstance();
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2566,7 +2533,6 @@ class phpQueryObject
 			$this->filter($selector, true);
 		return $this->newInstance();
 	}
-
 	/**
 	 * Internal stack iterator.
 	 *
@@ -2702,7 +2668,6 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2721,7 +2686,6 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
 	/**
 	 * Return form element value.
 	 *
@@ -2788,7 +2752,6 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2799,7 +2762,6 @@ class phpQueryObject
 			$this->elements = array_merge($this->elements, $this->previous->elements);
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2817,7 +2779,6 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2833,7 +2794,6 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2847,7 +2807,6 @@ class phpQueryObject
 		}
 		return false;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2866,7 +2825,6 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2881,7 +2839,6 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
 	/**
 	 * Proper name without underscore (just ->empty()) also works.
 	 *
@@ -2906,7 +2863,6 @@ class phpQueryObject
 		}
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2937,7 +2893,6 @@ class phpQueryObject
 		phpQuery::callbackRun($callback, $params);
 		return $this;
 	}
-
 	/**
 	 * Enter description here...
 	 *
@@ -2959,11 +2914,26 @@ class phpQueryObject
 //			phpQuery::map($this->elements, $callback)
 		);
 	}
-
+	/**
+	 * TODO
+	 *
+	 * @param <type> $key
+	 * @param <type> $value
+	 */
+	public function data($key, $value = null) {
+		;
+	}
+	/**
+	 * TODO
+	 * 
+	 * @param <type> $key
+	 */
+	public function removeData($key) {
+		
+	}
 	// INTERFACE IMPLEMENTATIONS
 
 	// ITERATOR INTERFACE
-	// TODO IteratorAggregate ???
 	/**
    * @access private
 	 */

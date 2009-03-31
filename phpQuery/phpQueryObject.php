@@ -689,7 +689,7 @@ class phpQueryObject
 			// backup last stack /for end()/
 			$this->elementsBackup = $this->elements;
 		// allow to define context
-		// TODO combine code below with phpQuery::pq() context quessing code
+		// TODO combine code below with phpQuery::pq() context guessing code
 		//   as generic function
 		if ($context) {
 			if (! is_array($context) && $context instanceof DOMELEMENT)
@@ -1877,7 +1877,8 @@ class phpQueryObject
 		return $this->markupPHP($code);
 	}
 	/**
-	 * TODO doc
+	 * Enter description here...
+	 * 
 	 * @param $code
 	 * @return unknown_type
 	 */
@@ -1887,7 +1888,8 @@ class phpQueryObject
 			: phpQuery::markupToPHP($this->markup());
 	}
 	/**
-	 * TODO doc
+	 * Enter description here...
+	 * 
 	 * @param $code
 	 * @return unknown_type
 	 */
@@ -2915,8 +2917,8 @@ class phpQueryObject
 		);
 	}
 	/**
-	 * TODO
-	 *
+	 * Enter description here...
+	 * 
 	 * @param <type> $key
 	 * @param <type> $value
 	 */
@@ -2932,7 +2934,7 @@ class phpQueryObject
 		}
 	}
 	/**
-	 * TODO
+	 * Enter description here...
 	 * 
 	 * @param <type> $key
 	 */

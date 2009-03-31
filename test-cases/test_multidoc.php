@@ -8,6 +8,7 @@ $testResult = array(
 );
 $doc1 = phpQuery::newDocumentFile('test.html');
 $doc2 = phpQuery::newDocumentFile('test.html');
+
 foreach ($doc1->find('p') as $node)
    $doc2->find('body')->append(pq($node));
 $testResult = $doc2->find('p');

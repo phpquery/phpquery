@@ -262,115 +262,21 @@ phpQuery::newDocumentXHTML($XHTML)
 // 		file_get_contents("http://www.chefkoch.de/magazin/artikel/943,0/AEG-Electrolux/Frischer-Saft-aus-dem-Dampfgarer.html"
 // 										 ))));
 
-// google group
-/*
-$content = <<<EOF
-"<html><head><meta http-equiv="content-type"
-content="text/html; charset=ISO-8859-1"><title>Google</
-title><script>window.google={kEI:"5JC3SdH_NYLM-
-AbsmOjvDw",kEXPI:"17259",kHL:"de"};
-var _gjwl=location;function _gjuc(){var a=_gjwl.hash;if(a.indexOf
-("&q=")>0||a.indexOf("#q=")>=0){a=a.substring(1);if(a.indexOf("#")==-1)
-{for(var c=0;c<a.length;){var d=c;if(a.charAt(d)=="&")++d;var
-b=a.indexOf("&",d);if(b==-1)b=a.length;var e=a.substring(d,b);if
-(e.indexOf("fp=")==0){a=a.substring(0,c)+a.substring(b,a.length);b=c}
-else if(e=="cad=h")return 0;c=b}_gjwl.href="search?"+a+"&cad=h";return
-1}}return 0};
-window._gjuc && location.hash && _gjuc();</script><style>body,td,a,p,.h
-{font-family:arial,sans-serif}.h{color:#36c;font-size:20px}.q
-{color:#00c}.ts td{padding:0}.ts{border-collapse:collapse}#gbar{height:
-22px;padding-left:2px}.gbh,.gbd{border-top:1px solid #c9d7f1;font-size:
-1px}.gbh{height:0;position:absolute;top:24px;width:100%}#gbi,#gbs
-{background:#fff;left:0;position:absolute;top:24px;visibility:hidden;z-
-index:1000}#gbi{border:1px solid;border-color:#c9d7f1 #36c #36c
-#a2bae7;z-index:1001}#guser{padding-bottom:7px !important}#gbar,#guser
-{font-size:13px;padding-top:1px !important}@media all{.gb1,.gb3{height:
-22px;margin-right:.73em;vertical-align:top}#gbar{float:left}}.gb2
-{display:block;padding:.2em .5em}a.gb1,a.gb2,a.gb3{color:#00c !
-important}.gb2,.gb3{text-decoration:none}a.gb2:hover
-{background:#36c;color:#fff !important}</style><script>google.y=
-{};google.x=function(e,g){google.y[e.id]=[e,g];return
-false};window.gbar={qs:function(){},tg:function(e){var o=
-{id:'gbar'};for(i in e)o[i]=e[i];google.x(o,function(){gbar.tg
-(o)})}};</script></head><body bgcolor=#ffffff text=#000000
-link=#0000cc vlink=#551a8b alink=#ff0000 onload="document.f.q.focus
-();if(document.images)new Image().src='/images/nav_logo3.png'"
-topmargin=3 marginheight=3><div id=gbar><nobr><b class=gb1>Web</b> <a
-href="http://images.google.de/imghp?hl=de&tab=wi" onclick=gbar.qs
-(this) class=gb1>Bilder</a> <a href="http://maps.google.de/maps?
-hl=de&tab=wl" onclick=gbar.qs(this) class=gb1>Maps</a> <a href="http://
-news.google.de/nwshp?hl=de&tab=wn" onclick=gbar.qs(this)
-class=gb1>News</a> <a href="http://video.google.de/?hl=de&tab=wv"
-onclick=gbar.qs(this) class=gb1>Video</a> <a href="http://
-mail.google.com/mail/?hl=de&tab=wm" class=gb1>Google Mail</a> <a
-href="http://www.google.de/intl/de/options/" onclick="this.blur
-();gbar.tg(event);return !1" class=gb3><u>Mehr</u> <small>&#9660;</
-small></a><div id=gbi> <a href="http://www.google.de/prdhp?
-hl=de&tab=wf" onclick=gbar.qs(this) class=gb2>Shopping</a> <a
-href="http://groups.google.de/grphp?hl=de&tab=wg" onclick=gbar.qs
-(this) class=gb2>Groups</a> <a href="http://books.google.de/bkshp?
-hl=de&tab=wp" onclick=gbar.qs(this) class=gb2>B cher</a> <a
-href="http://blogsearch.google.de/?hl=de&tab=wb" onclick=gbar.qs(this)
-class=gb2>Blogs</a> <div class=gb2><div class=gbd></div></div> <a
-href="http://de.youtube.com/?hl=de&tab=w1" onclick=gbar.qs(this)
-class=gb2>YouTube</a> <a href="http://www.google.com/calendar/render?
-hl=de&tab=wc" class=gb2>Kalender</a> <a href="http://
-picasaweb.google.de/home?hl=de&tab=wq" onclick=gbar.qs(this)
-class=gb2>Fotos</a> <a href="http://docs.google.com/?hl=de&tab=wo"
-class=gb2>Text &amp; Tabellen</a> <a href="http://www.google.de/reader/
-view/?hl=de&tab=wy" class=gb2>Reader</a> <a href="http://
-sites.google.com/?hl=de&tab=w3" class=gb2>Sites</a> <div
-class=gb2><div class=gbd></div></div> <a href="http://www.google.de/
-intl/de/options/" class=gb2>und noch mehr &raquo;</a></div> </nobr></
-div><div class=gbh style=left:0></div><div class=gbh style=right:0></
-div><div align=right id=guser style="font-size:84%;padding:0 0 4px"
-width=100%><nobr><a href="/url?sa=p&pref=ig&pval=3&q=http://
-www.google.de/ig%3Fhl%3Dde%26source%3Diglk&usg=AFQjCNFjfPavRPBJrOKJS3...">iGoogle</a>
-| <a href="https://www.google.com/accounts/Login?continue=http://
-www.google.de/&hl=de">Anmelden</a></nobr></div><center><br clear=all
-id=lgpd><img alt="Google" height=110 src="/intl/de_de/images/logo.gif"
-width=301><br><br><form action="/search" name=f><table cellpadding=0
-cellspacing=0><tr valign=top><td width=25%>&nbsp;</td><td align=center
-nowrap><input name=hl type=hidden value=de><input type=hidden name=ie
-value="ISO-8859-1"><input maxlength=2048 name=q size=55 title="Google-
-Suche" value=""><br><input name=btnG type=submit value="Google-
-Suche"><input name=btnI type=submit value="Auf gut Gl ck!"></td><td
-nowrap width=25%><font size=-2>&nbsp;&nbsp;<a href=/advanced_search?
-hl=de>Erweiterte Suche</a><br>&nbsp;&nbsp;<a href=/preferences?
-hl=de>Einstellungen</a><br>&nbsp;&nbsp;<a href=/language_tools?
-hl=de>Sprachtools</a></font></td></tr><tr><td align=center
-colspan=3><font size=-1><span style="text-align:left">Suche: <input
-id=all type=radio name=meta value="" checked><label for=all> Das Web </
-label><input id=lgr type=radio name=meta value="lr=lang_de"><label
-for=lgr> Seiten auf Deutsch </label><input id=cty type=radio name=meta
-value="cr=countryDE"><label for=cty> Seiten aus Deutschland </label></
-span></font></td></tr></table></form><br><br><font size=-1><a href="/
-intl/de/ads/">Werben mit Google</a> - <a href="/
-services/">Unternehmensangebote</a> - <a href="/intl/de/
-about.html"> ber Google</a> - <a href=http://www.google.com/
-ncr>Google.com in English</a></font><p><font size=-2>&copy;2009 - <a
-href="/intl/de/privacy.html">Datenschutz</a></font></p></center></
-body><script>if(google.y)google.y.first=[];window.setTimeout(function()
-{var xjs=document.createElement('script');xjs.src='/extern_js/f/
-CgJkZRICZGUgACswDjgELCswFjgELCswFzgBLCswGDgDLCswJTjJiAEsKzAnOAAs/
-UewAia80i-E.js';document.getElementsByTagName('head')[0].appendChild
-(xjs)},0);</script><script>function _gjp() {!(location.hash && _gjuc
-()) && setTimeout(_gjp, 500);}window._gjuc && _gjp();</script></html>"
-EOF;
-*/
-//$doc = phpQuery::newDocument($content);
+// http://code.google.com/p/phpquery/issues/detail?id=102
+$doc = phpQuery::newDocumentFileHTML('http://www.google.de'); 
 //$doc = phpQuery::newDocument('');
-//$images = $doc['img']->dump();
+$images = $doc['img']->dump();
 
-//var_dump(mb_ereg_match('^[\w|\||-]+$', 'img'));
-//var_dump(preg_match('@^[\w|\||-]+$@', 'img'));
+$foo = 'aaa';
+var_dump(mb_ereg_match('^[\w|\||-]+$', $foo) || $foo == '*');
+var_dump(preg_match('@^[\w|\||-]+$@', $foo) || $foo == '*');
 
 // http://code.google.com/p/phpquery/issues/detail?id=67
-$doc = phpQuery::newDocumentXML("<node1/><node2/>");
-$doc['node1']->data('foo', 'bar');
-var_dump($doc['node1']->data('foo'));
-$doc['node1']->removeData('foo');
-var_dump($doc['node1']->data('foo'));
-$doc['node1']->data('foo.bar', 'bar');
-var_dump($doc['node1']->data('foo.bar'));
-var_dump(phpQuery::$documents[$doc->getDocumentID()]->data);
+//$doc = phpQuery::newDocumentXML("<node1/><node2/>");
+//$doc['node1']->data('foo', 'bar');
+//var_dump($doc['node1']->data('foo'));
+//$doc['node1']->removeData('foo');
+//var_dump($doc['node1']->data('foo'));
+//$doc['node1']->data('foo.bar', 'bar');
+//var_dump($doc['node1']->data('foo.bar'));
+//var_dump(phpQuery::$documents[$doc->getDocumentID()]->data);

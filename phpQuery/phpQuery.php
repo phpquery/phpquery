@@ -18,12 +18,12 @@ define('DOMDOCUMENT', 'DOMDocument');
 define('DOMELEMENT', 'DOMElement');
 define('DOMNODELIST', 'DOMNodeList');
 define('DOMNODE', 'DOMNode');
-require_once(dirname(__FILE__).'/DOMEvent.php');
-require_once(dirname(__FILE__).'/DOMDocumentWrapper.php');
-require_once(dirname(__FILE__).'/phpQueryEvents.php');
-require_once(dirname(__FILE__).'/Callback.php');
-require_once(dirname(__FILE__).'/phpQueryObject.php');
-require_once(dirname(__FILE__).'/compat/mbstring.php');
+require_once(dirname(__FILE__).'/phpQuery/DOMEvent.php');
+require_once(dirname(__FILE__).'/phpQuery/DOMDocumentWrapper.php');
+require_once(dirname(__FILE__).'/phpQuery/phpQueryEvents.php');
+require_once(dirname(__FILE__).'/phpQuery/Callback.php');
+require_once(dirname(__FILE__).'/phpQuery/phpQueryObject.php');
+require_once(dirname(__FILE__).'/phpQuery/compat/mbstring.php');
 /**
  * Static namespace for phpQuery functions.
  *
@@ -243,7 +243,7 @@ abstract class phpQuery {
 	 *
 	 * @see phpQuery::selectDocument()
 	 * @param unknown_type $id
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public static function getDocument($id = null) {
 		if ($id)
@@ -257,8 +257,7 @@ abstract class phpQuery {
 	 * Chainable.
 	 *
 	 * @param unknown_type $markup
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO support DOMDocument
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public static function newDocument($markup = null, $contentType = null) {
 		if (! $markup)
@@ -271,46 +270,50 @@ abstract class phpQuery {
 	 * Chainable.
 	 *
 	 * @param unknown_type $markup
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO support DOMDocument
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
-	public static function newDocumentHTML($markup = null, $charset = 'utf-8') {
-		if (!isset($charset))
-			$charset = self::$defaultCharset;
-		return self::newDocument($markup, "text/html;charset=$charset");
+	public static function newDocumentHTML($markup = null, $charset = null) {
+		$contentType = $charset
+			? ";charset=$charset"
+			: '';
+		return self::newDocument($markup, "text/html{$contentType}");
 	}
 	/**
 	 * Creates new document from markup.
 	 * Chainable.
 	 *
 	 * @param unknown_type $markup
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO support DOMDocument
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
-	public static function newDocumentXML($markup = null, $charset = 'utf-8') {
-		return self::newDocument($markup, "text/xml;charset=$charset");
+	public static function newDocumentXML($markup = null, $charset = null) {
+		$contentType = $charset
+			? ";charset=$charset"
+			: '';
+		return self::newDocument($markup, "text/xml{$contentType}");
 	}
 	/**
 	 * Creates new document from markup.
 	 * Chainable.
 	 *
 	 * @param unknown_type $markup
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO support DOMDocument
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
-	public static function newDocumentXHTML($markup = null, $charset = 'utf-8') {
-		return self::newDocument($markup, "application/xhtml+xml;charset=$charset");
+	public static function newDocumentXHTML($markup = null, $charset = null) {
+		$contentType = $charset
+			? ";charset=$charset"
+			: '';
+		return self::newDocument($markup, "application/xhtml+xml{$contentType}");
 	}
 	/**
 	 * Creates new document from markup.
 	 * Chainable.
 	 *
 	 * @param unknown_type $markup
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO support DOMDocument
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
-	public static function newDocumentPHP($markup = null, $contentType = "text/html;charset=utf-8") {
-		$markup = phpQuery::phpToMarkup($markup);
+	public static function newDocumentPHP($markup = null, $contentType = "text/html") {
+		// TODO pass charset to phpToMarkup if possible (use DOMDocumentWrapper function)
+		$markup = phpQuery::phpToMarkup($markup, self::$defaultCharset);
 		return self::newDocument($markup, $contentType);
 	}
 	public static function phpToMarkup($php, $charset = 'utf-8') {
@@ -324,7 +327,7 @@ abstract class phpQuery {
 					$regex,
 					create_function('$m, $charset = "'.$charset.'"',
 						'return $m[1].$m[2]
-							.htmlspecialchars("<"."?php".$m[4]."?>", ENT_QUOTES|ENT_NOQUOTES, $charset)
+							.htmlspecialchars("<"."?php".$m[4]."?".">", ENT_QUOTES|ENT_NOQUOTES, $charset)
 							.$m[5].$m[2];'
 					),
 					$php
@@ -381,7 +384,7 @@ abstract class phpQuery {
 	 * Chainable.
 	 *
 	 * @param string $file URLs allowed. See File wrapper page at php.net for more supported sources.
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public static function newDocumentFile($file, $contentType = null) {
 		$documentID = self::createDocumentWrapper(
@@ -394,41 +397,46 @@ abstract class phpQuery {
 	 * Chainable.
 	 *
 	 * @param unknown_type $markup
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO support DOMDocument
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
-	public static function newDocumentFileHTML($file, $charset = 'utf-8') {
-		return self::newDocumentFile($file, "text/html;charset=$charset");
+	public static function newDocumentFileHTML($file, $charset = null) {
+		$contentType = $charset
+			? ";charset=$charset"
+			: '';
+		return self::newDocumentFile($file, "text/html{$contentType}");
 	}
 	/**
 	 * Creates new document from markup.
 	 * Chainable.
 	 *
 	 * @param unknown_type $markup
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO support DOMDocument
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
-	public static function newDocumentFileXML($file, $charset = 'utf-8') {
-		return self::newDocumentFile($file, "text/xml;charset=$charset");
+	public static function newDocumentFileXML($file, $charset = null) {
+		$contentType = $charset
+			? ";charset=$charset"
+			: '';
+		return self::newDocumentFile($file, "text/xml{$contentType}");
 	}
 	/**
 	 * Creates new document from markup.
 	 * Chainable.
 	 *
 	 * @param unknown_type $markup
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO support DOMDocument
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
-	public static function newDocumentFileXHTML($file, $charset = 'utf-8') {
-		return self::newDocumentFile($file, "application/xhtml+xml;charset=$charset");
+	public static function newDocumentFileXHTML($file, $charset = null) {
+		$contentType = $charset
+			? ";charset=$charset"
+			: '';
+		return self::newDocumentFile($file, "application/xhtml+xml{$contentType}");
 	}
 	/**
 	 * Creates new document from markup.
 	 * Chainable.
 	 *
 	 * @param unknown_type $markup
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
-	 * @TODO support DOMDocument
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
 	 */
 	public static function newDocumentFilePHP($file, $contentType = null) {
 		return self::newDocumentPHP(file_get_contents($file), $contentType);
@@ -438,8 +446,8 @@ abstract class phpQuery {
 	 * Chainable.
 	 *
 	 * @param $document DOMDocument
-	 * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPick
-	 * up
+	 * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
+	 * @TODO support DOMDocument
 	 */
 	public static function loadDocument($document) {
 		// TODO
@@ -1293,7 +1301,7 @@ class phpQueryPlugins {
  * Chainable.
  *
  * @see phpQuery::pq()
- * @return phpQueryObject|queryTemplatesFetch|queryTemplatesParse|queryTemplatesPickup
+ * @return phpQueryObject|QueryTemplatesSource|QueryTemplatesParse|QueryTemplatesSourceQuery
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
  * @package phpQuery
  */
@@ -1307,12 +1315,12 @@ function pq($arg1, $context = null) {
 // add plugins dir and Zend framework to include path
 set_include_path(
 	get_include_path()
-		.PATH_SEPARATOR.dirname(__FILE__).'/'
-		.PATH_SEPARATOR.dirname(__FILE__).'/plugins/'
+		.PATH_SEPARATOR.dirname(__FILE__).'/phpQuery/'
+		.PATH_SEPARATOR.dirname(__FILE__).'/phpQuery/plugins/'
 );
 // why ? no __call nor __get for statics in php...
 // XXX __callStatic will be available in PHP 5.3
 phpQuery::$plugins = new phpQueryPlugins();
 // include bootstrap file (personal library config)
-if (file_exists(dirname(__FILE__).'/bootstrap.php'))
-	require_once dirname(__FILE__).'/bootstrap.php';
+if (file_exists(dirname(__FILE__).'/phpQuery/bootstrap.php'))
+	require_once dirname(__FILE__).'/phpQuery/bootstrap.php';

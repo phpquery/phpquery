@@ -13,7 +13,8 @@ class Callback
 	public $callback = null;
 	public $params = null;
 	protected $name;
-	public function __construct($callback, $param1 = null, $param2 = null, $param3 = null) {
+	public function __construct($callback, $param1 = null, $param2 = null, 
+			$param3 = null) {
 		$params = func_get_args();
 		$params = array_slice($params, 1);
 		if ($callback instanceof Callback) {
@@ -45,7 +46,8 @@ class Callback
  * @author Tobiasz Cudnik <tobiasz.cudnik/gmail.com>
  */
 class CallbackBody extends Callback {
-	public function __construct($paramList, $code, $param1 = null, $param2 = null, $param3 = null) {
+	public function __construct($paramList, $code, $param1 = null, $param2 = null, 
+			$param3 = null) {
 		$params = func_get_args();
 		$params = array_slice($params, 2);
 		$this->callback = create_function($paramList, $code);

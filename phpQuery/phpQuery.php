@@ -31,6 +31,7 @@ require_once(dirname(__FILE__).'/phpQuery/compat/mbstring.php');
  * @package phpQuery
  */
 abstract class phpQuery {
+	public static $mbstringSupport = true;
 	public static $debug = false;
 	public static $documents = array();
 	public static $defaultDocumentID = null;

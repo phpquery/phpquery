@@ -301,7 +301,7 @@ class phpQueryObject
 	 * @access private
 	 */
 	protected function isChar($char) {
-		return extension_loaded('mbstring')
+		return extension_loaded('mbstring') && phpQuery::$mbstringSupport
 			? mb_eregi('\w', $char)
 			: preg_match('@\w@', $char);
 	}
@@ -714,7 +714,7 @@ class phpQueryObject
 			$delimiterBefore = false;
 			foreach($selector as $s) {
 				// TAG
-				$isTag = extension_loaded('mbstring')
+				$isTag = extension_loaded('mbstring') && phpQuery::$mbstringSupport
 					? mb_ereg_match('^[\w|\||-]+$', $s) || $s == '*'
 					: preg_match('@^[\w|\||-]+$@', $s) || $s == '*';
 				if ($isTag) {
@@ -1226,7 +1226,7 @@ class phpQueryObject
 									if ($val != $node->nodeType)
 										$break = true;
 								} else if ($this->isRegexp($attr)) {
-									$val = extension_loaded('mbstring')
+									$val = extension_loaded('mbstring') && phpQuery::$mbstringSupport
 										? quotemeta(trim($val, '"\''))
 										: preg_quote(trim($val, '"\''), '@');
 									// switch last character
@@ -1245,7 +1245,7 @@ class phpQueryObject
 									}
 									// cut last character
 									$attr = substr($attr, 0, -1);
-									$isMatch = extension_loaded('mbstring')
+									$isMatch = extension_loaded('mbstring') && phpQuery::$mbstringSupport
 										? mb_ereg_match($pattern, $node->getAttribute($attr))
 										: preg_match("@{$pattern}@", $node->getAttribute($attr));
 									if (! $isMatch)
@@ -1326,7 +1326,7 @@ class phpQueryObject
 		}
 		if (mb_strpos($url, ' ') !== false) {
 			$matches = null;
-			if (extension_loaded('mbstring'))
+			if (extension_loaded('mbstring') && phpQuery::$mbstringSupport)
 				mb_ereg('^([^ ]+) (.*)$', $url, $matches);
 			else
 				preg_match('^([^ ]+) (.*)$', $url, $matches);

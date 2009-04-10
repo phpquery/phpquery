@@ -3,7 +3,7 @@
  * phpQuery is a server-side, chainable, CSS3 selector driven
  * Document Object Model (DOM) API based on jQuery JavaScript Library.
  *
- * @version 0.9.5 RC1
+ * @version 0.9.5 RC2
  * @link http://code.google.com/p/phpquery/
  * @link http://phpquery-library.blogspot.com/
  * @link http://jquery.com/
@@ -31,6 +31,11 @@ require_once(dirname(__FILE__).'/phpQuery/compat/mbstring.php');
  * @package phpQuery
  */
 abstract class phpQuery {
+	/**
+	 * XXX: Workaround for mbstring problems 
+	 * 
+	 * @var bool
+	 */
 	public static $mbstringSupport = true;
 	public static $debug = false;
 	public static $documents = array();

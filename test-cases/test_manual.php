@@ -263,13 +263,13 @@ phpQuery::newDocumentXHTML($XHTML)
 // 										 ))));
 
 // http://code.google.com/p/phpquery/issues/detail?id=102
-$doc = phpQuery::newDocumentFileHTML('http://www.google.de'); 
-//$doc = phpQuery::newDocument('');
-$images = $doc['img']->dump();
-
-$foo = 'aaa';
-var_dump(mb_ereg_match('^[\w|\||-]+$', $foo) || $foo == '*');
-var_dump(preg_match('@^[\w|\||-]+$@', $foo) || $foo == '*');
+// $doc = phpQuery::newDocumentFileHTML('http://www.google.de'); 
+// //$doc = phpQuery::newDocument('');
+// $images = $doc['img']->dump();
+// 
+// $foo = 'aaa';
+// var_dump(mb_ereg_match('^[\w|\||-]+$', $foo) || $foo == '*');
+// var_dump(preg_match('@^[\w|\||-]+$@', $foo) || $foo == '*');
 
 // http://code.google.com/p/phpquery/issues/detail?id=67
 //$doc = phpQuery::newDocumentXML("<node1/><node2/>");
@@ -280,3 +280,7 @@ var_dump(preg_match('@^[\w|\||-]+$@', $foo) || $foo == '*');
 //$doc['node1']->data('foo.bar', 'bar');
 //var_dump($doc['node1']->data('foo.bar'));
 //var_dump(phpQuery::$documents[$doc->getDocumentID()]->data);
+
+// xhtml fragments
+$doc = phpQuery::newDocumentXHTML("<p><br/></p>");
+print $doc;

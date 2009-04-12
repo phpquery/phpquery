@@ -1,4 +1,8 @@
 <?php
+interface ICallbackNamed {
+	function hasName();
+	function getName();
+}
 /**
  * Callback class implementing ParamStructures, pattern similar to Currying.
  *
@@ -102,10 +106,6 @@ class CallbackReturnValue extends Callback
 	public function hasName() {
 		return isset($this->name) && $this->name;
 	}
-}
-interface ICallbackNamed {
-	function hasName();
-	function getName();
 }
 /**
  * CallbackParameterToReference can be used when we don't really want a callback,

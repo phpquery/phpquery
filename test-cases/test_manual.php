@@ -1,7 +1,7 @@
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <?php
 require_once('../phpQuery/phpQuery.php');
-phpQuery::$debug = 2;
+//phpQuery::$debug = 2;
 phpQuery::plugin('Scripts');
 
 
@@ -282,5 +282,20 @@ phpQuery::newDocumentXHTML($XHTML)
 //var_dump(phpQuery::$documents[$doc->getDocumentID()]->data);
 
 // xhtml fragments
-$doc = phpQuery::newDocumentXHTML("<p><br/></p>");
-print $doc;
+//$doc = phpQuery::newDocumentXHTML("<p><br/></p>");
+//print $doc;
+
+$doc = phpQuery::newDocument('<div id="content"></div><div id="content"></div>');
+//$content_string = str_repeat('a', 99988);
+$content_string = str_repeat(str_repeat('a', 350)."\n", 350);
+//var_dump(strlen($content_string));
+?><pre class='1'><?php
+//print $content_string;
+?></pre><?php
+pq('#content')->php('echo $content_string;');
+//pq('#content')->php('echo '.var_export($content_string, true));
+$doc->dumpTree();
+?><pre class='2'><?php
+var_dump($doc->php());
+?></pre><?php
+eval('?>'.$doc->php()); 

@@ -705,7 +705,7 @@ abstract class phpQuery {
 		}
 		// JSONP
 		$jsre = "/=\\?(&|$)/";
-		if ($options['dataType'] == 'jsonp') {
+		if (isset($options['dataType']) && $options['dataType'] == 'jsonp') {
 			$jsonpCallbackParam = $options['jsonp']
 				? $options['jsonp'] : 'callback';
 			if (strtolower($options['type']) == 'get') {
@@ -726,7 +726,7 @@ abstract class phpQuery {
 			}
 			$options['dataType'] = 'json';
 		}
-		if ($options['dataType'] == 'json') {
+		if (isset($options['dataType']) && $options['dataType'] == 'json') {
 			$jsonpCallback = 'json_'.md5(microtime());
 			$jsonpData = $jsonpUrl = false;
 			if ($options['data']) {
@@ -835,11 +835,11 @@ abstract class phpQuery {
 //		return new phpQueryAjaxResponse($response, $domId);
 	}
 	protected static function httpData($data, $type, $options) {
-		if ($options['dataFilter'])
+		if (isset($options['dataFilter']) && $options['dataFilter'])
 			$data = self::callbackRun($options['dataFilter'], array($data, $type));
 		if (is_string($data)) {
 			if ($type == "json") {
-				if ($options['_jsonp']) {
+				if (isset($options['_jsonp']) && $options['_jsonp']) {
 					$data = preg_replace('/^\s*\w+\((.*)\)\s*$/s', '$1', $data);
 				}
 				$data = self::parseJSON($data);

@@ -25,7 +25,7 @@ $testResult = array(
 $tests = array(
 	'functionCallback',
 	array('callbackClass', 'staticMethodCallback'),
-	array('callbackClass', 'methodCallback')
+	array(new callbackClass, 'methodCallback')
 );
 foreach($tests as $test) {
 	$result = phpQuery::newDocumentFile('test.html')

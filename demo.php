@@ -26,14 +26,14 @@ $doc['ul > li']
 // save it anywhere in the chain
 		->toReference($li);
 
-// SELECT IT
+// SELECT DOCUMENT
 // pq(); is using selected document as default
 phpQuery::selectDocument($doc);
-// documents are selected when created, iterated or by above method
+// documents are selected when created or by above method
 // query all unordered lists in last selected document
 $ul = pq('ul')->insertAfter('div');
 
-// INTERATE IT
+// ITERATE IT
 // all direct LIs from $ul
 foreach($ul['> li'] as $li) {
 	// iteration returns PLAIN dom nodes, NOT phpQuery objects

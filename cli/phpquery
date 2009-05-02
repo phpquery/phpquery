@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 if (!isset($argv[1]) || $argv[1] == 'help' || $argv[1] == '--help' || $argv[1] == '-h')
 	die("Usage: 

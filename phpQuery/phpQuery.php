@@ -94,6 +94,8 @@ abstract class phpQuery {
 		'data' => null,
 		'username' => null,
 		'password' => null,
+		'dataType' => null,
+		'ifModified' => null,
 		'accepts' => array(
 			'xml' => "application/xml, text/xml",
 			'html' => "text/html",

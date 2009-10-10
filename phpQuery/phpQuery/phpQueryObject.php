@@ -1329,7 +1329,7 @@ class phpQueryObject
 			if (extension_loaded('mbstring') && phpQuery::$mbstringSupport)
 				mb_ereg('^([^ ]+) (.*)$', $url, $matches);
 			else
-				preg_match('^([^ ]+) (.*)$', $url, $matches);
+				preg_match('@^([^ ]+) (.*)$@', $url, $matches);
 			$url = $matches[1];
 			$selector = $matches[2];
 			// FIXME this sucks, pass as callback param

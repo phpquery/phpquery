@@ -287,7 +287,7 @@ class DOMDocumentWrapper {
 		$requestedCharset = strtoupper($requestedCharset);
 		$documentCharset = strtoupper($documentCharset);
 		phpQuery::debug("DOC: $documentCharset REQ: $requestedCharset");
-		if ($requestedCharset && $documentCharset && $requestedCharset !== $documentCharset) {
+		/*if ($requestedCharset && $documentCharset && $requestedCharset !== $documentCharset) {
 			phpQuery::debug("CHARSET CONVERT");
 			// Document Encoding Conversion
 			// http://code.google.com/p/phpquery/issues/detail?id=86
@@ -310,16 +310,16 @@ class DOMDocumentWrapper {
 			} else {
 				phpQuery::debug("TODO: charset conversion without mbstring...");
 			}
-		}
+		}*/
 		$return = false;
 		if ($this->isDocumentFragment) {
 			phpQuery::debug("Full markup load (HTML), DocumentFragment detected, using charset '$charset'");
 			$return = $this->documentFragmentLoadMarkup($this, $charset, $markup);
 		} else {
-			if ($addDocumentCharset) {
+			//if ($addDocumentCharset) {
 				phpQuery::debug("Full markup load (HTML), appending charset: '$charset'");
 				$markup = $this->charsetAppendToHTML($markup, $charset);
-			}
+			//}
 			phpQuery::debug("Full markup load (HTML), documentCreate('$charset')");
 			$this->documentCreate($charset);
 			$return = phpQuery::$debug === 2
@@ -1404,7 +1404,7 @@ class phpQueryObject
 	 */
 	protected function isRegexp($pattern) {
 		return in_array(
-			$pattern[ mb_strlen($pattern)-1 ],
+			$pattern[ strlen($pattern)-1 ],
 			array('^','*','$')
 		);
 	}
@@ -1417,9 +1417,9 @@ class phpQueryObject
 	 * @access private
 	 */
 	protected function isChar($char) {
-		return extension_loaded('mbstring') && phpQuery::$mbstringSupport
+		return /*extension_loaded('mbstring') && phpQuery::$mbstringSupport
 			? mb_eregi('\w', $char)
-			: preg_match('@\w@', $char);
+			: */preg_match('@\w@', $char);
 	}
 	/**
 	 * @access private
@@ -1439,7 +1439,7 @@ class phpQueryObject
 		$specialChars = array('>',' ');
 //		$specialCharsMapping = array('/' => '>');
 		$specialCharsMapping = array();
-		$strlen = mb_strlen($query);
+		$strlen = strlen($query);
 		$classChars = array('.', '-');
 		$pseudoChars = array('-');
 		$tagChars = array('*', '|', '-');
@@ -1447,7 +1447,7 @@ class phpQueryObject
 		// http://code.google.com/p/phpquery/issues/detail?id=76
 		$_query = array();
 		for ($i=0; $i<$strlen; $i++)
-			$_query[] = mb_substr($query, $i, 1);
+			$_query[] = substr($query, $i, 1);
 		$query = $_query;
 		// it works, but i dont like it...
 		$i = 0;
@@ -1700,7 +1700,7 @@ class phpQueryObject
 	 */
 	protected function matchClasses($class, $node) {
 		// multi-class
-		if ( mb_strpos($class, '.', 1)) {
+		if ( strpos($class, '.', 1)) {
 			$classes = explode('.', substr($class, 1));
 			$classesCount = count( $classes );
 			$nodeClasses = explode(' ', $node->getAttribute('class') );
@@ -1830,13 +1830,13 @@ class phpQueryObject
 			$delimiterBefore = false;
 			foreach($selector as $s) {
 				// TAG
-				$isTag = extension_loaded('mbstring') && phpQuery::$mbstringSupport
+				$isTag = /*extension_loaded('mbstring') && phpQuery::$mbstringSupport
 					? mb_ereg_match('^[\w|\||-]+$', $s) || $s == '*'
-					: preg_match('@^[\w|\||-]+$@', $s) || $s == '*';
+					: */preg_match('@^[\w|\||-]+$@', $s) || $s == '*';
 				if ($isTag) {
 					if ($this->isXML()) {
 						// namespace support
-						if (mb_strpos($s, '|') !== false) {
+						if (strpos($s, '|') !== false) {
 							$ns = $tag = null;
 							list($ns, $tag) = explode('|', $s);
 							$XQuery .= "$ns:$tag";
@@ -1861,7 +1861,7 @@ class phpQueryObject
 					$attr = trim($s, '][');
 					$execute = false;
 					// attr with specifed value
-					if (mb_strpos($s, '=')) {
+					if (strpos($s, '=')) {
 						$value = null;
 						list($attr, $value) = explode('=', $attr);
 						$value = trim($value, "'\"");
@@ -1967,7 +1967,7 @@ class phpQueryObject
 	protected function pseudoClasses($class) {
 		// TODO clean args parsing ?
 		$class = ltrim($class, ':');
-		$haveArgs = mb_strpos($class, '(');
+		$haveArgs = strpos($class, '(');
 		if ($haveArgs !== false) {
 			$args = substr($class, $haveArgs+1, -1);
 			$class = substr($class, 0, $haveArgs);
@@ -2016,7 +2016,7 @@ class phpQueryObject
 				$text = trim($args, "\"'");
 				$stack = array();
 				foreach($this->elements as $node) {
-					if (mb_stripos($node->textContent, $text) === false)
+					if (stripos($node->textContent, $text) === false)
 						continue;
 					$stack[] = $node;
 				}
@@ -2168,13 +2168,13 @@ class phpQueryObject
 								return null;'),
 						new CallbackParam(), $param
 					);
-				else if (mb_strlen($param) > 1 && $param{1} == 'n')
+				else if (strlen($param) > 1 && $param{1} == 'n')
 					// an+b
 					$mapped = $this->map(
 						create_function('$node, $param',
 							'$prevs = pq($node)->prevAll()->size();
 							$index = 1+$prevs;
-							$b = mb_strlen($param) > 3
+							$b = strlen($param) > 3
 								? $param{3}
 								: 0;
 							$a = $param{0};
@@ -2314,7 +2314,7 @@ class phpQueryObject
 						// all besides DOMElement
 						if ( $s[0] == '[') {
 							$attr = trim($s, '[]');
-							if ( mb_strpos($attr, '=')) {
+							if ( strpos($attr, '=')) {
 								list( $attr, $val ) = explode('=', $attr);
 								if ($attr == 'nodeType' && $node->nodeType != $val)
 									$break = true;
@@ -2335,7 +2335,7 @@ class phpQueryObject
 						} else if ( $s[0] == '[') {
 							// strip side brackets
 							$attr = trim($s, '[]');
-							if (mb_strpos($attr, '=')) {
+							if (strpos($attr, '=')) {
 								list($attr, $val) = explode('=', $attr);
 								$val = self::unQuote($val);
 								if ($attr == 'nodeType') {
@@ -2361,9 +2361,9 @@ class phpQueryObject
 									}
 									// cut last character
 									$attr = substr($attr, 0, -1);
-									$isMatch = extension_loaded('mbstring') && phpQuery::$mbstringSupport
+									$isMatch = /*extension_loaded('mbstring') && phpQuery::$mbstringSupport
 										? mb_ereg_match($pattern, $node->getAttribute($attr))
-										: preg_match("@{$pattern}@", $node->getAttribute($attr));
+										: */preg_match("@{$pattern}@", $node->getAttribute($attr));
 									if (! $isMatch)
 										$break = true;
 								} else if ($node->getAttribute($attr) != $val)
@@ -2440,11 +2440,11 @@ class phpQueryObject
 			$callback = $data;
 			$data = null;
 		}
-		if (mb_strpos($url, ' ') !== false) {
+		if (strpos($url, ' ') !== false) {
 			$matches = null;
-			if (extension_loaded('mbstring') && phpQuery::$mbstringSupport)
+			/*if (extension_loaded('mbstring') && phpQuery::$mbstringSupport)
 				mb_ereg('^([^ ]+) (.*)$', $url, $matches);
-			else
+			else*/
 				preg_match('^([^ ]+) (.*)$', $url, $matches);
 			$url = $matches[1];
 			$selector = $matches[2];
@@ -3851,11 +3851,11 @@ class phpQueryObject
 							: in_array($option->attr('value'), $_val);
 //						$optionValue = $option->attr('value');
 //						$optionText = $option->text();
-//						$optionTextLenght = mb_strlen($optionText);
+//						$optionTextLenght = strlen($optionText);
 //						foreach($_val as $v)
 //							if ($optionValue == $v)
 //								$selected = true;
-//							else if ($optionText == $v && $optionTextLenght == mb_strlen($v))
+//							else if ($optionText == $v && $optionTextLenght == strlen($v))
 //								$selected = true;
 						if ($selected)
 							$option->attr('selected', 'selected');

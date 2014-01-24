@@ -1,0 +1,18 @@
+{
+    "name": "punkve/php-query",
+    "description": "This is phpQuery, a PHP port of jQuery selectors, super useful for DOM traversal and functional testing.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tobiasz Cudnik",
+            "email": "obiasz.cudnik@gmail.com",
+        },
+        {
+            "name": "RTom Boutell",
+            "email": "tom@punkave.com"
+        }
+    ],
+    "autoload": {
+        "files": [ "phpQuery/phpQuery.php" ]
+    }
+}

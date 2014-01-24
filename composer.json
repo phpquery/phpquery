@@ -1,5 +1,5 @@
 {
-    "name": "punkve/php-query",
+    "name": "punkave/php-query",
     "description": "This is phpQuery, a PHP port of jQuery selectors, super useful for DOM traversal and functional testing.",
     "license": "MIT",
     "authors": [

@@ -1,6 +1,11 @@
-h1. phpquery
+h1. phpQuery - pq();
 
-This joint aims to gather all/most forks and contrib code into one coherent and complete repo.
+phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library.
+Library is written in PHP5 and provides additional Command Line Interface (CLI). 
+
+h2. This Repo..
+
+..aims to gather all/most forks and contrib code into one coherent and complete repo.
 
 h3. State
 
@@ -8,7 +13,7 @@ h3. State
 
 h3. Code Base
 
-The base code was pulled from the original SVN sources @ https://code.google.com/p/phpquery/ , git tags applied to best of my knowledge. The original authors's git repo can be found here: https://github.com/TobiaszCudnik/phpquery
+The base code was pulled from the original SVN sources @ https://code.google.com/p/phpquery/ to preserve the original author's commit history. Tags were applied to best of my knowledge. The original authors's git repo can be found here: https://github.com/TobiaszCudnik/phpquery
 
 h3. Contribs & forks
 
@@ -17,3 +22,7 @@ h3. Contribs & forks
 * https://github.com/Londeren/PHPQuery
 * https://github.com/Virtuvia/phpQuery
 
+h3. Credits
+
+PHPQuery is the work of Tobiasz Cudnik (https://code.google.com/p/phpquery/ & https://github.com/TobiaszCudnik/phpquery)
+Additional Code: see "Contribs & forks" and/or commit log.

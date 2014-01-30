@@ -4,12 +4,12 @@ This joint aims to gather all/most forks and contrib code into one coherent and 
 
 h3. State
 
-Initial setup.. branches, tags, contrib branches.. no merges/picks done so far.
+30.1.2014: Initial setup.. branches, tags, contrib branches.. no merges/picks done so far.
 
 h3. Code Base
 
-The base code was pulled from the original SVN sources @ "$":https://code.google.com/p/phpquery/ , git tags applied to best of my knowledge.
-The original authors's git repo can be found here: "$":https://github.com/TobiaszCudnik/phpquery
+The base code was pulled from the original SVN sources @ https://code.google.com/p/phpquery/ , git tags applied to best of my knowledge.
+The original authors's git repo can be found here: https://github.com/TobiaszCudnik/phpquery
 
 h3. Contribs & forks
 

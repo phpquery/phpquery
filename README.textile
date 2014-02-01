@@ -7,22 +7,26 @@ h2. This Repo..
 
 ..aims to gather all/most forks and contrib code into one coherent and complete repo.
 
-h3. State
+h4. Maintainers wanted
+
+I don't plan to take role as a maintainer in the medium/long run.. i'm just a (fairly new) user of phpquery who was perplexed by all the mess - scattered forks and edits - out there ;). Thus: whoever wishes to take an active role as maintainer: feel free to contact me, and i'll hand over the ownership of this repo.
+
+h4. State
 
 30.1.2014: Initial setup.. branches, tags, contrib branches.. no merges/picks done so far.
 
-h3. Code Base
+h2. Code Base
 
 The base code was pulled from the original SVN sources @ https://code.google.com/p/phpquery/ to preserve the original author's commit history. Tags were applied to best of my knowledge. The original authors's git repo can be found here: https://github.com/TobiaszCudnik/phpquery
 
-h3. Contribs & forks
+h4. Contribs & forks
 
 * https://github.com/coderkk/phpQuery
 * https://github.com/falexandrou/phpQuery
 * https://github.com/Londeren/PHPQuery
 * https://github.com/Virtuvia/phpQuery
 
-h3. Credits
+h4. Credits
 
 PHPQuery is the work of Tobiasz Cudnik (https://code.google.com/p/phpquery/ & https://github.com/TobiaszCudnik/phpquery)
 Additional Code: see "Contribs & forks" and/or commit log.

@@ -312,8 +312,8 @@ class phpQueryObject
 		// clean spaces
 		// TODO include this inside parsing ?
 		$query = trim(
-			preg_replace('@\s+@', ' ',
-				preg_replace('@\s*(>|\\+|~)\s*@', '\\1', $query)
+			preg_replace('@\s+@u', ' ',
+				preg_replace('@\s*(>|\\+|~)\s*@u', '\\1', $query)
 			)
 		);
 		$queries = array(array());

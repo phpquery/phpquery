@@ -311,9 +311,10 @@ class phpQueryObject
 	protected function parseSelector($query) {
 		// clean spaces
 		// TODO include this inside parsing ?
+		$modifier = strtolower(str_replace('-', '', $this->charset)) == 'utf8' ? 'u' : '';
 		$query = trim(
-			preg_replace('@\s+@u', ' ',
-				preg_replace('@\s*(>|\\+|~)\s*@u', '\\1', $query)
+			preg_replace('@\s+@' . $modifier, ' ',
+				preg_replace('@\s*(>|\\+|~)\s*@' . $modifier, '\\1', $query)
 			)
 		);
 		$queries = array(array());

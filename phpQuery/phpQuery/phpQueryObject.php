@@ -967,18 +967,16 @@ class phpQueryObject
 				)->elements;
 			break;
 			case 'parent':
-				$this->elements = $this->map(
-					create_function('$node', '
-						return $node instanceof DOMELEMENT && $node->childNodes->length
-							? $node : null;')
-				)->elements;
+				$this->elements = $this->map(function($node) {
+                    return $node instanceof DOMELEMENT && $node->childNodes->length
+                        ? $node : null;
+                })->elements;
 			break;
 			case 'empty':
-				$this->elements = $this->map(
-					create_function('$node', '
-						return $node instanceof DOMELEMENT && $node->childNodes->length
-							? null : $node;')
-				)->elements;
+				$this->elements = $this->map(function($node) {
+                    return $node instanceof DOMELEMENT && $node->childNodes->length
+                        ? null : $node;
+                })->elements;
 			break;
 			case 'disabled':
 			case 'selected':
@@ -989,123 +987,117 @@ class phpQueryObject
 				)->elements;
 			break;
 			case 'enabled':
-				$this->elements = $this->map(
-					create_function('$node', '
-						return pq($node)->not(":disabled") ? $node : null;')
-				)->elements;
+				$this->elements = $this->map(function($node) {
+                    return pq($node)->not(":disabled") ? $node : null;
+                })->elements;
 			break;
 			case 'header':
-				$this->elements = $this->map(
-					create_function('$node',
-						'$isHeader = isset($node->tagName) && in_array($node->tagName, array(
+				$this->elements = $this->map(function($node) {
+                    $isHeader = isset($node->tagName) && in_array($node->tagName, array(
 							"h1", "h2", "h3", "h4", "h5", "h6", "h7"
 						));
 						return $isHeader
 							? $node
-							: null;')
-				)->elements;
-//				$this->elements = $this->map(
-//					create_function('$node', '$node = pq($node);
-//						return $node->is("h1")
-//							|| $node->is("h2")
-//							|| $node->is("h3")
-//							|| $node->is("h4")
-//							|| $node->is("h5")
-//							|| $node->is("h6")
-//							|| $node->is("h7")
-//							? $node
-//							: null;')
-//				)->elements;
+							: null;
+                })->elements;
+//				$this->elements = $this->map(function($node) {
+//                  $node = pq($node);
+//					return $node->is("h1")
+//						|| $node->is("h2")
+//						|| $node->is("h3")
+//						|| $node->is("h4")
+//						|| $node->is("h5")
+//						|| $node->is("h6")
+//						|| $node->is("h7")
+//						? $node
+//						: null;
+//              })->elements;
 			break;
 			case 'only-child':
-				$this->elements = $this->map(
-					create_function('$node',
-						'return pq($node)->siblings()->size() == 0 ? $node : null;')
-				)->elements;
+				$this->elements = $this->map(function($node) {
+                    return pq($node)->siblings()->size() == 0 ? $node : null;
+                })->elements;
 			break;
 			case 'first-child':
-				$this->elements = $this->map(
-					create_function('$node', 'return pq($node)->prevAll()->size() == 0 ? $node : null;')
-				)->elements;
+				$this->elements = $this->map(function($node) {
+                    return pq($node)->prevAll()->size() == 0 ? $node : null;
+                })->elements;
 			break;
 			case 'last-child':
-				$this->elements = $this->map(
-					create_function('$node', 'return pq($node)->nextAll()->size() == 0 ? $node : null;')
-				)->elements;
+				$this->elements = $this->map(function($node) {
+                    return pq($node)->nextAll()->size() == 0 ? $node : null;
+                })->elements;
 			break;
 			case 'nth-child':
 				$param = trim($args, "\"'");
 				if (! $param)
 					break;
 					// nth-child(n+b) to nth-child(1n+b)
-				if ($param{0} == 'n')
+				if ($param[0] == 'n')
 					$param = '1'.$param;
 				// :nth-child(index/even/odd/equation)
 				if ($param == 'even' || $param == 'odd')
-					$mapped = $this->map(
-						create_function('$node, $param',
-							'$index = pq($node)->prevAll()->size()+1;
-							if ($param == "even" && ($index%2) == 0)
-								return $node;
-							else if ($param == "odd" && $index%2 == 1)
-								return $node;
-							else
-								return null;'),
-						new CallbackParam(), $param
-					);
-				else if (mb_strlen($param) > 1 && $param{1} == 'n')
+					$mapped = $this->map(function($node, $param) {
+                            $index = intval(pq($node)->prevAll()->size())+1;
+                            if ($param == "even" && ($index%2) == 0)
+                                return $node;
+                            else if ($param == "odd" && $index%2 == 1)
+                                return $node;
+                            else
+                                return null;
+                        },
+                        new CallbackParam(), $param);
+				else if (mb_strlen($param) > 1 && $param[1] == 'n')
 					// an+b
-					$mapped = $this->map(
-						create_function('$node, $param',
-							'$prevs = pq($node)->prevAll()->size();
-							$index = 1+$prevs;
-							$b = mb_strlen($param) > 3
-								? $param{3}
-								: 0;
-							$a = $param{0};
-							if ($b && $param{2} == "-")
-								$b = -$b;
-							if ($a > 0) {
-								return ($index-$b)%$a == 0
-									? $node
-									: null;
-								phpQuery::debug($a."*".floor($index/$a)."+$b-1 == ".($a*floor($index/$a)+$b-1)." ?= $prevs");
-								return $a*floor($index/$a)+$b-1 == $prevs
-										? $node
-										: null;
-							} else if ($a == 0)
-								return $index == $b
-										? $node
-										: null;
-							else
-								// negative value
-								return $index <= $b
-										? $node
-										: null;
-//							if (! $b)
-//								return $index%$a == 0
-//									? $node
-//									: null;
-//							else
-//								return ($index-$b)%$a == 0
-//									? $node
-//									: null;
-							'),
-						new CallbackParam(), $param
-					);
+					$mapped = $this->map(function($node, $param) {
+                            $prevs = intval(pq($node)->prevAll()->size());
+                            $index = 1+$prevs;
+                            $b = mb_strlen($param) > 3
+                                ? $param[3]
+                                : 0;
+                            $a = $param[0];
+                            if ($b && $param[2] == "-")
+                                $b = -$b;
+                            if ($a > 0) {
+                                return ($index-$b)%$a == 0
+                                    ? $node
+                                    : null;
+                                phpQuery::debug($a."*".floor($index/$a)."+$b-1 == ".($a*floor($index/$a)+$b-1)." ?= $prevs");
+                                return $a*floor($index/$a)+$b-1 == $prevs
+                                    ? $node
+                                    : null;
+                            } else if ($a == 0)
+                                return $index == $b
+                                    ? $node
+                                    : null;
+                            else
+                                // negative value
+                                return $index <= $b
+                                    ? $node
+                                    : null;
+    //							if (! $b)
+    //								return $index%$a == 0
+    //									? $node
+    //									: null;
+    //							else
+    //								return ($index-$b)%$a == 0
+    //									? $node
+    //									: null;
+                        },
+                        new CallbackParam(), $param);
 				else
 					// index
-					$mapped = $this->map(
-						create_function('$node, $index',
-							'$prevs = pq($node)->prevAll()->size();
-							if ($prevs && $prevs == $index-1)
-								return $node;
-							else if (! $prevs && $index == 1)
-								return $node;
-							else
-								return null;'),
-						new CallbackParam(), $param
-					);
+					$mapped = $this->map(function($node, $index) {
+                            $prevs = pq($node)->prevAll()->size();
+                            if ($prevs && $prevs == $index-1)
+                                return $node;
+                            else if (! $prevs && $index == 1)
+                                return $node;
+                            else
+                                return null;
+                        },
+                        new CallbackParam(), $param);
+
 				$this->elements = $mapped->elements;
 			break;
 			default:
@@ -1879,7 +1871,7 @@ class phpQueryObject
 	}
 	/**
 	 * Enter description here...
-	 * 
+	 *
 	 * @param $code
 	 * @return unknown_type
 	 */
@@ -1890,7 +1882,7 @@ class phpQueryObject
 	}
 	/**
 	 * Enter description here...
-	 * 
+	 *
 	 * @param $code
 	 * @return unknown_type
 	 */
@@ -2919,7 +2911,7 @@ class phpQueryObject
 	}
 	/**
 	 * Enter description here...
-	 * 
+	 *
 	 * @param <type> $key
 	 * @param <type> $value
 	 */
@@ -2936,7 +2928,7 @@ class phpQueryObject
 	}
 	/**
 	 * Enter description here...
-	 * 
+	 *
 	 * @param <type> $key
 	 */
 	public function removeData($key) {
